@@ -34,6 +34,8 @@ Route::get('/detailhost/{hostid}', 'HostController@show');
 Route::get('/hostall/{id}', 'HostController@showhost');
 Route::post('/checkpath', 'ConfigController@check');
 Route::post('/adddesc', 'DescriptionController@addDescription');
+Route::post('/editdesc', 'DescriptionController@editDescription');
+Route::get('/deldesc/{id}', 'DescriptionController@deleteDescription');
 
 Route::get('/testssh', function () {
   return SSH::into('gitlab2')->run(array(

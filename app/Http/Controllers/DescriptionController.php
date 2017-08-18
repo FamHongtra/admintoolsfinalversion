@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Description;
 use Redirect;
+use DB;
 
 class DescriptionController extends Controller
 {
@@ -25,14 +26,25 @@ class DescriptionController extends Controller
       return Redirect::back();
     }
 
-    public function updateDescription(Request $request)
+    public function editDescription(Request $request)
     {
       //
+      $serverid = $request->input('serverid');
+      $descid = $request->input('descid');
+      $descname = $request->input('descname');
+      $descdetail = $request->input('descdetail');
+
+      DB::table('descriptions')->where('id', $descid)->update(['descname' => $descname , 'descdetail' => $descdetail]);
+      // return $descid.' '.$descname.' '.$descdetail ;
+      return Redirect::back();
+
     }
 
-    public function removeDescription($id)
+    public function deleteDescription($id)
     {
       //
+      DB::table('descriptions')->where('id', $id)->delete();
+      return Redirect::back();
     }
 
     public function listAllDescriptions($id)

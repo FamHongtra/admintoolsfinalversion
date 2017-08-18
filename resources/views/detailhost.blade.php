@@ -276,8 +276,8 @@
       </div>
       <div class="col s4">
         <div class="row">
-          <div class="col s12"><span style="font-size: 250%">About Host</span><hr>
-            <a class="modal-trigger" href="#modal2"><i class="material-icons left">add</i>add host description</a><br><br>
+          <div class="col s12"><span style="font-size: 250%; color:#607d8b">About Host</span><hr style="color: #607d8b">
+            <a class="modal-trigger" href="#modal2" style="color:#009688"><i class="material-icons left">add</i>add host description</a><br><br>
             <!-- <div class="card-panel teal"> -->
 
             <?php
@@ -290,11 +290,87 @@
               @foreach($descs as $indexKey=>$desc)
 
               <li>
-                <div class="collapsible-header"><i class="material-icons">dvr</i>{{$desc->descname}}</div>
-
+                <div class="collapsible-header"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
                 <div class="collapsible-body"><span class="break-word"><?php echo nl2br($desc->descdetail);?></span></div>
+                <a href="#modal4" class="modal-trigger" id="clickmodal4" hidden=""></a>
               </li>
 
+              <div id="edit{{$desc->id}}" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                  <br>
+                  <!-- <h5>Add Host Description</h5> -->
+                  <!-- <p>You should add host by using rsa key for secure</p> -->
+                  <!-- <hr class="style-four"><br> -->
+                  <div class="row">
+                    <div class="col s1"></div>
+                    <div class="col s10">
+                      <br>
+                      <div id="byrsakey" class="row" style="display:block;">
+                        <form action="{{url('editdesc')}}" id="editdescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                          <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="serverid" value="" id="serverid">
+                          <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
+                          <div class="row">
+                            <div class="input-field col s2"></div>
+                            <div class="input-field  col s8">
+                              <i class="material-icons prefix">description</i>
+                              <input id="icon_prefix" type="text" class="validate" name="descname" value="{{$desc->descname}}" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
+                              <label for="icon_prefix">Description Name</label>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="input-field col s2"></div>
+                            <div class="input-field col s8">
+                              <i class="material-icons prefix">mode_edit</i>
+                              <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">{{$desc->descdetail}}</textarea>
+                              <label for="icon_prefix2">Description Detail</label>
+                            </div>
+                          </div>
+                          <div class="row" align="center">
+                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="editDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Save Changes</button>
+                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal" ><i class="material-icons  left">close</i>Cancle</button>
+                          </div>
+                          <div id="errormsg2" class="row" align="center" style="display:none">
+                            <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="delete{{$desc->id}}" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                  <br>
+                  <!-- <h5>Add Host Description</h5> -->
+                  <!-- <p>You should add host by using rsa key for secure</p> -->
+                  <!-- <hr class="style-four"><br> -->
+                  <div class="row">
+                    <div class="col s1"></div>
+                    <div class="col s10">
+                      <br><br><br>
+                      <div id="byrsakey" class="row" style="display:block;">
+
+                          <div class="row">
+                            <div class="input-field col s2"></div>
+                            <div class="input-field  col s8" align="center">
+                              <span><p style="font-size:25px"> <i class="material-icons">error_outline</i> Do you want to delete this description?</p></span>
+                            </div><
+                          </div><br>
+                          <div class="row" align="center">
+                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onclick="location.href='{{ url('deldesc/'.$desc->id) }}'" name="button"><i class="material-icons  left">done</i>Ok</button>
+                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
+                          </div>
+                          <div id="errormsg2" class="row" align="center" style="display:none">
+                            <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               @endforeach
 
               <!-- <li>
@@ -324,6 +400,8 @@
 
 
   <!-- Modal Structure -->
+
+  <!-- add config path -->
   <div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
       <br>
@@ -369,6 +447,7 @@
     </div>
   </div>
 
+  <!-- add description -->
   <div id="modal2" class="modal modal-fixed-footer">
     <div class="modal-content">
       <br>
@@ -394,7 +473,7 @@
               <div class="row">
                 <div class="input-field col s2"></div>
                 <div class="input-field col s8">
-                  <i class="material-icons prefix">mode_edit</i>
+                  <i class="material-icons prefix">line_weight</i>
                   <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea"></textarea>
                   <label for="icon_prefix2">Description Detail</label>
                 </div>
@@ -411,6 +490,7 @@
       </div>
     </div>
   </div>
+
   <div id="status"  style="display:none">
 
     <?php
@@ -433,6 +513,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 <script type="text/javascript">
 //dialogs
+
+
 
 function addDesc(){
 
@@ -460,6 +542,34 @@ function addDesc(){
     document.getElementById('errormsg2').style.display = "block" ;
   }
 
+}
+
+function editDesc(id){
+  // alert("Hello"+id);
+
+  $idform=document.getElementById('editdescform'+id);
+
+  $server = document.getElementById('server').textContent ;
+  $idform.elements.namedItem('serverid').value = $server;
+
+
+  $formdescname = $idform.elements.namedItem("descname").value;
+
+  $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+  $resvaliddescname = $descnamepatt.test($formdescname);
+
+  $formdescdetail = $idform.elements.namedItem("descdetail").value;
+
+  if( ($formdescname != "") && ($formdescdetail != "")){
+    if($resvaliddescname){
+      document.getElementById('errormsg2').style.display = "none" ;
+      $("#editdescform"+id).submit();
+    }else{
+      document.getElementById('errormsg2').style.display = "block" ;
+    }
+  }else{
+    document.getElementById('errormsg2').style.display = "block" ;
+  }
 
 }
 
