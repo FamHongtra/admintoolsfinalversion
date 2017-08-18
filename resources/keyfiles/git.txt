@@ -1,0 +1,11 @@
+if  [[  $filepath == "/etc/testpath/testpath.config" ]]
+then         clear
+              	echo "Please wait…"
+           		mkdir --p /etc/nanoad/tmp_repo/etc/testpath
+           		cp /etc/testpath/testpath.conf /etc/nanoad/tmp_repo/etc/testpath
+               	git --git-dir=/etc/nanoad/tmp_repo.git --work-tree=/etc/nanoad/tmp_repo add . &> /dev/null
+    git --git-dir=/etc/nanoad/tmp_repo.git --work-tree=/etc/nanoad/tmp_repo commit -m "$(date +%Y-%m-%d' '%H:%M:%S)" &> /dev/null
+git --git-dir=/etc/nanoad/tmp_repo.git --work-tree=/etc/nanoad/tmp_repo push -u backupversion master &> /dev/null
+clear
+echo "Done! Your configuration file was saved."
+fi
