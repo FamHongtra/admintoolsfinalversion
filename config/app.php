@@ -178,6 +178,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         // Add-on for project
         Collective\Remote\RemoteServiceProvider::class,
+        // Gitlab API
+        Vinkla\GitLab\GitLabServiceProvider::class,
     ],
 
     /*
@@ -228,6 +230,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         // Add-on for project
         'SSH' => Collective\Remote\RemoteFacade::class,
+        'GitLab' => Vinkla\GitLab\Facades\GitLab::class,
     ],
 
 ];

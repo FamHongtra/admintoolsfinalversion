@@ -11,6 +11,8 @@
 |
 */
 
+
+
 Route::get('/', function () {
   return view('welcome');
 });
@@ -27,6 +29,7 @@ Route::get('/showhost', function () {
   //
   return view('showhost',$data);
 });
+
 Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');
 // Route::post('/addhost', 'HostController@store');
@@ -35,7 +38,16 @@ Route::get('/hostall/{id}', 'HostController@showhost');
 Route::post('/checkpath', 'ConfigController@check');
 Route::post('/adddesc', 'DescriptionController@addDescription');
 Route::post('/editdesc', 'DescriptionController@editDescription');
-Route::get('/deldesc/{id}', 'DescriptionController@deleteDescription');
+Route::post('/deldesc', 'DescriptionController@deleteDescription');
+
+Route::get('/testapi', function () {
+
+
+  $projects = GitLab::api('projects')->all();
+
+  return view('welcome');
+});
+
 
 Route::get('/testssh', function () {
   return SSH::into('gitlab2')->run(array(

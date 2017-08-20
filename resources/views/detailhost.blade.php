@@ -237,7 +237,7 @@
               <div class="card-content white-text">
                 <div class="row">
                   <div class="col s9">
-                    <span class="card-title">Repository of Configuration</span>
+                    <span class="card-title">Repository of Configurations</span>
                   </div>
                   <div class="col s3" align="right">
                     <a class="modal-trigger waves-effect waves-light btn-large teal" href="#modal1"><i class="material-icons left">add</i>Add Config</a>
@@ -321,14 +321,14 @@
                           <div class="row">
                             <div class="input-field col s2"></div>
                             <div class="input-field col s8">
-                              <i class="material-icons prefix">mode_edit</i>
+                              <i class="material-icons prefix">line_weight</i>
                               <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">{{$desc->descdetail}}</textarea>
                               <label for="icon_prefix2">Description Detail</label>
                             </div>
                           </div>
                           <div class="row" align="center">
                             <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="editDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Save Changes</button>
-                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal" ><i class="material-icons  left">close</i>Cancle</button>
+                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss=  "modal" ><i class="material-icons  left">close</i>Cancle</button>
                           </div>
                           <div id="errormsg2" class="row" align="center" style="display:none">
                             <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
@@ -351,15 +351,19 @@
                     <div class="col s10">
                       <br><br><br>
                       <div id="byrsakey" class="row" style="display:block;">
+                        <form action="{{url('deldesc')}}" id="deldescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                          <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="serverid" value="" id="serverid">
+                          <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
 
                           <div class="row">
                             <div class="input-field col s2"></div>
                             <div class="input-field  col s8" align="center">
-                              <span><p style="font-size:25px"> <i class="material-icons">error_outline</i> Do you want to delete this description?</p></span>
-                            </div><
+                              <span><p style="font-size:25px"> <i class="material-icons">error_outline</i>Do you want to delete this description?</p></span>
+                            </div>
                           </div><br>
                           <div class="row" align="center">
-                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onclick="location.href='{{ url('deldesc/'.$desc->id) }}'" name="button"><i class="material-icons  left">done</i>Ok</button>
+                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
                             <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
                           </div>
                           <div id="errormsg2" class="row" align="center" style="display:none">
@@ -573,11 +577,25 @@ function editDesc(id){
 
 }
 
+function delDesc(id){
+  // alert("Hello"+id);
+
+  $idform=document.getElementById('deldescform'+id);
+
+  $server = document.getElementById('server').textContent ;
+  $idform.elements.namedItem('serverid').value = $server;
+
+  $("#deldescform"+id).submit();
+
+}
+
 function chkconfigname(){
 
 
   $idform=document.getElementById('hostform');
   $formpathname = $idform.elements.namedItem("pathname").value;
+  $server = document.getElementById('server').textContent ;
+  $idform.elements.namedItem('serverid').value = $server;
 
   $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
   $resvalidpathname = $pathnamepatt.test($formpathname);

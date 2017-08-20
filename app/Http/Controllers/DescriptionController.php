@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Description;
+use App\Host;
 use Redirect;
 use DB;
 
@@ -23,7 +24,8 @@ class DescriptionController extends Controller
       $obj->host_id = $serverid;
       $obj->save();
 
-      return Redirect::back();
+      $serverobj = Host::find($serverid);
+      return Redirect::back()->with('obj',$serverobj);
     }
 
     public function editDescription(Request $request)
@@ -36,15 +38,22 @@ class DescriptionController extends Controller
 
       DB::table('descriptions')->where('id', $descid)->update(['descname' => $descname , 'descdetail' => $descdetail]);
       // return $descid.' '.$descname.' '.$descdetail ;
-      return Redirect::back();
+
+      $serverobj = Host::find($serverid);
+      return Redirect::back()->with('obj',$serverobj);
 
     }
 
-    public function deleteDescription($id)
+    public function deleteDescription(Request $request)
     {
       //
-      DB::table('descriptions')->where('id', $id)->delete();
-      return Redirect::back();
+      $serverid = $request->input('serverid');
+      $descid = $request->input('descid');
+
+      DB::table('descriptions')->where('id', $descid)->delete();
+
+      $serverobj = Host::find($serverid);
+      return Redirect::back()->with('obj',$serverobj);
     }
 
     public function listAllDescriptions($id)
