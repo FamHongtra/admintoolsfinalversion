@@ -79,8 +79,11 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                  Hello
 
+                    Gitlab API <br>
+                    @foreach($projs as $proj)
+                      {{$proj['id']." ".$proj['http_url_to_repo']}} <br>
+                    @endforeach
                 </div>
 
                 <div class="links">

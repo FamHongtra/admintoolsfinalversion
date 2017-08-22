@@ -45,7 +45,7 @@ return [
             'keytext'   => '',
             'keyphrase' => '',
             'agent'     => '',
-            'timeout'   => 10,
+            'timeout'   => 120,
         ],
         //In progress
         'gitlab2' => [

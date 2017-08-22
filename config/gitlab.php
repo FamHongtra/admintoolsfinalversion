@@ -40,7 +40,9 @@ return [
     'connections' => [
 
         'main' => [
-            'token' => '3f-Byt_xvKMeJVpDHR4i',
+
+          // 'token' => 'Y4j5tRnMsaBpF7JzgxZX',
+            'token' => 'emBTcr-fGss3FM7iXv5k',
             'base_url' => 'http://13.228.10.174/api/v3/',
         ],
 

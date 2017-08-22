@@ -285,12 +285,12 @@
             ?>
 
 
-            <ul class="collapsible popout" data-collapsible="expandable">
+            <ul class="collapsible popout" data-collapsible="expandable" >
 
               @foreach($descs as $indexKey=>$desc)
 
               <li>
-                <div class="collapsible-header"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
+                <div class="collapsible-header blue-grey lighten-5 blue-grey darken-text"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
                 <div class="collapsible-body"><span class="break-word"><?php echo nl2br($desc->descdetail);?></span></div>
                 <a href="#modal4" class="modal-trigger" id="clickmodal4" hidden=""></a>
               </li>
@@ -355,14 +355,14 @@
                           <input type="hidden" name="_token" value="{{ csrf_token() }}">
                           <input type="hidden" name="serverid" value="" id="serverid">
                           <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
-
                           <div class="row">
-                            <div class="input-field col s2"></div>
-                            <div class="input-field  col s8" align="center">
-                              <span><p style="font-size:25px"> <i class="material-icons">error_outline</i>Do you want to delete this description?</p></span>
+                            <div class="col s2"></div>
+                            <div class="col s8">
+                              <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this description?</p>
                             </div>
                           </div><br>
                           <div class="row" align="center">
+
                             <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
                             <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
                           </div>
@@ -616,14 +616,26 @@ function chkconfigname(){
 
 function checkStatus(){
 
+
   $addpathcomeback = document.getElementById('openmodal').textContent ;
-  if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)){
-    if(($addpathcomeback.indexOf("1") >= 0)){
-      $msg = "<span>The configuration file was saved to the system.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else if(($addpathcomeback.indexOf("0") >= 0)){
+  // check path && description message toast
+
+  if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)){
+    if(($addpathcomeback.indexOf("0") >= 0)){
       $msg = "<span>Sorry, the configuration file not found.</span>"
       Materialize.toast($msg, 5000,'pink accent-1 rounded');
+    }else if(($addpathcomeback.indexOf("1") >= 0)){
+      $msg = "<span>The configuration file was saved to the system.</span>"
+      Materialize.toast($msg, 5000,'teal accent-3 rounded');
+    }else if(($addpathcomeback.indexOf("2") >= 0)){
+      $msg = "<span>The host description was added.</span>"
+      Materialize.toast($msg, 5000,'teal accent-3 rounded');
+    }else if(($addpathcomeback.indexOf("3") >= 0)){
+      $msg = "<span>The host description was edited.</span>"
+      Materialize.toast($msg, 5000,'teal accent-3 rounded');
+    }else if(($addpathcomeback.indexOf("4") >= 0)){
+      $msg = "<span>The host description was deleted.</span>"
+      Materialize.toast($msg, 5000,'teal accent-3 rounded');
     }
   }else{
     $status= document.getElementById('status').textContent;
@@ -636,11 +648,6 @@ function checkStatus(){
     }
   }
 
-
-  // if($addpathcomeback=="0" || $addpathcomeback=="1"){
-  // alert($addpathcomeback);
-  //
-  // }
   $server = document.getElementById('server').textContent ;
   document.getElementById('serverid').value = $server;
 }

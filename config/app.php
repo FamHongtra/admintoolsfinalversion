@@ -180,6 +180,8 @@ return [
         Collective\Remote\RemoteServiceProvider::class,
         // Gitlab API
         Vinkla\GitLab\GitLabServiceProvider::class,
+        Ixudra\Curl\CurlServiceProvider::class,
+
     ],
 
     /*
@@ -231,6 +233,7 @@ return [
         // Add-on for project
         'SSH' => Collective\Remote\RemoteFacade::class,
         'GitLab' => Vinkla\GitLab\Facades\GitLab::class,
+        'Curl' => Ixudra\Curl\Facades\Curl::class,
     ],
 
 ];

@@ -25,7 +25,8 @@ class DescriptionController extends Controller
       $obj->save();
 
       $serverobj = Host::find($serverid);
-      return Redirect::back()->with('obj',$serverobj);
+      $GLOBALS['test'] = 2 ;
+      return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
     }
 
     public function editDescription(Request $request)
@@ -40,8 +41,8 @@ class DescriptionController extends Controller
       // return $descid.' '.$descname.' '.$descdetail ;
 
       $serverobj = Host::find($serverid);
-      return Redirect::back()->with('obj',$serverobj);
-
+      $GLOBALS['test'] = 3 ;
+      return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
     }
 
     public function deleteDescription(Request $request)
@@ -53,7 +54,8 @@ class DescriptionController extends Controller
       DB::table('descriptions')->where('id', $descid)->delete();
 
       $serverobj = Host::find($serverid);
-      return Redirect::back()->with('obj',$serverobj);
+      $GLOBALS['test'] = 4 ;
+      return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
     }
 
     public function listAllDescriptions($id)
