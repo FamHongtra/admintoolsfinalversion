@@ -81,7 +81,7 @@ class ConfigController extends Controller
           //Using Gitlab API
 
           $user_id = 29;
-          $imp_token = "y8sjNrH5eoPoL2HEsAtk";
+          $imp_token = "eWQofD635bPE5auXVNAE";
           $proj_name = str_random(20);
 
           SSH::into('gitlab')->run(array(
