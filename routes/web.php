@@ -17,18 +17,67 @@ Route::get('/', function () {
   return view('welcome');
 });
 
-Route::get('/showhost', function () {
+Route::get('/createtmpuser', function () {
 
-  $objs = App\Host::where('user_id',1)->get();
+  //Create User for Test
+  $name = "AdminFam";
+  $email = "adminfam@example.com";
+  $username = "adminfam";
+  $password = "adminfameiei";
+  $token = "44Tz1jUhEsmeVudseix_";
+  $gitlab_userid = 29;
 
-  $data['objs'] = $objs;
-  // foreach ($objs as $obj) {
-  //   echo $obj->servername;
-  // }
+  $obj = new App\User();
+  $obj->name = $name;
+  $obj->email = $email;
+  $obj->username = $username;
+  $obj->password = $password;
+  $obj->token = $token;
+  $obj->gitlab_userid = $gitlab_userid;
+  $obj->save();
 
   //
+  // return view('welcome');
+});
+
+Route::get('/createtmphost', function () {
+
+  //Create Host for Test
+  $obj = new App\Host();
+  $obj->servername = "Server01";
+  $obj->host = "192.168.1.2";
+  $obj->port = 22;
+  $obj->save();
+
+  $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+
+  $obj2 = new App\Control();
+  $obj2->username_ssh = "root";
+  $obj2->password_ssh = "password";
+  $obj2->passtype_id = 1;
+  $obj2->user_id = 1;
+  $obj2->host_id = $host->id ;
+  $obj2->save();
+
+  //
+  // return view('welcome');
+});
+
+Route::get('/showhost', function () {
+
+  $user_id = 1 ;
+
+  $objs = DB::table('hosts')
+  ->join('controls', 'hosts.id', '=', 'controls.host_id')
+  ->where('controls.user_id', $user_id)
+  ->get();
+
+  $data['objs'] = $objs;
+
   return view('showhost',$data);
 });
+
+
 
 Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');
@@ -57,7 +106,7 @@ Route::get('/testapi', function () {
     //Using Impersonal Token instead of Private Token (Impersonal Token: Yy7H679yiYqysDCaLTmB)
     //"sudo curl --silent --header 'PRIVATE-TOKEN: Yy7H679yiYqysDCaLTmB' -X GET 'http://13.228.10.174/api/v4/projects'",
 
-      // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/projects/user/19?name=MyProject3&visibility=public'",
+    // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/projects/user/19?name=MyProject3&visibility=public'",
   ), function($line){
 
     // Return JSON Syntax
@@ -84,7 +133,7 @@ Route::get('/testapicreateuser', function () {
 
   SSH::into('gitlab')->run(array(
 
-    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' --data 'username=usertest' --data 'password=testeieiei' --data 'name=user' --data 'email=usertest@example.com' http://13.228.10.174/api/v4/users",
+    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' --data 'username=adminfam' --data 'password=adminfameiei' --data 'name=AdminFam' --data 'email=adminfam@example.com' http://13.228.10.174/api/v4/users",
 
   ), function($line){
 
@@ -100,7 +149,7 @@ Route::get('/testapicreatetoken', function () {
 
   //Create Impersonal Token and get token
 
-  $user_id = 28;
+  $user_id = 29;
 
   SSH::into('gitlab')->run(array(
 
@@ -120,8 +169,8 @@ Route::get('/testapicreaterepo', function () {
 
   //Create Repository by Using Impersonal Token
 
-  $user_id = 28;
-  $imp_token = "y8sjNrH5eoPoL2HEsAtk";
+  $user_id = 29;
+  $imp_token = "UmM88DPkcbo6hRVC_TBo";
   $proj_name = str_random(20);
 
   SSH::into('gitlab')->run(array(
@@ -141,8 +190,8 @@ Route::get('/testapilistrepo', function () {
 
   //List Repositories by Using Impersonal Token
 
-  $user_id = 28;
-  $imp_token = "y8sjNrH5eoPoL2HEsAtk";
+  $user_id = 29;
+  $imp_token = "UmM88DPkcbo6hRVC_TBo";
 
   SSH::into('gitlab')->run(array(
 
@@ -171,7 +220,7 @@ Route::get('/testapilistrepocommits', function () {
 
   //List Repository Commits by Using Impersonal Token
 
-  $user_id = 28;
+  $user_id = 29;
   $proj_id = 57;
   $imp_token = "y8sjNrH5eoPoL2HEsAtk";
 

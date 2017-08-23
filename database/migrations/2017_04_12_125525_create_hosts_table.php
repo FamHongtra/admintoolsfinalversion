@@ -18,11 +18,6 @@ class CreateHostsTable extends Migration
             $table->string('servername');
             $table->string('host');
             $table->integer('port');
-            $table->string('username');
-            $table->string('password');
-            $table->integer('passtype');
-            $table->string('repository');
-            $table->integer('user_id');
             $table->timestamps();
         });
     }

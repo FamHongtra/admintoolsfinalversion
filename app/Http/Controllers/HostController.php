@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use SSH;
 use App\Host;
+use App\Control;
 use Redirect;
 use Hash;
+use DB;
 
 class HostController extends Controller
 {
@@ -92,7 +94,7 @@ class HostController extends Controller
     $repository = "http://".$user_name."@13.228.10.174/".$user_name."/".$servername.".git" ;
     //remote to ansible for keeping RSA key
     if($bywhat == "rsakey"){
-  
+
       $original_name = $request->input('original_name');
       $local_path = '../resources/keyfiles/'.$original_name;
       $remote_dir =  "/etc/ansible/keyfiles/".$user_name."/".$servername;
@@ -126,14 +128,17 @@ class HostController extends Controller
 
 
       if($GLOBALS['ping'] == 1){
-        $usrfortest = "admina" ;
-        $emailfortest = "admina@example.com" ;
-        $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
+
+        // $usrfortest = "admina" ;
+        // $emailfortest = "admina@example.com" ;
+        // $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
 
 
           SSH::into('ansible')->run(array(
             "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
-            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
+            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+            // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
+
           ));
 
         }
@@ -142,12 +147,17 @@ class HostController extends Controller
       $obj->servername = $servername;
       $obj->host = $host;
       $obj->port = $port;
-      $obj->username = $usrname;
-      $obj->password = $remote_path;
-      $obj->passtype = 1;
-      $obj->repository = $repository;
-      $obj->user_id = $user_id;
       $obj->save();
+
+      $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+
+      $obj2 = new Control();
+      $obj2->username_ssh = $usrname;
+      $obj2->password_ssh = $password;
+      $obj2->passtype_id = 1;
+      $obj2->user_id = $user_id;
+      $obj2->host_id = $host->id ;
+      $obj2->save();
 
       return redirect('showhost');
       // return "Add host by RSA Key";
@@ -175,14 +185,15 @@ class HostController extends Controller
 
 
       if($GLOBALS['ping'] == 1){
-        $usrfortest = "admina" ;
-        $emailfortest = "admina@example.com" ;
-        $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
+        // $usrfortest = "admina" ;
+        // $emailfortest = "admina@example.com" ;
+        // $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
 
 
           SSH::into('ansible')->run(array(
             "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
-            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
+            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+            // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
           ));
 
         }
@@ -193,12 +204,17 @@ class HostController extends Controller
         $obj->servername = $servername;
         $obj->host = $host;
         $obj->port = $port;
-        $obj->username = $usrname;
-        $obj->password = $password;
-        $obj->passtype = 1;
-        $obj->repository = $repository;
-        $obj->user_id = $user_id;
         $obj->save();
+
+        $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+
+        $obj2 = new Control();
+        $obj2->username_ssh = $usrname;
+        $obj2->password_ssh = $password;
+        $obj2->passtype_id = 2;
+        $obj2->user_id = $user_id;
+        $obj2->host_id = $host->id ;
+        $obj2->save();
 
         return redirect('showhost');
 
@@ -216,8 +232,13 @@ class HostController extends Controller
     */
     public function show($id)
     {
-      $obj = Host::find($id);
+      $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+
+      echo $host_id;
+
+      $obj = Host::find($host_id);
       $data['obj'] = $obj;
+      $data['controlid'] = $id;
 
       return view('detailhost',$data) ;
     }

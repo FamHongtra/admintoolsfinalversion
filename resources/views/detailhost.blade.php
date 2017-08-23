@@ -246,7 +246,7 @@
               </div>
               <?php
               use Illuminate\Support\Facades\DB as DB;
-              $configs = DB::table('configs')->where('host_id', $obj->id )->get();
+              $configs = DB::table('configs')->where('control_id', $controlid)->get();
               ?>
               <div class="card-action blue-grey lighten-5 blue-grey darken-text" >
                 <table>
@@ -420,6 +420,7 @@
             <form action="{{url('checkpath')}}" id="hostform" class="col s12" method="post" enctype="multipart/form-data">
               <input type="hidden" name="_token" value="{{ csrf_token() }}">
               <input type="hidden" name="serverid" value="" id="serverid">
+              <input type="hidden" name="controlid" value="{{$controlid}}" id="controlid">
               <div class="row">
                 <div class="input-field col s2"></div>
                 <div class="input-field  col s8">

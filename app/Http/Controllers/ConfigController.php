@@ -45,16 +45,26 @@ class ConfigController extends Controller
   public function check(Request $request)
   {
     //
+    $GLOBALS['jsonArray'] = "";
     $GLOBALS['test'] = 0;
     $serverid = $request->input('serverid');
     $GLOBALS['serverid'] = $serverid;
+    $controlid = $request->input('controlid');
+    $GLOBALS['controlid'] = $controlid;
     $pathname = $request->input('pathname');
     $GLOBALS['pathname'] = $pathname;
     $pathconf = $request->input('pathconf');
     $GLOBALS['pathconf'] = $pathconf;
     $host = DB::table('hosts')->where('id', $GLOBALS['serverid'])->first();
     $servername = $host->servername ;
-    $hostusr = $host->username;
+
+    $control = DB::table('controls')->where('id', $GLOBALS['controlid'])->first();
+
+    $hostusr = $control->username_ssh;
+
+    $user_id = $control->user_id;
+    $GLOBALS['user'] = DB::table('users')->where('id', $user_id)->first();
+
     //Separate
     $nameconf =substr($pathconf, strrpos($pathconf, '/') + 1);
     $namepath =substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);
@@ -66,13 +76,41 @@ class ConfigController extends Controller
       ), function($line){
         if (strpos($line, $GLOBALS['pathconf']) !== false) {
           $GLOBALS['test'] = 1 ;
+
+
+          //Using Gitlab API
+
+          $user_id = 29;
+          $imp_token = "y8sjNrH5eoPoL2HEsAtk";
+          $proj_name = str_random(20);
+
+          SSH::into('gitlab')->run(array(
+
+            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://13.228.10.174/api/v4/projects",
+
+          ), function($line){
+
+            $GLOBALS['jsonArray'] = json_decode($line);
+            //
+            // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
+
+          });
+
+
+
           $obj = new Config();
           $obj->configname = $GLOBALS['pathname'];
           $obj->configpath = $GLOBALS['pathconf'];
-          $obj->host_id = $GLOBALS['serverid'];
+          $obj->repository = "http://".$GLOBALS['user']->username.":".$GLOBALS['user']->password."@13.228.10.174/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->keygen = $GLOBALS['jsonArray']->name;
+          $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+          $obj->control_id = $GLOBALS['controlid'];
           $obj->save();
         }
       });
+
+
+//Waiting...
 
       if($GLOBALS['test'] == 1){
         //Adding

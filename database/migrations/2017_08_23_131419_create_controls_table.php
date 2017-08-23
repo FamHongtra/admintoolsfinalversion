@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateConfigsTable extends Migration
+class CreateControlsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,13 @@ class CreateConfigsTable extends Migration
      */
     public function up()
     {
-        //
-        Schema::create('configs', function (Blueprint $table) {
+        Schema::create('controls', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('configname');
-            $table->string('configpath');
-            $table->string('repository');
-            $table->string('keygen');
-            $table->integer('gitlab_projid');
-            $table->integer('control_id');
+            $table->string('username_ssh');
+            $table->string('password_ssh');
+            $table->integer('passtype_id');
+            $table->integer('user_id');
+            $table->integer('host_id');
             $table->timestamps();
         });
     }
@@ -33,7 +31,6 @@ class CreateConfigsTable extends Migration
      */
     public function down()
     {
-        //
-        Schema::dropIfExists('configs');
+        Schema::dropIfExists('controls');
     }
 }
