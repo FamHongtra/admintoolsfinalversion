@@ -234,8 +234,6 @@ class HostController extends Controller
     {
       $host_id = DB::table('controls')->where('id', $id)->value('host_id');
 
-      echo $host_id;
-
       $obj = Host::find($host_id);
       $data['obj'] = $obj;
       $data['controlid'] = $id;
