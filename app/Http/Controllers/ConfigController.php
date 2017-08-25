@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use SSH;
 use Redirect;
 use App\Config;
+use App\Host;
 use DB;
 
 class ConfigController extends Controller
@@ -210,7 +211,64 @@ class ConfigController extends Controller
   public function show($id)
   {
     //
+    $control_id = DB::table('configs')->where('id', $id)->value('control_id');
+    $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+    $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
+
+    $obj = Host::find($host_id);
+
+    $user_id = 29;
+    $imp_token = "eWQofD635bPE5auXVNAE";
+    $GLOBALS['jsonArray'] = "";
+
+    SSH::into('gitlab')->run(array(
+
+      "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://13.228.10.174/api/v4/projects/$proj_id/repository/commits",
+
+    ), function($line){
+      // echo $line;
+
+      $GLOBALS['jsonArray'] = json_decode($line);
+      $collection = collect($GLOBALS['jsonArray']);
+      $sorted = $collection->sortBy('committed_date');
+
+      //
+      // return dd($sorted);
+
+      // foreach ($jsonArray as $item) {
+      //   # code...
+      //   print_r("Revision short ID: ".$item->short_id.", Commits Title: ".$item->title); echo '<br/>';
+      //
+      // }
+
+    });
+
+    $data['obj'] = $obj;
+    $data['controlid'] = $control_id;
+    $data['configid'] = $id ;
+    // $collection = collect($GLOBALS['jsonArray']);
+    // $sorted = $collection->sortBy('committed_date');
+    // $data['configversions'] = $sorted;
+    $data['configversions'] = $GLOBALS['jsonArray'];
+    $GLOBALS['test'] = 5;
+
+    return view('detailrepo',$data)->withErrors($GLOBALS['test']) ;
+
   }
+
+  public function deleteConfig(Request $request)
+  {
+    //
+    $serverid = $request->input('serverid');
+    $configid = $request->input('configid');
+
+    DB::table('configs')->where('id', $configid)->delete();
+
+    $serverobj = Host::find($serverid);
+    $GLOBALS['test'] = 6 ;
+    return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
+  }
+
 
   /**
   * Show the form for editing the specified resource.

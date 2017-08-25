@@ -85,9 +85,12 @@ Route::post('/addhost', 'HostController@store');
 Route::get('/detailhost/{hostid}', 'HostController@show');
 Route::get('/hostall/{id}', 'HostController@showhost');
 Route::post('/checkpath', 'ConfigController@check');
+Route::post('/delconfig', 'ConfigController@deleteConfig');
 Route::post('/adddesc', 'DescriptionController@addDescription');
 Route::post('/editdesc', 'DescriptionController@editDescription');
 Route::post('/deldesc', 'DescriptionController@deleteDescription');
+Route::get('/detailrepo/{configid}', 'ConfigController@show');
+Route::get('/detailversion/{versionid}', 'ConfigController@showcontent');
 
 //About Gitlab API
 
@@ -243,6 +246,33 @@ Route::get('/testapilistrepocommits', function () {
 
   });
 });
+
+Route::get('/testdecode', function () {
+
+  $imp_token = "eWQofD635bPE5auXVNAE";
+  $proj_id = 69 ;
+
+  $file = "eiei.conf";
+  $out = str_replace('.','%2E',$file);
+  // echo $out;
+
+  SSH::into('gitlab')->run(array(
+
+    "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://13.228.10.174/api/v4/projects/$proj_id/repository/files/$out/raw?ref=master'",
+
+  ), function($line){
+    echo nl2br($line);
+    // $jsonArray = json_decode($line);
+    //
+    // echo $jsonArray;
+    //
+    // // return dd($jsonArray);
+
+  });
+
+});
+
+
 
 
 

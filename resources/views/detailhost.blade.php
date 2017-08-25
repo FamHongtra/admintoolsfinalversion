@@ -112,7 +112,16 @@
       </ul>
     </div>
   </nav>
-  <br><br>
+  <div class="row">
+
+  </div>
+  <div class="row">
+  <div class="col s7">
+    <div class="col s4" align="left">
+          <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('showhost')}}"><i class="material-icons left">arrow_back</i>Back</a>
+    </div>
+  </div>
+  </div>
   <div id="openmodal" style="display:none">
     @if($errors->any())
     {{$errors->first()}}
@@ -253,9 +262,9 @@
                   <thead>
                     <tr>
                       <th style="width:4%">No.</th>
-                      <th style="width:31%">Configuration Name</th>
+                      <th style="width:36%">Configuration Name</th>
                       <th style="width:35%">Path</th>
-                      <th style="width:30%">Action</th>
+                      <th style="width:25%">Actions</th>
                     </tr>
                   </thead>
                   @foreach($configs as $indexKey=>$config)
@@ -264,9 +273,44 @@
                       <td>{{$indexKey+1}}</td>
                       <td>{{$config->configname}}</td>
                       <td>{{$config->configpath}}</td>
-                      <td><a class="waves-effect waves-light btn">View</a> <a class="waves-effect waves-light btn">Edit</a> <a class="waves-effect waves-light btn">Delete</a></td>
+                      <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}" style="width:120px">View</a> <a class="modal-trigger waves-effect waves-light btn" href="#delconfig{{$config->id}}" style="width:120px">Delete</a></td>
                     </tr>
                   </tbody>
+                  <div id="delconfig{{$config->id}}" class="modal modal-fixed-footer">
+                    <div class="modal-content">
+                      <br>
+                      <!-- <h5>Add Host Description</h5> -->
+                      <!-- <p>You should add host by using rsa key for secure</p> -->
+                      <!-- <hr class="style-four"><br> -->
+                      <div class="row">
+                        <div class="col s1"></div>
+                        <div class="col s10">
+                          <br><br><br>
+                          <div id="byrsakey" class="row" style="display:block;">
+                            <form action="{{url('delconfig')}}" id="delconfigform{{$config->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="serverid" value="" id="serverid">
+                              <input type="hidden" name="configid" value="{{$config->id}}" id="configid">
+                              <div class="row">
+                                <div class="col s2"></div>
+                                <div class="col s8">
+                                  <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this config?</p>
+                                </div>
+                              </div><br>
+                              <div class="row" align="center">
+
+                                <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delConf({{$config->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
+                                <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
+                              </div>
+                              <div id="errormsg2" class="row" align="center" style="display:none">
+                                <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   @endforeach
                 </table>
               </div>
@@ -590,6 +634,18 @@ function delDesc(id){
 
 }
 
+function delConf(id){
+  // alert("Hello"+id);
+
+  $idform=document.getElementById('delconfigform'+id);
+
+  $server = document.getElementById('server').textContent ;
+  $idform.elements.namedItem('serverid').value = $server;
+
+  $("#delconfigform"+id).submit();
+
+}
+
 function chkconfigname(){
 
 
@@ -621,7 +677,7 @@ function checkStatus(){
   $addpathcomeback = document.getElementById('openmodal').textContent ;
   // check path && description message toast
 
-  if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)){
+  if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)||($addpathcomeback.indexOf("5") >= 0)||($addpathcomeback.indexOf("6") >= 0)){
     if(($addpathcomeback.indexOf("0") >= 0)){
       $msg = "<span>Sorry, the configuration file not found.</span>"
       Materialize.toast($msg, 5000,'pink accent-1 rounded');
@@ -636,6 +692,9 @@ function checkStatus(){
       Materialize.toast($msg, 5000,'teal accent-3 rounded');
     }else if(($addpathcomeback.indexOf("4") >= 0)){
       $msg = "<span>The host description was deleted.</span>"
+      Materialize.toast($msg, 5000,'teal accent-3 rounded');
+    }else if(($addpathcomeback.indexOf("6") >= 0)){
+      $msg = "<span>The config was deleted.</span>"
       Materialize.toast($msg, 5000,'teal accent-3 rounded');
     }
   }else{
