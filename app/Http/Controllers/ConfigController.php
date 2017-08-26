@@ -129,9 +129,12 @@ class ConfigController extends Controller
         $configlatest = DB::table('configs')->orderBy('id','desc')->first();
         $configkeygen = $configlatest->keygen ;
         $configrepo = $configlatest->repository ;
+        $configpath = $configlatest->configpath ; //Add this.
+        $configname = $configlatest->configname ; //Add this.
 
         $username = $GLOBALS['user']->username;
         $useremail = $GLOBALS['user']->email;
+
 
         SSH::into('ansible')->run(array(
           // "ansible -m shell -a '$mkdirfirst' $servername",
@@ -146,6 +149,10 @@ class ConfigController extends Controller
           "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.name \"$username\"'",
           "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
           "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+          "ansible $servername -m shell -a 'cp $configpath ~/nanoad/tmp_repo/$configkeygen'",//Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
         ));
 
         $dollar = '$filepath' ;
@@ -244,6 +251,7 @@ class ConfigController extends Controller
     });
 
     $data['obj'] = $obj;
+
     $data['controlid'] = $control_id;
     $data['configid'] = $id ;
     // $collection = collect($GLOBALS['jsonArray']);

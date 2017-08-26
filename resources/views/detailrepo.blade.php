@@ -122,7 +122,7 @@
   <div class="row">
     <div class="col s7">
       <div class="col s4" align="left">
-        <a class="waves-effect waves-light btn-large" style="width:200px" href="{{ URL::previous() }}"><i class="material-icons left">arrow_back</i>Back</a>
+        <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('detailhost/'.$controlid)}}"><i class="material-icons left">arrow_back</i>Back</a>
       </div>
     </div>
   </div>

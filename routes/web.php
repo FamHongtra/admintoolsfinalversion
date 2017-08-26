@@ -78,7 +78,6 @@ Route::get('/showhost', function () {
 });
 
 
-
 Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');
 // Route::post('/addhost', 'HostController@store');
