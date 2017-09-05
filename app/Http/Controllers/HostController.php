@@ -134,14 +134,14 @@ class HostController extends Controller
         // $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
 
 
-          SSH::into('ansible')->run(array(
-            "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
-            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
-            // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
+        SSH::into('ansible')->run(array(
+          "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+          // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
 
-          ));
+        ));
 
-        }
+      }
       //Testing
       $obj = new Host();
       $obj->servername = $servername;
@@ -190,88 +190,112 @@ class HostController extends Controller
         // $repofortest = "http://admina:adminaeiei@13.228.10.174/admina/server001.git" ;
 
 
-          SSH::into('ansible')->run(array(
-            "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
-            "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
-            // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
-          ));
+        SSH::into('ansible')->run(array(
+          "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+          // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
+        ));
 
-        }
-        //Testing
-
-        //
-        $obj = new Host();
-        $obj->servername = $servername;
-        $obj->host = $host;
-        $obj->port = $port;
-        $obj->save();
-
-        $host = DB::table('hosts')->orderBy('id', 'desc')->first();
-
-        $obj2 = new Control();
-        $obj2->username_ssh = $usrname;
-        $obj2->password_ssh = $password;
-        $obj2->passtype_id = 2;
-        $obj2->user_id = $user_id;
-        $obj2->host_id = $host->id ;
-        $obj2->save();
-
-        return redirect('showhost');
-
-        // return "Add host by password";
       }
+      //Testing
 
-      //  return "by ".$bywhat."servername: ".$servername." host: ".$host." port: ".$port." username: ".$usrname." password: ".$password." filepath: ".$filepath;
-    }
-
-    /**
-    * Display the specified resource.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-    public function show($id)
-    {
-      $host_id = DB::table('controls')->where('id', $id)->value('host_id');
-
-      $obj = Host::find($host_id);
-      $data['obj'] = $obj;
-      $data['controlid'] = $id;
-
-      return view('detailhost',$data) ;
-    }
-
-    /**
-    * Show the form for editing the specified resource.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-    public function edit($id)
-    {
       //
+      $obj = new Host();
+      $obj->servername = $servername;
+      $obj->host = $host;
+      $obj->port = $port;
+      $obj->save();
+
+      $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+
+      $obj2 = new Control();
+      $obj2->username_ssh = $usrname;
+      $obj2->password_ssh = $password;
+      $obj2->passtype_id = 2;
+      $obj2->user_id = $user_id;
+      $obj2->host_id = $host->id ;
+      $obj2->save();
+
+      return redirect('showhost');
+
+      // return "Add host by password";
     }
 
-    /**
-    * Update the specified resource in storage.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-    public function update(Request $request, $id)
-    {
-      //
-    }
-
-    /**
-    * Remove the specified resource from storage.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-    public function destroy($id)
-    {
-      //
-    }
+    //  return "by ".$bywhat."servername: ".$servername." host: ".$host." port: ".$port." username: ".$usrname." password: ".$password." filepath: ".$filepath;
   }
+
+  /**
+  * Display the specified resource.
+  *
+  * @param  int  $id
+  * @return \Illuminate\Http\Response
+  */
+  public function show($id)
+  {
+    $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+
+    $obj = Host::find($host_id);
+    $data['obj'] = $obj;
+    $data['controlid'] = $id;
+
+    return view('detailhost',$data) ;
+  }
+
+  public function search(Request $request)
+  {
+    $searchkey = $request->input('searchkey');
+    $user_id = $request->input('user_id');
+    if($searchkey!=null){
+      $objs = DB::table('hosts')
+      ->join('controls', 'hosts.id', '=', 'controls.host_id')
+      ->where('controls.user_id', $user_id)
+      ->where('hosts.servername','like','%'.$searchkey.'%')
+      ->orWhere('hosts.host','like', '%'.$searchkey.'%')
+      ->get();
+    }else{
+      $objs = DB::table('hosts')
+      ->join('controls', 'hosts.id', '=', 'controls.host_id')
+      ->where('controls.user_id', $user_id)
+      ->get();
+    }
+
+    $data['objs'] = $objs;
+    $data['user_id'] = $user_id;
+
+    return view('showhost',$data);
+  }
+
+  /**
+  * Show the form for editing the specified resource.
+  *
+  * @param  int  $id
+  * @return \Illuminate\Http\Response
+  */
+  public function edit($id)
+  {
+    //
+  }
+
+  /**
+  * Update the specified resource in storage.
+  *
+  * @param  \Illuminate\Http\Request  $request
+  * @param  int  $id
+  * @return \Illuminate\Http\Response
+  */
+  public function update(Request $request, $id)
+  {
+    //
+  }
+
+  /**
+  * Remove the specified resource from storage.
+  *
+  * @param  int  $id
+  * @return \Illuminate\Http\Response
+  */
+  public function destroy($id)
+  {
+    //
+  }
+}

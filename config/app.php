@@ -181,6 +181,7 @@ return [
         // Gitlab API
         Vinkla\GitLab\GitLabServiceProvider::class,
         Ixudra\Curl\CurlServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
 
     ],
 
@@ -234,6 +235,9 @@ return [
         'SSH' => Collective\Remote\RemoteFacade::class,
         'GitLab' => Vinkla\GitLab\Facades\GitLab::class,
         'Curl' => Ixudra\Curl\Facades\Curl::class,
+        'Input' => Illuminate\Support\Facades\Input::class,
+        'Response' => Illuminate\Support\Facades\Response::class,
+        'Form' => Collective\Html\FormFacade::class,
     ],
 
 ];
