@@ -191,7 +191,12 @@ class HostController extends Controller
 
 
         SSH::into('ansible')->run(array(
-          "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          //install nanoad
+          // "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+
+          //install vimad
+          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+
           "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
           // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
         ));

@@ -135,28 +135,45 @@ class ConfigController extends Controller
         $username = $GLOBALS['user']->username;
         $useremail = $GLOBALS['user']->email;
 
+        //for nanoad editor
+        // SSH::into('ansible')->run(array(
+        //   //To Adding
+        //   "ansible-playbook /etc/ansible/Nanoadform.yml -i /etc/ansible/hosts -e 'host=$servername'",
+        //   "ansible $servername -m shell -a 'mkdir -p ~/nanoad/tmp_repo/$configkeygen'",
+        //   "ansible $servername -m shell -a 'git init ~/nanoad/tmp_repo/$configkeygen'",
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.name \"$username\"'",
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+        //   "ansible $servername -m shell -a 'cp $configpath ~/nanoad/tmp_repo/$configkeygen'",//Add this.
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
+        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+        // ));
 
+        //for vimad editor
         SSH::into('ansible')->run(array(
-          // "ansible -m shell -a '$mkdirfirst' $servername",
-          // "ansible -m shell -a '$cpfilefirst' $servername",
-          // "ansible -m shell -a '$gitaddfirst' $servername",
-          // "ansible -m shell -a '$gitcommitfirst' $servername",
-          // "ansible -m shell -a '$gitpushfirst' $servername",
           //To Adding
-          "ansible-playbook /etc/ansible/Nanoadform.yml -i /etc/ansible/hosts -e 'host=$servername'",
-          "ansible $servername -m shell -a 'mkdir -p ~/nanoad/tmp_repo/$configkeygen'",
-          "ansible $servername -m shell -a 'git init ~/nanoad/tmp_repo/$configkeygen'",
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.name \"$username\"'",
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
-          "ansible $servername -m shell -a 'cp $configpath ~/nanoad/tmp_repo/$configkeygen'",//Add this.
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+          "ansible-playbook /etc/ansible/Vimadform.yml -i /etc/ansible/hosts -e 'host=$servername'",
+          "ansible $servername -m shell -a 'mkdir -p ~/vim/tmp_repo/$configkeygen'",
+          "ansible $servername -m shell -a 'git init ~/vim/tmp_repo/$configkeygen'",
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+          "ansible $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
         ));
 
         $dollar = '$filepath' ;
         $dollar = preg_quote($dollar, '/');
+
+        $choice = '$choice' ;
+        $choice = preg_quote($choice, '/');
+
+        $yourmsg = '$msg';
+        $yourmsg = preg_quote($yourmsg, '/');
+
         $pleasewait = '\"Please wait...\"' ;
 
 
@@ -176,31 +193,34 @@ class ConfigController extends Controller
           $cfp = '\"'.$config->configpath.'\"';
           $conf =substr($config->configpath, strrpos($config->configpath, '/') + 1);
           $path =substr( $config->configpath, 0, strrpos( $config->configpath, '/' ) + 1);
-          // $mkdir = 'mkdir -p ~/nanoad/tmp_repo/'.$config->keygen;
 
-          $cpfile = 'cp '.$config->configpath.' ~/nanoad/tmp_repo/'.$config->keygen;
-          //เด๋วลองทำต่อ
-          // if($hostusr == "root"){
-          // }
+          $cpfile = 'cp '.$config->configpath.' ~/vim/tmp_repo/'.$config->keygen;
 
-          $gitadd = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.' add . &> /dev/null';
+          $gitadd = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' add . &> /dev/null';
           $edited = $config->configname.' was edited by '.$hostusr.' at ';
           $datemsg = '%%Y-%%m-%%d';
           $timemsg = '%%H:%%M:%%S';
-          $gitcommit = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
-          $gitpush = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
+
+          $first_prompt = 'read -p \"Do you want to enter commit message for your change? (y/n): \" choice';
+          $second_prompt = 'read -p \"Enter the commit message: \" msg';
+
+          $gitcommitmsg = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m '.$yourmsg.' &> /dev/null';
+          $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
+          $gitpush = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
           $done = 'echo \"Done! Your Configuration file was saved.\"';
           if($key!=$GLOBALS['configscount']){
-            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\tclear\\n\\techo '.$pleasewait.'\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$gitcommit.'\\n\\t'.$gitpush.'\\n\\tclear\\n\\t'.$done.'\\nel';
+            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nel';
           }else{
-            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\tclear\\n\\techo '.$pleasewait.'\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$gitcommit.'\\n\\t'.$gitpush.'\\n\\tclear\\n\\t'.$done.'\\nfi';
+            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nfi';
           }
-
-          //  $inloop = $inloop.'\\n\\nif [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\tclear\\n\\techo '.$pleasewait.'\\n\\t'.$mkdir.'\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$gitcommit.'\\n\\t'.$gitpush.'\\n\\tclear\\n\\t'.$done.'\\nfi';
         }
         SSH::into('ansible')->run(array(
           // "ansible $servername -m shell -a 'printf \"\\nHello\\nWorld\\n$config->configname\" >> /etc/nanoad/scripts/nanoad.sh' --become",
-          "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/nanoad/scripts/nanoad.sh'",
+
+
+          //append checkpath to nanoad.sh
+          // "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/nanoad/scripts/nanoad.sh'",
+          "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
         ));
       }
     }
