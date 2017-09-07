@@ -132,7 +132,7 @@
     @endif
   </div>
   <div class="row">
-    <div class="col s7">
+    <div class="col s6">
       <div class="col s4" align="center">
         <div class="card cyan darken-3" style="width:250px">
           <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
@@ -174,8 +174,8 @@
                   <thead>
                     <tr>
                       <th style="width:4%">No.</th>
-                      <th style="width:31%">Configuration Name</th>
-                      <th style="width:35%">Path</th>
+                      <th style="width:66%">Configuration Name (Path)</th>
+                      <!-- <th style="width:35%">Path</th> -->
                       <th style="width:30%">Actions</th>
                     </tr>
                   </thead>
@@ -183,8 +183,8 @@
                   <tbody align="right">
                     <tr>
                       <td>{{$indexKey+1}}</td>
-                      <td>{{$config->configname}}</td>
-                      <td>{{$config->configpath}}</td>
+                      <td>{{$config->configname}}<br>({{$config->configpath}})</td>
+                      <!-- <td>{{$config->configpath}}</td> -->
                       <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}">Show Versions</a></td>
                     </tr>
                   </tbody>
@@ -196,7 +196,7 @@
         </div>
       </div>
     </div>
-    <div class="col s5">
+    <div class="col s6">
       <div class="row">
         <div class="col s12"><span style="font-size: 250%; color:#607d8b">Versions of Configuration</span><hr style="color: #607d8b"><br>
           <div class="card">
@@ -212,10 +212,12 @@
                 <thead>
                   <tr>
                     <th style="width:4%">No.</th>
-                    <th style="width:60%">Version Title</th>
+                    <th style="width:40%">Version Title</th>
                     <th style="width:5%"></th>
-                    <th style="width:15%">Version ID</th>
-                    <th style="width:26%">Actions</th>
+                    <th style="width:14%">Edited by</th>
+                    <th style="width:17%">Edited at</th>
+                    <th style="width:10%">Version ID</th>
+                    <th style="width:10%">Actions</th>
                   </tr>
                 </thead>
 
@@ -226,6 +228,8 @@
                     <td>{{$indexKey+1}}</td>
                     <td id="itemtitle{{$indexKey+1}}">{{$version->title}}</td>
                     <td></td>
+                    <td>{{$version->author_name}}</td>
+                    <td>{{substr($version->committed_date,0,10)." ".substr($version->committed_date,11,5)}}</td>
                     <td>{{$version->short_id}}</td>
                     <td><a class="modal-trigger waves-effect waves-light btn" href="#modal{{$indexKey+1}}">View</a></td>
                   </tr>

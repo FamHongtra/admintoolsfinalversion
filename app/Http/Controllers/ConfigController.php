@@ -326,12 +326,14 @@ class ConfigController extends Controller
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
     ), function($line){
-        echo $line;
+        // echo $line;
 
     });
 
     // echo "git clone ".$configrepo." /home/$hostusr/vim/tmp_repo/".$configkeygen;
     // echo $configname;
+
+      return redirect()->action('ConfigController@show', ['id' => $configid]);
 
   }
 
