@@ -59,11 +59,21 @@ return [
             'timeout'   => 10,
         ],
         //Ansible Server on AWS
-        'ansible' => [
+        'ansible2' => [
             'host'      => '13.228.0.211',
             'username'  => 'ubuntu',
             'password'  => '',
             'key'       => 'ansible.pem',
+            'keytext'   => '',
+            'keyphrase' => '',
+            'agent'     => '',
+            'timeout'   => 120,
+        ],
+        'ansible' => [
+            'host'      => '54.254.145.81',
+            'username'  => 'centos',
+            'password'  => 'eieiei',
+            'key'       => '',
             'keytext'   => '',
             'keyphrase' => '',
             'agent'     => '',

@@ -297,6 +297,44 @@ class ConfigController extends Controller
     return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
   }
 
+  public function revisionconfig(Request $request)
+  {
+    //
+    $configid = $request->input('configid');
+
+    $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
+
+    $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
+
+    $configrepo = $request->input('configrepo');
+    $configkeygen = $request->input('configkeygen');
+    $revisionid = $request->input('revisionid');
+    $serverid = $request->input('serverid');
+    $servername = $request->input('servername');
+    $configfullpath = $request->input('configpath');
+    $configpath =substr( $configfullpath, 0, strrpos( $configfullpath, '/' ) + 1);
+    $configname =substr($configfullpath, strrpos($configfullpath, '/') + 1);
+
+    SSH::into('ansible')->run(array(
+      "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen reset --hard $revisionid'",
+      "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+      "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname $configpath'",
+      "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+    ), function($line){
+        echo $line;
+
+    });
+
+    // echo "git clone ".$configrepo." /home/$hostusr/vim/tmp_repo/".$configkeygen;
+    // echo $configname;
+
+  }
+
 
   /**
   * Show the form for editing the specified resource.

@@ -97,6 +97,8 @@ Route::post('/deldesc', 'DescriptionController@deleteDescription');
 Route::get('/detailrepo/{configid}', 'ConfigController@show');
 Route::get('/detailversion/{versionid}', 'ConfigController@showcontent');
 Route::get('search/autocomplete', 'SearchController@autocomplete');
+Route::post('/revision', 'ConfigController@revisionconfig');
+
 
 //About Gitlab API
 

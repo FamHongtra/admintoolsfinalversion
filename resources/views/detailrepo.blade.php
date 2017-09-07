@@ -162,9 +162,12 @@
               <?php
               use Illuminate\Support\Facades\DB as DB;
               $configs = DB::table('configs')->where('control_id', $controlid)->get();
+              $configid = DB::table('configs')->where('id', $configid)->value('id');
               $configname = DB::table('configs')->where('id', $configid)->value('configname');
               $configpath = DB::table('configs')->where('id', $configid)->value('configpath');
               $configprojid = DB::table('configs')->where('id', $configid)->value('gitlab_projid');
+              $configrepo = DB::table('configs')->where('id', $configid)->value('repository');
+              $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
               ?>
               <div class="card-action blue-grey lighten-5 blue-grey darken-text" >
                 <table>
@@ -211,12 +214,13 @@
                     <th style="width:4%">No.</th>
                     <th style="width:60%">Version Title</th>
                     <th style="width:5%"></th>
-                    <th style="width:15%">Short ID</th>
+                    <th style="width:15%">Version ID</th>
                     <th style="width:26%">Actions</th>
                   </tr>
                 </thead>
 
                 @foreach($configversions as $indexKey=>$version)
+
                 <tbody align="right">
                   <tr id="item{{$indexKey+1}}">
                     <td>{{$indexKey+1}}</td>
@@ -238,6 +242,7 @@
                     $imp_token = "eWQofD635bPE5auXVNAE";
                     $proj_id = $configprojid ;
 
+
                     $conf =substr($configpath, strrpos($configpath, '/') + 1);
 
                     $out = str_replace('.','%2E',$conf);
@@ -254,9 +259,21 @@
                     <br><br><br><br>
                   </div>
                   <div class="modal-footer">
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a><a href="#!" class="modal-action modal-close waves-effect waves-green btn teal lighten-2" style="margin-right:10px">Close</a>
+                    <a onClick="revisionSubmit({{$indexKey+1}})" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a><a href="#!" class="modal-action modal-close waves-effect waves-green btn teal lighten-2" style="margin-right:10px">Close</a>
                   </div>
                 </div>
+
+
+                <form id="versform{{$indexKey+1}}" action="{{url('revision')}}" method="post">
+                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="configid" value="{{ $configid }}">
+                  <input type="hidden" name="configrepo" value="{{ $configrepo }}">
+                  <input type="hidden" name="configkeygen" value="{{ $configkeygen }}">
+                  <input type="hidden" name="revisionid" value="{{ $version->short_id }}">
+                  <input type="hidden" name="serverid" value="{{$obj->id}}">
+                  <input type="hidden" name="servername" value="{{$obj->servername}}">
+                  <input type="hidden" name="configpath" value="{{$configpath}}">
+                </form>
                 @endforeach
               </table>
             </div>
@@ -362,6 +379,14 @@
     }else{
       document.getElementById('errormsg2').style.display = "block" ;
     }
+
+  }
+
+  function revisionSubmit(id){
+    // alert("Hello"+id);
+
+
+    $("#versform"+id).submit();
 
   }
 
