@@ -31,7 +31,8 @@ class SearchController extends Controller
     ->where('controls.user_id', $user_id)
     ->where('hosts.servername','like','%'.$term.'%')
     ->orWhere('hosts.host','like', '%'.$term.'%')
-    ->take(5)->get();
+    ->get();
+    // ->take(5)->get();
 
     foreach ($queries as $query)
     {

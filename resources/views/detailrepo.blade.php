@@ -202,8 +202,11 @@
           <div class="card">
             <div class="card-content">
               <div class="row">
-                <div class="col s12" align="center"><br>
-                  <span class="card-title">Configurations Name: {{$configname}}<br>({{$configpath}})</span>
+                <div class="col s12" align="center">
+                  <div class="" align="right">
+                    <a class="modal-trigger waves-effect waves-light btn-flat" href="{{url('editconfig/'.$config->id)}}"><i class="material-icons left">edit</i>Edit</a>
+                  </div>
+                  <span class="card-title">Configurations Name: {{$configname}}<br><b>({{$configpath}})</b></span>
                 </div>
               </div>
             </div>
@@ -243,7 +246,9 @@
 
                   <div class="modal-content">
                     @php
-                    $imp_token = "eWQofD635bPE5auXVNAE";
+                    //impersonal token of gitlab user.
+
+                    $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
                     $proj_id = $configprojid ;
 
 
@@ -253,7 +258,7 @@
 
                     SSH::into('gitlab')->run(array(
 
-                    "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://13.228.10.174/api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
+                    "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
 
                     ), function($line){
                       echo nl2br($line);
@@ -283,238 +288,280 @@
             </div>
           </div>
 
+          <div id="modallastest" class="modal modal-fixed-footer">
+            <div class="modal-header">
+              <h5>{{$configname." (".$configpath.")"}}</h5>
+            </div>
+
+            <div class="modal-content">
+              <div class="row">
+                <form class="col s12">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <textarea id="textarea1" class="materialize-textarea">@php
+                        //impersonal token of gitlab user.
+
+                        $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+                        $proj_id = $configprojid ;
+
+
+                        $conf =substr($configpath, strrpos($configpath, '/') + 1);
+
+                        $out = str_replace('.','%2E',$conf);
+
+                        SSH::into('gitlab')->run(array(
+
+                        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=master'",
+
+                        ), function($line){
+                          echo $line;
+
+                        });
+                        @endphp</textarea>
+                      <label for="textarea1"></label>
+                    </div>
+                  </div>
+                </form>
+              </div>
+                <br><br><br><br>
+              </div>
+              <div class="modal-footer">
+                <a onClick="revisionSubmit({{$indexKey+1}})" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a><a href="#!" class="modal-action modal-close waves-effect waves-green btn teal lighten-2" style="margin-right:10px">Close</a>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-  </div>
-
-  <div id="server" class="" style="display:none">
-    {{$obj->id}}
-  </div>
-  <div class="container" align="left">
-    <!-- Page Content goes here -->
-
-
-    <!-- Modal Structure -->
-
-    <!-- add config path -->
-
-
-
-
-    <div id="status"  style="display:none">
-
-      <?php
-      use Collective\Remote\RemoteFacade as SSH ;
-      SSH::into('ansible')->run(array(
-        "ansible -m ping $obj->servername",
-      ), function($line){
-        // if (strpos($line, 'pong') !== false) {
-        //   echo "<span>connected</span>" ;
-        // }
-        echo $line;
-      });
-      ?>
+    <div class="row">
     </div>
-  </div>
-  <script src="js/progressbar.js"></script>
 
-  <!--Import jQuery before materialize.js-->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-  <script type="text/javascript">
-  //dialogs
+    <div id="server" class="" style="display:none">
+      {{$obj->id}}
+    </div>
+    <div class="container" align="left">
+      <!-- Page Content goes here -->
 
 
+      <!-- Modal Structure -->
 
-  function addDesc(){
-
-    $idform=document.getElementById('descform');
-
-    $server = document.getElementById('server').textContent ;
-    $idform.elements.namedItem('serverid').value = $server;
+      <!-- add config path -->
 
 
-    $formdescname = $idform.elements.namedItem("descname").value;
 
-    $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-    $resvaliddescname = $descnamepatt.test($formdescname);
 
-    $formdescdetail = $idform.elements.namedItem("descdetail").value;
+      <div id="status"  style="display:none">
 
-    if( ($formdescname != "") && ($formdescdetail != "")){
-      if($resvaliddescname){
-        document.getElementById('errormsg2').style.display = "none" ;
-        $("#descform").submit();
+        <?php
+        use Collective\Remote\RemoteFacade as SSH ;
+        SSH::into('ansible')->run(array(
+          "ansible -m ping $obj->servername",
+        ), function($line){
+          // if (strpos($line, 'pong') !== false) {
+          //   echo "<span>connected</span>" ;
+          // }
+          echo $line;
+        });
+        ?>
+      </div>
+    </div>
+    <script src="js/progressbar.js"></script>
+
+    <!--Import jQuery before materialize.js-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+    <script type="text/javascript">
+    //dialogs
+
+
+
+    function addDesc(){
+
+      $idform=document.getElementById('descform');
+
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
+
+
+      $formdescname = $idform.elements.namedItem("descname").value;
+
+      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvaliddescname = $descnamepatt.test($formdescname);
+
+      $formdescdetail = $idform.elements.namedItem("descdetail").value;
+
+      if( ($formdescname != "") && ($formdescdetail != "")){
+        if($resvaliddescname){
+          document.getElementById('errormsg2').style.display = "none" ;
+          $("#descform").submit();
+        }else{
+          document.getElementById('errormsg2').style.display = "block" ;
+        }
       }else{
         document.getElementById('errormsg2').style.display = "block" ;
       }
-    }else{
-      document.getElementById('errormsg2').style.display = "block" ;
+
     }
 
-  }
+    function editDesc(id){
+      // alert("Hello"+id);
 
-  function editDesc(id){
-    // alert("Hello"+id);
+      $idform=document.getElementById('editdescform'+id);
 
-    $idform=document.getElementById('editdescform'+id);
-
-    $server = document.getElementById('server').textContent ;
-    $idform.elements.namedItem('serverid').value = $server;
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
 
 
-    $formdescname = $idform.elements.namedItem("descname").value;
+      $formdescname = $idform.elements.namedItem("descname").value;
 
-    $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-    $resvaliddescname = $descnamepatt.test($formdescname);
+      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvaliddescname = $descnamepatt.test($formdescname);
 
-    $formdescdetail = $idform.elements.namedItem("descdetail").value;
+      $formdescdetail = $idform.elements.namedItem("descdetail").value;
 
-    if( ($formdescname != "") && ($formdescdetail != "")){
-      if($resvaliddescname){
-        document.getElementById('errormsg2').style.display = "none" ;
-        $("#editdescform"+id).submit();
+      if( ($formdescname != "") && ($formdescdetail != "")){
+        if($resvaliddescname){
+          document.getElementById('errormsg2').style.display = "none" ;
+          $("#editdescform"+id).submit();
+        }else{
+          document.getElementById('errormsg2').style.display = "block" ;
+        }
       }else{
         document.getElementById('errormsg2').style.display = "block" ;
       }
-    }else{
-      document.getElementById('errormsg2').style.display = "block" ;
+
     }
 
-  }
-
-  function revisionSubmit(id){
-    // alert("Hello"+id);
+    function revisionSubmit(id){
+      // alert("Hello"+id);
 
 
-    $("#versform"+id).submit();
+      $("#versform"+id).submit();
 
-  }
+    }
 
-  function delDesc(id){
-    // alert("Hello"+id);
+    function delDesc(id){
+      // alert("Hello"+id);
 
-    $idform=document.getElementById('deldescform'+id);
+      $idform=document.getElementById('deldescform'+id);
 
-    $server = document.getElementById('server').textContent ;
-    $idform.elements.namedItem('serverid').value = $server;
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
 
-    $("#deldescform"+id).submit();
+      $("#deldescform"+id).submit();
 
-  }
+    }
 
-  function chkconfigname(){
+    function chkconfigname(){
 
 
-    $idform=document.getElementById('hostform');
-    $formpathname = $idform.elements.namedItem("pathname").value;
-    $server = document.getElementById('server').textContent ;
-    $idform.elements.namedItem('serverid').value = $server;
+      $idform=document.getElementById('hostform');
+      $formpathname = $idform.elements.namedItem("pathname").value;
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
 
-    $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-    $resvalidpathname = $pathnamepatt.test($formpathname);
+      $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvalidpathname = $pathnamepatt.test($formpathname);
 
-    $formpathconf = $idform.elements.namedItem("pathconf").value;
-    if( ($formpathname != "") && ($formpathconf != "")){
-      if($resvalidpathname){
-        document.getElementById('errormsg1').style.display = "none" ;
-        $("#hostform").submit();
+      $formpathconf = $idform.elements.namedItem("pathconf").value;
+      if( ($formpathname != "") && ($formpathconf != "")){
+        if($resvalidpathname){
+          document.getElementById('errormsg1').style.display = "none" ;
+          $("#hostform").submit();
+        }else{
+          document.getElementById('errormsg1').style.display = "block" ;
+        }
       }else{
         document.getElementById('errormsg1').style.display = "block" ;
       }
-    }else{
-      document.getElementById('errormsg1').style.display = "block" ;
+
     }
 
-  }
-
-  function checkStatus(){
+    function checkStatus(){
 
 
-    $addpathcomeback = document.getElementById('openmodal').textContent ;
-    // check path && description message toast
+      $addpathcomeback = document.getElementById('openmodal').textContent ;
+      // check path && description message toast
 
-    if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)||($addpathcomeback.indexOf("5") >= 0)){
-      if(($addpathcomeback.indexOf("0") >= 0)){
-        $msg = "<span>Sorry, the configuration file not found.</span>"
-        Materialize.toast($msg, 5000,'pink accent-1 rounded');
-      }else if(($addpathcomeback.indexOf("1") >= 0)){
-        $msg = "<span>The configuration file was saved to the system.</span>"
-        Materialize.toast($msg, 5000,'teal accent-3 rounded');
-      }else if(($addpathcomeback.indexOf("2") >= 0)){
-        $msg = "<span>The host description was added.</span>"
-        Materialize.toast($msg, 5000,'teal accent-3 rounded');
-      }else if(($addpathcomeback.indexOf("3") >= 0)){
-        $msg = "<span>The host description was edited.</span>"
-        Materialize.toast($msg, 5000,'teal accent-3 rounded');
-      }else if(($addpathcomeback.indexOf("4") >= 0)){
-        $msg = "<span>The host description was deleted.</span>"
-        Materialize.toast($msg, 5000,'teal accent-3 rounded');
-      }else if(($addpathcomeback.indexOf("5") >= 0)){
+      if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)||($addpathcomeback.indexOf("5") >= 0)){
+        if(($addpathcomeback.indexOf("0") >= 0)){
+          $msg = "<span>Sorry, the configuration file not found.</span>"
+          Materialize.toast($msg, 5000,'pink accent-1 rounded');
+        }else if(($addpathcomeback.indexOf("1") >= 0)){
+          $msg = "<span>The configuration file was saved to the system.</span>"
+          Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }else if(($addpathcomeback.indexOf("2") >= 0)){
+          $msg = "<span>The host description was added.</span>"
+          Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }else if(($addpathcomeback.indexOf("3") >= 0)){
+          $msg = "<span>The host description was edited.</span>"
+          Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }else if(($addpathcomeback.indexOf("4") >= 0)){
+          $msg = "<span>The host description was deleted.</span>"
+          Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }else if(($addpathcomeback.indexOf("5") >= 0)){
 
-      }
-    }else{
-      $status= document.getElementById('status').textContent;
-      if(($status.indexOf("SUCCESS") >= 0)){
-        $msg = "<span>connected</span>"
-        Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }
       }else{
-        $msg= "<span>disconnect</span>";
-        Materialize.toast($msg, 5000,'pink accent-1 rounded');
+        $status= document.getElementById('status').textContent;
+        if(($status.indexOf("SUCCESS") >= 0)){
+          $msg = "<span>connected</span>"
+          Materialize.toast($msg, 5000,'teal accent-3 rounded');
+        }else{
+          $msg= "<span>disconnect</span>";
+          Materialize.toast($msg, 5000,'pink accent-1 rounded');
+        }
       }
+
+      document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
+
+      $server = document.getElementById('server').textContent ;
+      document.getElementById('serverid').value = $server;
+    }
+    //modal scripts
+    $(document).ready(function(){
+      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+      $('.modal').modal();
+    });
+
+    $(document).ready(function(){
+      $('.collapsible').collapsible();
+    });
+
+
+    function byPassword() {
+      document.getElementById('byrsakey').style.display = "none";
+      document.getElementById('bypassword').style.display = "block";
+      $("#password").removeClass('teal accent-4');
+      $("#password").addClass('teal darken-3');
+      $("#rsakey").removeClass('cyan darken-3');
+      $("#rsakey").addClass('cyan darken-1');
+    }
+    function byRSAKey() {
+      document.getElementById('bypassword').style.display = "none";
+      document.getElementById('byrsakey').style.display = "block";
+      $("#password").removeClass('teal darken-3');
+      $("#password").addClass('teal accent-4');
+      $("#rsakey").removeClass('cyan darken-1');
+      $("#rsakey").addClass('cyan darken-3');
     }
 
-    document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
 
-    $server = document.getElementById('server').textContent ;
-    document.getElementById('serverid').value = $server;
-  }
-  //modal scripts
-  $(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $('.modal').modal();
-  });
+    $("#submitbtn").on('click', function(){
+      $form1 = document.getElementById('byrsakey').style.display ;
 
-  $(document).ready(function(){
-    $('.collapsible').collapsible();
-  });
+      $form2 = document.getElementById('bypassword').style.display ;
+      if($form1 == "block"){
+        alert('Sent form RSA');
+        $("#hostform").submit();
+      }else if($form2 == "block"){
+        alert('Sent form Pass');
+        $("#hostform2").submit();
+      }
+    });
 
+    </script>
+  </body>
 
-  function byPassword() {
-    document.getElementById('byrsakey').style.display = "none";
-    document.getElementById('bypassword').style.display = "block";
-    $("#password").removeClass('teal accent-4');
-    $("#password").addClass('teal darken-3');
-    $("#rsakey").removeClass('cyan darken-3');
-    $("#rsakey").addClass('cyan darken-1');
-  }
-  function byRSAKey() {
-    document.getElementById('bypassword').style.display = "none";
-    document.getElementById('byrsakey').style.display = "block";
-    $("#password").removeClass('teal darken-3');
-    $("#password").addClass('teal accent-4');
-    $("#rsakey").removeClass('cyan darken-1');
-    $("#rsakey").addClass('cyan darken-3');
-  }
-
-
-  $("#submitbtn").on('click', function(){
-    $form1 = document.getElementById('byrsakey').style.display ;
-
-    $form2 = document.getElementById('bypassword').style.display ;
-    if($form1 == "block"){
-      alert('Sent form RSA');
-      $("#hostform").submit();
-    }else if($form2 == "block"){
-      alert('Sent form Pass');
-      $("#hostform2").submit();
-    }
-  });
-
-  </script>
-</body>
-
-</html>
+  </html>

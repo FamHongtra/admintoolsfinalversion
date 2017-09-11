@@ -302,7 +302,7 @@
   });
 
   function blankSearch() {
-    document.getElementById('search').value = '';
+    document.getElementById('autocomplete').value = '';
   }
 
   function byPassword() {

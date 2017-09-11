@@ -8,6 +8,7 @@ use Redirect;
 use App\Config;
 use App\Host;
 use DB;
+use File;
 
 class ConfigController extends Controller
 {
@@ -81,13 +82,13 @@ class ConfigController extends Controller
 
           //Using Gitlab API
 
-          $user_id = 29;
-          $imp_token = "eWQofD635bPE5auXVNAE";
+          $user_id = 4;
+          $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
           $proj_name = str_random(20);
 
           SSH::into('gitlab')->run(array(
 
-            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://13.228.10.174/api/v4/projects",
+            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
 
           ), function($line){
 
@@ -102,7 +103,7 @@ class ConfigController extends Controller
           $obj = new Config();
           $obj->configname = $GLOBALS['pathname'];
           $obj->configpath = $GLOBALS['pathconf'];
-          $obj->repository = "http://".$GLOBALS['user']->username.":".$GLOBALS['user']->password."@13.228.10.174/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->repository = "http://".$GLOBALS['user']->username.":".$GLOBALS['user']->password."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
           $obj->keygen = $GLOBALS['jsonArray']->name;
           $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
           $obj->control_id = $GLOBALS['controlid'];
@@ -244,13 +245,13 @@ class ConfigController extends Controller
 
     $obj = Host::find($host_id);
 
-    $user_id = 29;
-    $imp_token = "eWQofD635bPE5auXVNAE";
+    $user_id = 4;
+    $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
     $GLOBALS['jsonArray'] = "";
 
     SSH::into('gitlab')->run(array(
 
-      "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://13.228.10.174/api/v4/projects/$proj_id/repository/commits",
+      "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
 
     ), function($line){
       // echo $line;
@@ -319,23 +320,83 @@ class ConfigController extends Controller
       "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen reset --hard $revisionid'",
       "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
-      "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname $configpath'",
+      "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configfullpath'",
       "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
 
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
       "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
     ), function($line){
-        // echo $line;
+      // echo $line;
 
     });
 
     // echo "git clone ".$configrepo." /home/$hostusr/vim/tmp_repo/".$configkeygen;
     // echo $configname;
 
-      return redirect()->action('ConfigController@show', ['id' => $configid]);
+    return redirect()->action('ConfigController@show', ['id' => $configid]);
 
   }
+
+  public function editconfig($id)
+  {
+    //
+    $control_id = DB::table('configs')->where('id', $id)->value('control_id');
+    $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+    $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
+
+    $obj = Host::find($host_id);
+
+    $data['obj'] = $obj;
+
+    $data['controlid'] = $control_id;
+    $data['configid'] = $id ;
+
+    $GLOBALS['test'] = 5;
+
+    return view('editconfig',$data)->withErrors($GLOBALS['test']) ;
+
+    //
+    // $data = $request->input('data');
+    //
+    // File::put('configs/test.conf', $data);
+    // echo nl2br($data);
+  }
+
+  public function savecommit(Request $request)
+  {
+    //
+    $edittext = $request->input('edittext');
+    $commitmsg = $request->input('commitmsg');
+
+    File::put('configs/test.conf', $edittext);
+
+    // echo $edittext." ".$commitmsg;
+
+
+    // $control_id = DB::table('configs')->where('id', $id)->value('control_id');
+    // $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+    // $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
+    //
+    // $obj = Host::find($host_id);
+    //
+    // $data['obj'] = $obj;
+    //
+    // $data['controlid'] = $control_id;
+    // $data['configid'] = $id ;
+    //
+    // $GLOBALS['test'] = 5;
+    //
+    // return view('editconfig',$data)->withErrors($GLOBALS['test']) ;
+
+    //
+    // $data = $request->input('data');
+    //
+    // File::put('configs/test.conf', $data);
+    // echo nl2br($data);
+  }
+
+
 
 
   /**

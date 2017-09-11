@@ -38,7 +38,7 @@ return [
             'timeout'   => 10,
         ],
         'gitlab' => [
-            'host'      => '13.228.10.174',
+            'host'      => '52.221.75.98',
             'username'  => 'root',
             'password'  => 'project2017',
             'key'       => '',
@@ -70,7 +70,7 @@ return [
             'timeout'   => 120,
         ],
         'ansible' => [
-            'host'      => '54.254.145.81',
+            'host'      => '13.228.0.211',
             'username'  => 'centos',
             'password'  => 'eieiei',
             'key'       => '',
