@@ -187,6 +187,7 @@
       <div class="col s10">
         <form action="{{url('savecommit')}}" id="commitform" class="col s12" method="post" enctype="multipart/form-data">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
+          <input type="hidden" id="configid" name="configid" value="{{$configid}}">
           <input type="hidden" id="edittext" name="edittext" value="">
           <div class="row">
             <div class="input-field col s2"></div>

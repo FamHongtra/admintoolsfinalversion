@@ -369,15 +369,25 @@ class ConfigController extends Controller
     $edittext = $request->input('edittext');
     $commitmsg = $request->input('commitmsg');
 
-    File::put('configs/test.conf', $edittext);
+    $configid = $request->input('configid');
 
-    // echo $edittext." ".$commitmsg;
+    $configpath = DB::table('configs')->where('id', $configid)->value('configpath');
+    $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
+    $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
+    $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
+    $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
+    $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
 
+    SSH::into('ansible')->run(array(
+      "ansible $servername -m shell -a 'echo \"$edittext\" > $configpath'",
+      "ansible $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$commitmsg\" &> /dev/null'", //Add this.
+      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+    ), function($line){
 
-    // $control_id = DB::table('configs')->where('id', $id)->value('control_id');
-    // $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
-    // $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
-    //
+    });
+    // 
     // $obj = Host::find($host_id);
     //
     // $data['obj'] = $obj;
@@ -386,14 +396,14 @@ class ConfigController extends Controller
     // $data['configid'] = $id ;
     //
     // $GLOBALS['test'] = 5;
-    //
-    // return view('editconfig',$data)->withErrors($GLOBALS['test']) ;
 
+    return redirect()->action('ConfigController@show', ['id' => $configid]);
     //
-    // $data = $request->input('data');
-    //
-    // File::put('configs/test.conf', $data);
-    // echo nl2br($data);
+    // echo "Yeah!";
+    // File::put('configs/test.conf', $edittext);
+
+    // echo $edittext." ".$commitmsg;
+
   }
 
 
