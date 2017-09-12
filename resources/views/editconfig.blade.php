@@ -160,8 +160,6 @@
 
 
         $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
-        $proj_id = 2 ;
-        $configpath = "/home/ubuntu/test.conf";
 
 
         $conf =substr($configpath, strrpos($configpath, '/') + 1);
@@ -170,7 +168,7 @@
 
         SSH::into('gitlab')->run(array(
 
-        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=master'",
+        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$configprojid/repository/files/$out/raw?ref=master'",
 
         ), function($line){
           echo $line;

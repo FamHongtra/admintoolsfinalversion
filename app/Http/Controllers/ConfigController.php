@@ -206,7 +206,8 @@ class ConfigController extends Controller
           $second_prompt = 'read -p \"Enter the commit message: \" msg';
 
           $gitcommitmsg = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m '.$yourmsg.' &> /dev/null';
-          $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
+          // $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
+          $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"Untitled.\" &> /dev/null';
           $gitpush = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
           $done = 'echo \"Done! Your Configuration file was saved.\"';
           if($key!=$GLOBALS['configscount']){
@@ -378,6 +379,14 @@ class ConfigController extends Controller
     $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
     $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
 
+    // $length = strlen(utf8_decode($commitmsg));
+
+    if ($commitmsg == "") {
+      $commitmsg = 'Untitled.';
+    }
+
+    echo $commitmsg;
+
     SSH::into('ansible')->run(array(
       "ansible $servername -m shell -a 'echo \"$edittext\" > $configpath'",
       "ansible $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
@@ -387,23 +396,8 @@ class ConfigController extends Controller
     ), function($line){
 
     });
-    // 
-    // $obj = Host::find($host_id);
-    //
-    // $data['obj'] = $obj;
-    //
-    // $data['controlid'] = $control_id;
-    // $data['configid'] = $id ;
-    //
-    // $GLOBALS['test'] = 5;
 
     return redirect()->action('ConfigController@show', ['id' => $configid]);
-    //
-    // echo "Yeah!";
-    // File::put('configs/test.conf', $edittext);
-
-    // echo $edittext." ".$commitmsg;
-
   }
 
 
