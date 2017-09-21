@@ -220,6 +220,10 @@
     <div class="row">
     </div>
 
+    <div class="" id="testnaja">
+
+    </div>
+
     <div id="server" class="" style="display:none">
       {{$obj->id}}
     </div>
@@ -250,6 +254,7 @@
     function saveCommit(){
       // alert("Hello"+id);
       document.getElementById('edittext').value = editor.getValue();
+
       $("#commitform").submit();
 
 

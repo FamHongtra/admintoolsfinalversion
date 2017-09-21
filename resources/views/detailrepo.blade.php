@@ -161,8 +161,8 @@
               </div>
               <?php
               use Illuminate\Support\Facades\DB as DB;
-              $configs = DB::table('configs')->where('control_id', $controlid)->get();
-              $configid = DB::table('configs')->where('id', $configid)->value('id');
+               $configs = DB::table('configs')->where('control_id', $controlid)->get();
+              // $configid = DB::table('configs')->where('id', $id)->value('id');
               $configname = DB::table('configs')->where('id', $configid)->value('configname');
               $configpath = DB::table('configs')->where('id', $configid)->value('configpath');
               $configprojid = DB::table('configs')->where('id', $configid)->value('gitlab_projid');
@@ -204,7 +204,7 @@
               <div class="row">
                 <div class="col s12" align="center">
                   <div class="" align="right">
-                    <a class="modal-trigger waves-effect waves-light btn-flat" href="{{url('editconfig/'.$config->id)}}"><i class="material-icons left">edit</i>Edit</a>
+                    <a class="modal-trigger waves-effect waves-light btn-flat" href="{{url('editconfig/'.$configid)}}"><i class="material-icons left">edit</i>Edit</a>
                   </div>
                   <span class="card-title">Configurations Name: {{$configname}}<br><b>({{$configpath}})</b></span>
                 </div>

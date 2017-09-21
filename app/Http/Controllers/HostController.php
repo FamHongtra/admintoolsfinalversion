@@ -204,7 +204,6 @@ class HostController extends Controller
       }
       //Testing
 
-      //
       $obj = new Host();
       $obj->servername = $servername;
       $obj->host = $host;
@@ -223,7 +222,7 @@ class HostController extends Controller
 
       return redirect('showhost');
 
-      // return "Add host by password";
+
     }
 
     //  return "by ".$bywhat."servername: ".$servername." host: ".$host." port: ".$port." username: ".$usrname." password: ".$password." filepath: ".$filepath;

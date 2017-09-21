@@ -317,20 +317,51 @@ class ConfigController extends Controller
     $configpath =substr( $configfullpath, 0, strrpos( $configfullpath, '/' ) + 1);
     $configname =substr($configfullpath, strrpos($configfullpath, '/') + 1);
 
-    SSH::into('ansible')->run(array(
-      "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen reset --hard $revisionid'",
-      "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
-      "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configfullpath'",
-      "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+    $services = array("nginx", "httpd", "mysql");
+    $serviceconfig = "";
 
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
-    ), function($line){
-      // echo $line;
+    foreach ( $services as $service ){
+      if ( strpos( $configfullpath, $service ) !== FALSE ){
+        $serviceconfig = $service;
+      }
+    }
 
-    });
+    if ($serviceconfig == "") {
+
+      SSH::into('ansible')->run(array(
+        "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen reset --hard $revisionid'",
+        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configfullpath'",
+        "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+
+      ), function($line){
+        // echo $line;
+      });
+
+    }else{
+
+      SSH::into('ansible')->run(array(
+        "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen reset --hard $revisionid'",
+        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configfullpath'",
+        "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+        "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
+      ), function($line){
+        // echo $line;
+      });
+
+    }
+
 
     // echo "git clone ".$configrepo." /home/$hostusr/vim/tmp_repo/".$configkeygen;
     // echo $configname;
@@ -366,38 +397,83 @@ class ConfigController extends Controller
 
   public function savecommit(Request $request)
   {
-    //
+
     $edittext = $request->input('edittext');
+
+
+    //  curl --request PUT --header 'PRIVATE-TOKEN: 9zxm6Uvgy4m_xbP-qvH7' 'http://52.221.75.98//api/v4/projects/6/repository/files/default%2Econf?branch=master&content=some%20other%20content&commit_message=update%20file'
+    $edittext = urlencode($edittext);
+
     $commitmsg = $request->input('commitmsg');
-
-    $configid = $request->input('configid');
-
-    $configpath = DB::table('configs')->where('id', $configid)->value('configpath');
-    $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
-    $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
-    $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
-    $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
-    $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
-
-    // $length = strlen(utf8_decode($commitmsg));
 
     if ($commitmsg == "") {
       $commitmsg = 'Untitled.';
     }
 
-    echo $commitmsg;
+    $commitmsg = urlencode($commitmsg);
 
-    SSH::into('ansible')->run(array(
-      "ansible $servername -m shell -a 'echo \"$edittext\" > $configpath'",
-      "ansible $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$commitmsg\" &> /dev/null'", //Add this.
-      "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+    $configid = $request->input('configid');
+
+    $configpath = DB::table('configs')->where('id', $configid)->value('configpath');
+
+    $configname = substr($configpath, strrpos($configpath, '/') + 1);
+
+    $configname = urlencode($configname);
+
+    $configpath = strtolower($configpath);
+
+    $services = array("nginx", "httpd", "mysql");
+
+    $serviceconfig = "";
+
+    foreach ( $services as $service ){
+      if ( strpos( $configpath, $service ) !== FALSE ){
+        $serviceconfig = $service;
+      }
+    }
+
+
+    $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
+    $configrepo = DB::table('configs')->where('id', $configid)->value('repository');
+    $proj_id = DB::table('configs')->where('id', $configid)->value('gitlab_projid');
+    $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
+    $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
+    $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
+    $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
+    SSH::into('gitlab')->run(array(
+      "curl --request PUT --header 'PRIVATE-TOKEN: 9zxm6Uvgy4m_xbP-qvH7' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$configname?branch=master&content=$edittext&commit_message=$commitmsg'",
     ), function($line){
-
+      // echo $line;
     });
 
+    if ($serviceconfig == "") {
+
+      SSH::into('ansible')->run(array(
+        "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
+        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
+        "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+      ), function($line){
+
+      });
+
+    }else{
+
+      SSH::into('ansible')->run(array(
+        "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
+        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
+        "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+        "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
+      ), function($line){
+
+      });
+    }
+
+
+
     return redirect()->action('ConfigController@show', ['id' => $configid]);
+
   }
 
 

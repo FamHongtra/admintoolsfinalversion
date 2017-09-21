@@ -14,6 +14,7 @@
 
 
 Route::get('/', function () {
+
   return view('welcome');
 });
 
@@ -346,8 +347,8 @@ Route::get('/testeditor', function () {
 
 
 Route::get('/testssh', function () {
-  return SSH::into('gitlab2')->run(array(
-    'echo "Hello3" | sudo tee --a /file',
+  return SSH::into('ansible')->run(array(
+    'ansible -m ping ubuntu',
   ), function($line){
     echo $line;
   });
