@@ -11,7 +11,12 @@
   <!-- Compiled and minified CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
 
-  <!-- Compiled and minified JavaScript -->
+  <!-- Sweetalert2 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.js"></script>
+
 
   <!-- icon -->
   <link rel="stylesheet" href="https://cdn.iconmonstr.com/1.2.0/css/iconmonstr-iconic-font.min.css">
@@ -97,345 +102,355 @@
   }
 
 
+  .swal2-modal {
+    font-family: 'Abel', sans-serif;
+  }
+
   </style>
 </head>
 
-<body onload="checkStatus()">
 
-  <nav>
-    <div class="nav-wrapper teal lighten-1">
-      <a href="{{url('showhost')}}" class="brand-logo">Logo</a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="sass.html">Sass</a></li>
-        <li><a href="badges.html">Components</a></li>
-        <li><a href="collapsible.html">JavaScript</a></li>
-      </ul>
-    </div>
-  </nav>
-  <div class="row">
-
-  </div>
-  <div class="row">
-  <div class="col s7">
-    <div class="col s4" align="left">
-          <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('showhost')}}"><i class="material-icons left">arrow_back</i>Back</a>
-    </div>
-  </div>
-  </div>
-  <div id="openmodal" style="display:none">
-    @if($errors->any())
-    {{$errors->first()}}
+@if (Session::has('status'))
+<body onload="hasmsg()">
+  @else
+  <body>
     @endif
-  </div>
-  <div class="row">
 
-    <div class="col s12" align="center"></div>
 
-    <div class="col s8">
+    <nav>
+      <div class="nav-wrapper teal lighten-1">
+        <a href="{{url('showhost')}}" class="brand-logo">Logo</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a href="sass.html">Sass</a></li>
+          <li><a href="badges.html">Components</a></li>
+          <li><a href="collapsible.html">JavaScript</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="row">
 
-      <div class="col s4" align="center">
-        <div class="card cyan darken-3" style="width:250px">
-          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
-        </div>
-        <div class="card" style="width:250px;">
-          <div class="card-image" style="padding:20px">
-            <img src="../img/server.png">
-            <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
-          </div>
-          <div class="card-action white">
-            <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" onclick="window.location.reload()"><i class="material-icons left">swap_vert</i>Connection</a>
-          </div>
+    </div>
+    <div class="row">
+      <div class="col s7">
+        <div class="col s4" align="left">
+          <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('showhost')}}" onclick="return loading();"><i class="material-icons left">arrow_back</i>Back</a>
         </div>
       </div>
+    </div>
+    <div id="openmodal" style="display:none">
+      @if($errors->any())
+      {{$errors->first()}}
+      @endif
+    </div>
+    <div class="row">
+
+      <div class="col s12" align="center"></div>
 
       <div class="col s8">
-        <div class="row">
-          <div class="col s12">
-            <div class="card blue-grey darken-1">
-              <div class="card-content white-text">
-                <span class="card-title"><h4>
-                  <?php SSH::into('ansible')->run(array(
-                    "ansible -m shell -a 'cat /etc/*-release' $obj->servername --become",
-                  ), function($line){
-                    if (strpos($line, 'SUCCESS') !== false) {
-                      $bfname_pos = strpos($line,"PRETTY_NAME=")+13;
-                      $bfname = substr($line,$bfname_pos);
-                      $afname_pos = strpos($bfname,"\"");
-                      $osversion = substr($bfname,0,$afname_pos);
-                      echo $osversion;
-                    }else{
-                      echo "Undifined" ;
-                    }
-                  }); ?></h4></span>
+
+        <div class="col s4" align="center">
+          <div class="card cyan darken-3" style="width:250px">
+            <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+          </div>
+          <div class="card" style="width:250px;">
+            <div class="card-image" style="padding:20px">
+              <img src="../img/server.png">
+              <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
+            </div>
+            <div class="card-action white">
+              <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('checkconnection/'.$controlid)}}" onclick="return loading();"><i class="material-icons left">swap_vert</i>Connection</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col s8">
+          <div class="row">
+            <div class="col s12">
+              <div class="card blue-grey darken-1">
+                <div class="card-content white-text">
+                  <span class="card-title"><h4>
+                    <?php SSH::into('ansible')->run(array(
+                      "ansible -m shell -a 'cat /etc/*-release' $obj->servername --become",
+                    ), function($line){
+                      if (strpos($line, 'SUCCESS') !== false) {
+                        $bfname_pos = strpos($line,"PRETTY_NAME=")+13;
+                        $bfname = substr($line,$bfname_pos);
+                        $afname_pos = strpos($bfname,"\"");
+                        $osversion = substr($bfname,0,$afname_pos);
+                        echo $osversion;
+                      }else{
+                        echo "Undifined" ;
+                      }
+                    }); ?></h4></span>
+                  </div>
+                  <div class="card-action blue-grey lighten-5">
+                    <i class="im im-linux-os" style="color:#546e7a;"><span style="font-family: 'Abel', sans-serif;margin-left:20px; color:#546e7a">Linux OS Version</span></i>
+                  </div>
                 </div>
-                <div class="card-action blue-grey lighten-5">
-                  <i class="im im-linux-os" style="color:#546e7a;"><span style="font-family: 'Abel', sans-serif;margin-left:20px; color:#546e7a">Linux OS Version</span></i>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col s6">
+                <div class="card blue-grey darken-1">
+                  <div class="card-content white-text">
+                    <span class="card-title">Processor</span>
+                    <?php SSH::into('ansible')->run(array(
+                      "ansible -m shell -a 'cat /proc/cpuinfo | grep \"model name\" | uniq' $obj->servername --become",
+                    ), function($line){
+                      if (strpos($line, 'SUCCESS') !== false) {
+                        $bfcpu_pos = strpos($line,":")+1;
+                        $bfcpu = substr($line,$bfcpu_pos);
+                        $atcpu_pos = strpos($bfcpu,"@");
+                        $atcpu = substr($bfcpu,0,$atcpu_pos-1);
+
+                        $cpuspeed = substr($bfcpu,$atcpu_pos+1);
+                        echo $atcpu;
+                        echo "<div align=\"right\" style=\"margin-right:30px\"><h4>$cpuspeed</h4></div>";
+                      }else{
+                        echo "<br>";
+                        echo "<div align=\"right\" style=\"margin-right:30px\"><h4>Undifined</h4></div>" ;
+                      }
+                    }); ?>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col s6">
+                <div class="card blue-grey darken-1">
+                  <div class="card-content white-text">
+                    <span class="card-title" >Installed memory (RAM)</span>
+                    <div class="" align="right" style="margin-right:30px">
+                      <br>
+                      <?php
+                      $GLOBALS['total'] = 0;
+                      SSH::into('ansible')->run(array(
+                        "ansible -m shell -a 'dmidecode -t 17 | grep Size' $obj->servername --become",
+                      ), function($line){
+                        if (strpos($line, 'SUCCESS') !== false) {
+                          $bfsize_pos = strpos($line,"Size:");
+                          $bfmem = substr($line,$bfsize_pos);
+                          $atmem_pos = strpos($bfmem,"Size: No Module Installed");
+                          $atmem_all = substr($bfmem,0,$atmem_pos-1);//get Size: xxxx MB ALL
+                          while(substr_count($atmem_all, 'Size:')!=false){
+                            $bfint = strpos($atmem_all,'Size:');
+                            $integ = substr($atmem_all,$bfint+6);
+                            $atint = strpos($integ,'MB');
+                            $integ = substr($integ,0,$atint-1);
+                            $GLOBALS['total']+=$integ;
+                            $bf = strpos($atmem_all,"MB");
+                            $atmem_all = substr($atmem_all,$bf+3);
+                          }
+                          echo "<h4>";
+                          echo round($GLOBALS['total']/1024)." Gb";
+                          echo "</h4>";
+                        }else{
+                          echo "<h4>Undifined</h4>";
+                        }
+                      }); ?>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="row">
-            <div class="col s6">
+            <div class="col s12">
               <div class="card blue-grey darken-1">
                 <div class="card-content white-text">
-                  <span class="card-title">Processor</span>
-                  <?php SSH::into('ansible')->run(array(
-                    "ansible -m shell -a 'cat /proc/cpuinfo | grep \"model name\" | uniq' $obj->servername --become",
-                  ), function($line){
-                    if (strpos($line, 'SUCCESS') !== false) {
-                      $bfcpu_pos = strpos($line,":")+1;
-                      $bfcpu = substr($line,$bfcpu_pos);
-                      $atcpu_pos = strpos($bfcpu,"@");
-                      $atcpu = substr($bfcpu,0,$atcpu_pos-1);
-
-                      $cpuspeed = substr($bfcpu,$atcpu_pos+1);
-                      echo $atcpu;
-                      echo "<div align=\"right\" style=\"margin-right:30px\"><h4>$cpuspeed</h4></div>";
-                    }else{
-                      echo "<br>";
-                      echo "<div align=\"right\" style=\"margin-right:30px\"><h4>Undifined</h4></div>" ;
-                    }
-                  }); ?>
-                </div>
-              </div>
-            </div>
-
-            <div class="col s6">
-              <div class="card blue-grey darken-1">
-                <div class="card-content white-text">
-                  <span class="card-title" >Installed memory (RAM)</span>
-                  <div class="" align="right" style="margin-right:30px">
-                    <br>
-                    <?php
-                    $GLOBALS['total'] = 0;
-                    SSH::into('ansible')->run(array(
-                      "ansible -m shell -a 'dmidecode -t 17 | grep Size' $obj->servername --become",
-                    ), function($line){
-                      if (strpos($line, 'SUCCESS') !== false) {
-                        $bfsize_pos = strpos($line,"Size:");
-                        $bfmem = substr($line,$bfsize_pos);
-                        $atmem_pos = strpos($bfmem,"Size: No Module Installed");
-                        $atmem_all = substr($bfmem,0,$atmem_pos-1);//get Size: xxxx MB ALL
-                        while(substr_count($atmem_all, 'Size:')!=false){
-                          $bfint = strpos($atmem_all,'Size:');
-                          $integ = substr($atmem_all,$bfint+6);
-                          $atint = strpos($integ,'MB');
-                          $integ = substr($integ,0,$atint-1);
-                          $GLOBALS['total']+=$integ;
-                          $bf = strpos($atmem_all,"MB");
-                          $atmem_all = substr($atmem_all,$bf+3);
-                        }
-                        echo "<h4>";
-                        echo round($GLOBALS['total']/1024)." Gb";
-                        echo "</h4>";
-                      }else{
-                        echo "<h4>Undifined</h4>";
-                      }
-                    }); ?>
+                  <div class="row">
+                    <div class="col s9">
+                      <span class="card-title">Repository of Configurations</span>
+                    </div>
+                    <div class="col s3" align="right">
+                      <a class="modal-trigger waves-effect waves-light btn-large teal" href="#modal1"><i class="material-icons left">add</i>Add Config</a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                <?php
+                use Illuminate\Support\Facades\DB as DB;
+                $configs = DB::table('configs')->where('control_id', $controlid)->get();
+                ?>
+                <div class="card-action blue-grey lighten-5 blue-grey darken-text" >
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:4%">No.</th>
+                        <th style="width:36%">Configuration Name</th>
+                        <th style="width:35%">Path</th>
+                        <th style="width:25%">Actions</th>
+                      </tr>
+                    </thead>
+                    @foreach($configs as $indexKey=>$config)
+                    <tbody align="right">
+                      <tr>
+                        <td>{{$indexKey+1}}</td>
+                        <td>{{$config->configname}}</td>
+                        <td>{{$config->configpath}}</td>
+                        <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}" onclick="return loading();" style="width:120px">View</a> <a class="modal-trigger waves-effect waves-light btn" href="#delconfig{{$config->id}}" style="width:120px">Delete</a></td>
+                      </tr>
+                    </tbody>
+                    <div id="delconfig{{$config->id}}" class="modal modal-fixed-footer">
+                      <div class="modal-content">
+                        <br>
+                        <!-- <h5>Add Host Description</h5> -->
+                        <!-- <p>You should add host by using rsa key for secure</p> -->
+                        <!-- <hr class="style-four"><br> -->
+                        <div class="row">
+                          <div class="col s1"></div>
+                          <div class="col s10">
+                            <br><br><br>
+                            <div id="byrsakey" class="row" style="display:block;">
+                              <form action="{{url('delconfig')}}" id="delconfigform{{$config->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="serverid" value="" id="serverid">
+                                <input type="hidden" name="configid" value="{{$config->id}}" id="configid">
+                                <div class="row">
+                                  <div class="col s2"></div>
+                                  <div class="col s8">
+                                    <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this config?</p>
+                                  </div>
+                                </div><br>
+                                <div class="row" align="center">
 
-        <div class="row">
-          <div class="col s12">
-            <div class="card blue-grey darken-1">
-              <div class="card-content white-text">
-                <div class="row">
-                  <div class="col s9">
-                    <span class="card-title">Repository of Configurations</span>
-                  </div>
-                  <div class="col s3" align="right">
-                    <a class="modal-trigger waves-effect waves-light btn-large teal" href="#modal1"><i class="material-icons left">add</i>Add Config</a>
-                  </div>
-                </div>
-              </div>
-              <?php
-              use Illuminate\Support\Facades\DB as DB;
-              $configs = DB::table('configs')->where('control_id', $controlid)->get();
-              ?>
-              <div class="card-action blue-grey lighten-5 blue-grey darken-text" >
-                <table>
-                  <thead>
-                    <tr>
-                      <th style="width:4%">No.</th>
-                      <th style="width:36%">Configuration Name</th>
-                      <th style="width:35%">Path</th>
-                      <th style="width:25%">Actions</th>
-                    </tr>
-                  </thead>
-                  @foreach($configs as $indexKey=>$config)
-                  <tbody align="right">
-                    <tr>
-                      <td>{{$indexKey+1}}</td>
-                      <td>{{$config->configname}}</td>
-                      <td>{{$config->configpath}}</td>
-                      <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}" style="width:120px">View</a> <a class="modal-trigger waves-effect waves-light btn" href="#delconfig{{$config->id}}" style="width:120px">Delete</a></td>
-                    </tr>
-                  </tbody>
-                  <div id="delconfig{{$config->id}}" class="modal modal-fixed-footer">
-                    <div class="modal-content">
-                      <br>
-                      <!-- <h5>Add Host Description</h5> -->
-                      <!-- <p>You should add host by using rsa key for secure</p> -->
-                      <!-- <hr class="style-four"><br> -->
-                      <div class="row">
-                        <div class="col s1"></div>
-                        <div class="col s10">
-                          <br><br><br>
-                          <div id="byrsakey" class="row" style="display:block;">
-                            <form action="{{url('delconfig')}}" id="delconfigform{{$config->id}}" class="col s12" method="post" enctype="multipart/form-data">
-                              <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                              <input type="hidden" name="serverid" value="" id="serverid">
-                              <input type="hidden" name="configid" value="{{$config->id}}" id="configid">
-                              <div class="row">
-                                <div class="col s2"></div>
-                                <div class="col s8">
-                                  <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this config?</p>
+                                  <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delConf({{$config->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
+                                  <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
                                 </div>
-                              </div><br>
-                              <div class="row" align="center">
-
-                                <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delConf({{$config->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
-                                <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
-                              </div>
-                              <div id="errormsg2" class="row" align="center" style="display:none">
-                                <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                              </div>
-                            </form>
+                                <div id="errormsg2" class="row" align="center" style="display:none">
+                                  <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                                </div>
+                              </form>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  @endforeach
-                </table>
+                    @endforeach
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="col s4">
-        <div class="row">
-          <div class="col s12"><span style="font-size: 250%; color:#607d8b">About Host</span><hr style="color: #607d8b">
-            <a class="modal-trigger" href="#modal2" style="color:#009688"><i class="material-icons left">add</i>add host description</a><br><br>
-            <!-- <div class="card-panel teal"> -->
+        <div class="col s4">
+          <div class="row">
+            <div class="col s12"><span style="font-size: 250%; color:#607d8b">About Host</span><hr style="color: #607d8b">
+              <a class="modal-trigger" href="#modal2" style="color:#009688"><i class="material-icons left">add</i>add host description</a><br><br>
+              <!-- <div class="card-panel teal"> -->
 
-            <?php
-            $descs = DB::table('descriptions')->where('host_id', $obj->id )->get();
-            ?>
+              <?php
+              $descs = DB::table('descriptions')->where('host_id', $obj->id )->get();
+              ?>
 
 
-            <ul class="collapsible popout" data-collapsible="expandable" >
+              <ul class="collapsible popout" data-collapsible="expandable" >
 
-              @foreach($descs as $indexKey=>$desc)
+                @foreach($descs as $indexKey=>$desc)
 
-              <li>
-                <div class="collapsible-header blue-grey lighten-5 blue-grey darken-text"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
-                <div class="collapsible-body"><span class="break-word"><?php echo nl2br($desc->descdetail);?></span></div>
-                <a href="#modal4" class="modal-trigger" id="clickmodal4" hidden=""></a>
+                <li>
+                  <div class="collapsible-header blue-grey lighten-5 blue-grey darken-text"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
+                  <div class="collapsible-body"><span class="break-word"><?php echo nl2br($desc->descdetail);?></span></div>
+                  <a href="#modal4" class="modal-trigger" id="clickmodal4" hidden=""></a>
+                </li>
+
+                <div id="edit{{$desc->id}}" class="modal modal-fixed-footer">
+                  <div class="modal-content">
+                    <br>
+                    <!-- <h5>Add Host Description</h5> -->
+                    <!-- <p>You should add host by using rsa key for secure</p> -->
+                    <!-- <hr class="style-four"><br> -->
+                    <div class="row">
+                      <div class="col s1"></div>
+                      <div class="col s10">
+                        <br>
+                        <div id="byrsakey" class="row" style="display:block;">
+                          <form action="{{url('editdesc')}}" id="editdescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="serverid" value="" id="serverid">
+                            <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
+                            <div class="row">
+                              <div class="input-field col s2"></div>
+                              <div class="input-field  col s8">
+                                <i class="material-icons prefix">description</i>
+                                <input id="icon_prefix" type="text" class="validate" name="descname" value="{{$desc->descname}}" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
+                                <label for="icon_prefix">Description Name</label>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="input-field col s2"></div>
+                              <div class="input-field col s8">
+                                <i class="material-icons prefix">line_weight</i>
+                                <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">{{$desc->descdetail}}</textarea>
+                                <label for="icon_prefix2">Description Detail</label>
+                              </div>
+                            </div>
+                            <div class="row" align="center">
+                              <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="editDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Save Changes</button>
+                              <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss=  "modal" ><i class="material-icons  left">close</i>Cancle</button>
+                            </div>
+                            <div id="errormsg2" class="row" align="center" style="display:none">
+                              <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="delete{{$desc->id}}" class="modal modal-fixed-footer">
+                  <div class="modal-content">
+                    <br>
+                    <!-- <h5>Add Host Description</h5> -->
+                    <!-- <p>You should add host by using rsa key for secure</p> -->
+                    <!-- <hr class="style-four"><br> -->
+                    <div class="row">
+                      <div class="col s1"></div>
+                      <div class="col s10">
+                        <br><br><br>
+                        <div id="byrsakey" class="row" style="display:block;">
+                          <form action="{{url('deldesc')}}" id="deldescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="serverid" value="" id="serverid">
+                            <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
+                            <div class="row">
+                              <div class="col s2"></div>
+                              <div class="col s8">
+                                <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this description?</p>
+                              </div>
+                            </div><br>
+                            <div class="row" align="center">
+
+                              <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
+                              <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
+                            </div>
+                            <div id="errormsg2" class="row" align="center" style="display:none">
+                              <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endforeach
+
+                <!-- <li>
+                <div class="collapsible-header"><i class="material-icons">dvr</i>Second</div>
+                <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
               </li>
-
-              <div id="edit{{$desc->id}}" class="modal modal-fixed-footer">
-                <div class="modal-content">
-                  <br>
-                  <!-- <h5>Add Host Description</h5> -->
-                  <!-- <p>You should add host by using rsa key for secure</p> -->
-                  <!-- <hr class="style-four"><br> -->
-                  <div class="row">
-                    <div class="col s1"></div>
-                    <div class="col s10">
-                      <br>
-                      <div id="byrsakey" class="row" style="display:block;">
-                        <form action="{{url('editdesc')}}" id="editdescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
-                          <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="serverid" value="" id="serverid">
-                          <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
-                          <div class="row">
-                            <div class="input-field col s2"></div>
-                            <div class="input-field  col s8">
-                              <i class="material-icons prefix">description</i>
-                              <input id="icon_prefix" type="text" class="validate" name="descname" value="{{$desc->descname}}" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
-                              <label for="icon_prefix">Description Name</label>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="input-field col s2"></div>
-                            <div class="input-field col s8">
-                              <i class="material-icons prefix">line_weight</i>
-                              <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">{{$desc->descdetail}}</textarea>
-                              <label for="icon_prefix2">Description Detail</label>
-                            </div>
-                          </div>
-                          <div class="row" align="center">
-                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="editDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Save Changes</button>
-                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss=  "modal" ><i class="material-icons  left">close</i>Cancle</button>
-                          </div>
-                          <div id="errormsg2" class="row" align="center" style="display:none">
-                            <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="delete{{$desc->id}}" class="modal modal-fixed-footer">
-                <div class="modal-content">
-                  <br>
-                  <!-- <h5>Add Host Description</h5> -->
-                  <!-- <p>You should add host by using rsa key for secure</p> -->
-                  <!-- <hr class="style-four"><br> -->
-                  <div class="row">
-                    <div class="col s1"></div>
-                    <div class="col s10">
-                      <br><br><br>
-                      <div id="byrsakey" class="row" style="display:block;">
-                        <form action="{{url('deldesc')}}" id="deldescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
-                          <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="serverid" value="" id="serverid">
-                          <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
-                          <div class="row">
-                            <div class="col s2"></div>
-                            <div class="col s8">
-                              <p style="font-size:25px; text-align: center"><i class="material-icons">error_outline</i>Do you want to delete this description?</p>
-                            </div>
-                          </div><br>
-                          <div class="row" align="center">
-
-                            <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="delDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Ok</button>
-                            <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss="modal"><i class="material-icons  left">close</i>Cancle</button>
-                          </div>
-                          <div id="errormsg2" class="row" align="center" style="display:none">
-                            <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              @endforeach
-
-              <!-- <li>
-              <div class="collapsible-header"><i class="material-icons">dvr</i>Second</div>
+              <li>
+              <div class="collapsible-header"><i class="material-icons">dvr</i>Third</div>
               <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
-            </li>
-            <li>
-            <div class="collapsible-header"><i class="material-icons">dvr</i>Third</div>
-            <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
-          </li> -->
-        </ul>
-        <!-- <span class="white-text">I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively. I am similar to what is called a panel in other frameworks. I am similar to what is called a panel in otI am similar to what is called a panel in other frameworks.I am similar to what is called a panel in other frameworks.I am similar to what is called a panel in other frameworks.her frameworks.
-      </span> -->
-      <!-- </div> -->
+            </li> -->
+          </ul>
+          <!-- <span class="white-text">I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively. I am similar to what is called a panel in other frameworks. I am similar to what is called a panel in otI am similar to what is called a panel in other frameworks.I am similar to what is called a panel in other frameworks.I am similar to what is called a panel in other frameworks.her frameworks.
+        </span> -->
+        <!-- </div> -->
+      </div>
     </div>
   </div>
-</div>
 </div>
 <div class="row">
 </div>
@@ -539,23 +554,7 @@
       </div>
     </div>
   </div>
-
-  <div id="status"  style="display:none">
-
-    <?php
-    use Collective\Remote\RemoteFacade as SSH ;
-    SSH::into('ansible')->run(array(
-      "ansible -m ping $obj->servername",
-    ), function($line){
-      // if (strpos($line, 'pong') !== false) {
-      //   echo "<span>connected</span>" ;
-      // }
-      echo $line;
-    });
-    ?>
-  </div>
 </div>
-<script src="js/progressbar.js"></script>
 
 <!--Import jQuery before materialize.js-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
@@ -563,6 +562,32 @@
 <script type="text/javascript">
 //dialogs
 
+@if (Session::has('status'))
+function hasmsg(){
+  swal({
+    title: "{!! Session::get('title') !!}",
+    text: "{!! Session::get('text') !!}",
+    type: "{!! Session::get('icon') !!}",
+    confirmButtonColor: '#26a69a',
+  });
+
+}
+
+// swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
+
+@endif
+
+function loading(){
+  swal({
+    imageUrl: '../img/load.gif',
+    imageWidth: 120,
+    showCancelButton: false,
+    showConfirmButton: false,
+    animation: false,
+    allowOutsideClick: false,
+    confirmButtonColor: '#26a69a',
+  });
+}
 
 
 function addDesc(){
@@ -582,6 +607,16 @@ function addDesc(){
 
   if( ($formdescname != "") && ($formdescdetail != "")){
     if($resvaliddescname){
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+      $('#modal2').modal().hide();
       document.getElementById('errormsg2').style.display = "none" ;
       $("#descform").submit();
     }else{
@@ -611,6 +646,16 @@ function editDesc(id){
 
   if( ($formdescname != "") && ($formdescdetail != "")){
     if($resvaliddescname){
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+      $('#edit'+id).modal().hide();
       document.getElementById('errormsg2').style.display = "none" ;
       $("#editdescform"+id).submit();
     }else{
@@ -630,6 +675,17 @@ function delDesc(id){
   $server = document.getElementById('server').textContent ;
   $idform.elements.namedItem('serverid').value = $server;
 
+  swal({
+    imageUrl: '../img/load.gif',
+    imageWidth: 120,
+    showCancelButton: false,
+    showConfirmButton: false,
+    animation: false,
+    allowOutsideClick: false,
+    confirmButtonColor: '#26a69a',
+  });
+  $('#delete'+id).modal().hide();
+
   $("#deldescform"+id).submit();
 
 }
@@ -642,12 +698,21 @@ function delConf(id){
   $server = document.getElementById('server').textContent ;
   $idform.elements.namedItem('serverid').value = $server;
 
+  swal({
+    imageUrl: '../img/load.gif',
+    imageWidth: 120,
+    showCancelButton: false,
+    showConfirmButton: false,
+    animation: false,
+    allowOutsideClick: false,
+    confirmButtonColor: '#26a69a',
+  });
+  $('#delconfig'+id).modal().hide();
   $("#delconfigform"+id).submit();
 
 }
 
 function chkconfigname(){
-
 
   $idform=document.getElementById('hostform');
   $formpathname = $idform.elements.namedItem("pathname").value;
@@ -660,6 +725,17 @@ function chkconfigname(){
   $formpathconf = $idform.elements.namedItem("pathconf").value;
   if( ($formpathname != "") && ($formpathconf != "")){
     if($resvalidpathname){
+
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+      $('#modal1').modal().hide();
       document.getElementById('errormsg1').style.display = "none" ;
       $("#hostform").submit();
     }else{
@@ -668,49 +744,8 @@ function chkconfigname(){
   }else{
     document.getElementById('errormsg1').style.display = "block" ;
   }
-
 }
 
-function checkStatus(){
-
-
-  $addpathcomeback = document.getElementById('openmodal').textContent ;
-  // check path && description message toast
-
-  if(($addpathcomeback.indexOf("0") >= 0)||($addpathcomeback.indexOf("1") >= 0)||($addpathcomeback.indexOf("2") >= 0)||($addpathcomeback.indexOf("3") >= 0)||($addpathcomeback.indexOf("4") >= 0)||($addpathcomeback.indexOf("5") >= 0)||($addpathcomeback.indexOf("6") >= 0)){
-    if(($addpathcomeback.indexOf("0") >= 0)){
-      $msg = "<span>Sorry, the configuration file not found.</span>"
-      Materialize.toast($msg, 5000,'pink accent-1 rounded');
-    }else if(($addpathcomeback.indexOf("1") >= 0)){
-      $msg = "<span>The configuration file was saved to the system.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else if(($addpathcomeback.indexOf("2") >= 0)){
-      $msg = "<span>The host description was added.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else if(($addpathcomeback.indexOf("3") >= 0)){
-      $msg = "<span>The host description was edited.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else if(($addpathcomeback.indexOf("4") >= 0)){
-      $msg = "<span>The host description was deleted.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else if(($addpathcomeback.indexOf("6") >= 0)){
-      $msg = "<span>The config was deleted.</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }
-  }else{
-    $status= document.getElementById('status').textContent;
-    if(($status.indexOf("SUCCESS") >= 0)){
-      $msg = "<span>connected</span>"
-      Materialize.toast($msg, 5000,'teal accent-3 rounded');
-    }else{
-      $msg= "<span>disconnect</span>";
-      Materialize.toast($msg, 5000,'pink accent-1 rounded');
-    }
-  }
-
-  $server = document.getElementById('server').textContent ;
-  document.getElementById('serverid').value = $server;
-}
 //modal scripts
 $(document).ready(function(){
   // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered

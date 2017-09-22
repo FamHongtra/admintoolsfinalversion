@@ -9,6 +9,7 @@ use App\Config;
 use App\Host;
 use DB;
 use File;
+use Alert;
 
 class ConfigController extends Controller
 {
@@ -49,6 +50,12 @@ class ConfigController extends Controller
     //
     $GLOBALS['jsonArray'] = "";
     $GLOBALS['test'] = 0;
+
+    $request->session()->flash('status', 'true');
+    $request->session()->flash('title', 'Failed!');
+    $request->session()->flash('text', 'The configuration file not found.');
+    $request->session()->flash('icon', 'error');
+
     $serverid = $request->input('serverid');
     $GLOBALS['serverid'] = $serverid;
     $controlid = $request->input('controlid');
@@ -116,6 +123,11 @@ class ConfigController extends Controller
       //Waiting...
 
       if($GLOBALS['test'] == 1){
+
+        $request->session()->flash('status', 'true');
+        $request->session()->flash('title', 'Successful!');
+        $request->session()->flash('text', 'The configuration file was saved to the system.');
+        $request->session()->flash('icon', 'success');
         //Adding
         // $curpath = substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);// for make dir firsttime
         // $mkdirfirst = 'mkdir -p ~/nanoad/tmp_repo'.$curpath;
@@ -296,6 +308,12 @@ class ConfigController extends Controller
 
     $serverobj = Host::find($serverid);
     $GLOBALS['test'] = 6 ;
+
+    $request->session()->flash('status', 'true');
+    $request->session()->flash('title', 'Successful!');
+    $request->session()->flash('text', 'The config was deleted.');
+    $request->session()->flash('icon', 'success');
+
     return Redirect::back()->with('obj',$serverobj)->withErrors($GLOBALS['test']);
   }
 
@@ -319,6 +337,7 @@ class ConfigController extends Controller
 
     $services = array("nginx", "httpd", "mysql");
     $serviceconfig = "";
+    $GLOBALS['servicerestart'] = "success";
 
     foreach ( $services as $service ){
       if ( strpos( $configfullpath, $service ) !== FALSE ){
@@ -355,11 +374,37 @@ class ConfigController extends Controller
         "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
         "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was revisioned to version id $revisionid.\" &> /dev/null'", //Add this.
         "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
-        "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
       ), function($line){
         // echo $line;
       });
 
+      SSH::into('ansible')->run(array(
+        "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
+      ), function($line){
+        if (strpos($line, 'msg') !== false) {
+          $GLOBALS['servicerestart'] = "failure";
+          $cutfront = substr($line,strpos($line, 'msg')+7);
+          $newcut = substr($cutfront,0,strpos($cutfront, '}')-1);
+          $GLOBALS['failuremsg'] = $newcut;
+        }
+      });
+
+    }
+
+    if( $GLOBALS['servicerestart'] == "success"){
+
+      $request->session()->flash('status', 'success');
+      $request->session()->flash('title', 'Successful!');
+      $request->session()->flash('text', 'Revision Configuration task was successful.');
+      $request->session()->flash('icon', 'success');
+
+    }else{
+
+      $request->session()->flash('status', 'failure');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'Revision Configuration task was failed.');
+      $request->session()->flash('icon', 'error');
+      $request->session()->flash('failuremsg', $GLOBALS['failuremsg']);
     }
 
     //
@@ -424,6 +469,7 @@ class ConfigController extends Controller
     $services = array("nginx", "httpd", "mysql");
 
     $serviceconfig = "";
+    $GLOBALS['servicerestart'] = "success";
 
     foreach ( $services as $service ){
       if ( strpos( $configpath, $service ) !== FALSE ){
@@ -448,7 +494,7 @@ class ConfigController extends Controller
     if ($serviceconfig == "") {
 
       SSH::into('ansible')->run(array(
-          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ pull backupversion master &> /dev/null'",//Add this.
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ pull backupversion master &> /dev/null'",//Add this.
         "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
         // "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
         "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
@@ -466,10 +512,36 @@ class ConfigController extends Controller
         // "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
         "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
         "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+        // "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
+      ), function($line){
+      });
+
+      SSH::into('ansible')->run(array(
         "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
       ), function($line){
-        // echo $line;
+        if (strpos($line, 'msg') !== false) {
+          $GLOBALS['servicerestart'] = "failure";
+          $cutfront = substr($line,strpos($line, 'msg')+7);
+          $newcut = substr($cutfront,0,strpos($cutfront, '}')-1);
+          $GLOBALS['failuremsg'] = $newcut;
+        }
       });
+    }
+
+    if( $GLOBALS['servicerestart'] == "success"){
+
+      $request->session()->flash('status', 'success');
+      $request->session()->flash('title', 'Successful!');
+      $request->session()->flash('text', 'Edit Configuration task was successful.');
+      $request->session()->flash('icon', 'success');
+
+    }else{
+
+      $request->session()->flash('status', 'failure');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'Edit Configuration task was failed.');
+      $request->session()->flash('icon', 'error');
+      $request->session()->flash('failuremsg', $GLOBALS['failuremsg']);
     }
 
     return redirect()->action('ConfigController@show', ['id' => $configid]);

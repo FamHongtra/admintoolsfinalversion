@@ -12,7 +12,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
 
   <!-- Compiled and minified JavaScript -->
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.js"></script>
   <!-- icon -->
   <link rel="stylesheet" href="https://cdn.iconmonstr.com/1.2.0/css/iconmonstr-iconic-font.min.css">
   <!--Let browser know website is optimized for mobile-->
@@ -108,6 +111,11 @@
     width: 100%;
   }
 
+  .swal2-modal {
+    font-family: 'Abel', sans-serif;
+  }
+
+
   </style>
 </head>
 
@@ -125,7 +133,7 @@
 
   <nav>
     <div class="nav-wrapper teal lighten-1">
-      <a href="{{url('showhost')}}" class="brand-logo">Logo</a>
+      <a href="{{url('showhost')}}" onclick="return loading();" class="brand-logo">Logo</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a href="sass.html">Sass</a></li>
         <li><a href="badges.html">Components</a></li>
@@ -139,7 +147,7 @@
   <div class="row">
     <div class="col s7">
       <div class="col s4" align="left">
-        <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('detailrepo/'.$configid)}}"><i class="material-icons left">arrow_back</i>Back</a>
+        <a class="waves-effect waves-light btn-large" style="width:200px" href="{{url('detailrepo/'.$configid)}}"  onclick="return loading();"><i class="material-icons left">arrow_back</i>Back</a>
       </div>
     </div>
   </div>
@@ -191,7 +199,7 @@
             <div class="input-field col s2"></div>
             <div class="input-field input-field2 col s8">
               <i class="material-icons prefix">comment</i>
-              <input id="icon_prefix" type="text" class="validate" name="commitmsg" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
+              <input id="icon_prefix" type="text" class="validate" name="commitmsg" pattern="^[a-zA-Z0-9-@\s]{1,50}$" title="Servername should be 1 to 32 characters.">
               <label for="icon_prefix">Commit message</label>
             </div>
           </div>
@@ -253,115 +261,21 @@
     //dialogs
     function saveCommit(){
       // alert("Hello"+id);
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
       document.getElementById('edittext').value = editor.getValue();
-
       $("#commitform").submit();
 
-
     }
 
 
-    function addDesc(){
-
-      $idform=document.getElementById('descform');
-
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
-
-
-      $formdescname = $idform.elements.namedItem("descname").value;
-
-      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvaliddescname = $descnamepatt.test($formdescname);
-
-      $formdescdetail = $idform.elements.namedItem("descdetail").value;
-
-      if( ($formdescname != "") && ($formdescdetail != "")){
-        if($resvaliddescname){
-          document.getElementById('errormsg2').style.display = "none" ;
-          $("#descform").submit();
-        }else{
-          document.getElementById('errormsg2').style.display = "block" ;
-        }
-      }else{
-        document.getElementById('errormsg2').style.display = "block" ;
-      }
-
-    }
-
-    function editDesc(id){
-      // alert("Hello"+id);
-
-      $idform=document.getElementById('editdescform'+id);
-
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
-
-
-      $formdescname = $idform.elements.namedItem("descname").value;
-
-      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvaliddescname = $descnamepatt.test($formdescname);
-
-      $formdescdetail = $idform.elements.namedItem("descdetail").value;
-
-      if( ($formdescname != "") && ($formdescdetail != "")){
-        if($resvaliddescname){
-          document.getElementById('errormsg2').style.display = "none" ;
-          $("#editdescform"+id).submit();
-        }else{
-          document.getElementById('errormsg2').style.display = "block" ;
-        }
-      }else{
-        document.getElementById('errormsg2').style.display = "block" ;
-      }
-
-    }
-
-    function revisionSubmit(id){
-      // alert("Hello"+id);
-
-
-      $("#versform"+id).submit();
-
-    }
-
-    function delDesc(id){
-      // alert("Hello"+id);
-
-      $idform=document.getElementById('deldescform'+id);
-
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
-
-      $("#deldescform"+id).submit();
-
-    }
-
-    function chkconfigname(){
-
-
-      $idform=document.getElementById('hostform');
-      $formpathname = $idform.elements.namedItem("pathname").value;
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
-
-      $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidpathname = $pathnamepatt.test($formpathname);
-
-      $formpathconf = $idform.elements.namedItem("pathconf").value;
-      if( ($formpathname != "") && ($formpathconf != "")){
-        if($resvalidpathname){
-          document.getElementById('errormsg1').style.display = "none" ;
-          $("#hostform").submit();
-        }else{
-          document.getElementById('errormsg1').style.display = "block" ;
-        }
-      }else{
-        document.getElementById('errormsg1').style.display = "block" ;
-      }
-
-    }
 
     //modal scripts
     $(document).ready(function(){

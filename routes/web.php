@@ -95,6 +95,7 @@ Route::post('/delconfig', 'ConfigController@deleteConfig');
 Route::post('/adddesc', 'DescriptionController@addDescription');
 Route::post('/editdesc', 'DescriptionController@editDescription');
 Route::post('/deldesc', 'DescriptionController@deleteDescription');
+Route::get('/checkconnection/{hostid}', 'HostController@checkConnection');
 Route::get('/detailrepo/{configid}', 'ConfigController@show');
 Route::get('/editconfig/{configid}', 'ConfigController@editconfig');
 Route::get('/detailversion/{versionid}', 'ConfigController@showcontent');

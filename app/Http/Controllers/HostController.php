@@ -245,6 +245,45 @@ class HostController extends Controller
     return view('detailhost',$data) ;
   }
 
+  public function checkConnection(Request $request, $id)
+  {
+    $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+
+
+    $obj = Host::find($host_id);
+    $servername = $obj->servername ;
+
+    $GLOBALS['ping'] = 0;
+
+    SSH::into('ansible')->run(array(
+      "ansible -m ping $servername",
+    ), function($line){
+      if (strpos($line, 'SUCCESS') !== false) {
+        $GLOBALS['ping'] = 1;
+      }
+    });
+
+    if($GLOBALS['ping'] == 1){
+      $request->session()->flash('status', 'connection');
+      $request->session()->flash('title', 'Connected!');
+      $request->session()->flash('text', 'The host is already connected.');
+      $request->session()->flash('icon', 'success');
+    }else{
+      $request->session()->flash('status', 'connection');
+      $request->session()->flash('title', 'Disconnected!');
+      $request->session()->flash('text', 'The host is not connected.');
+      $request->session()->flash('icon', 'error');
+    }
+
+
+
+    $data['obj'] = $obj;
+    $data['controlid'] = $id;
+
+    return Redirect::back();
+    // return view('detailhost',$data) ;
+  }
+
   public function search(Request $request)
   {
     $searchkey = $request->input('searchkey');
