@@ -362,10 +362,7 @@ class ConfigController extends Controller
 
     }
 
-
-    // echo "git clone ".$configrepo." /home/$hostusr/vim/tmp_repo/".$configkeygen;
-    // echo $configname;
-
+    //
     return redirect()->action('ConfigController@show', ['id' => $configid]);
 
   }
@@ -397,6 +394,8 @@ class ConfigController extends Controller
 
   public function savecommit(Request $request)
   {
+
+    $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
 
     $edittext = $request->input('edittext');
 
@@ -441,7 +440,7 @@ class ConfigController extends Controller
     $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
     $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
     SSH::into('gitlab')->run(array(
-      "curl --request PUT --header 'PRIVATE-TOKEN: 9zxm6Uvgy4m_xbP-qvH7' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$configname?branch=master&content=$edittext&commit_message=$commitmsg'",
+      "curl --request PUT --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$configname?branch=master&content=$edittext&commit_message=$commitmsg'",
     ), function($line){
       // echo $line;
     });
@@ -449,10 +448,12 @@ class ConfigController extends Controller
     if ($serviceconfig == "") {
 
       SSH::into('ansible')->run(array(
+          "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ pull backupversion master &> /dev/null'",//Add this.
         "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
-        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        // "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
         "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
         "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ pull &> /dev/null'",
       ), function($line){
 
       });
@@ -460,17 +461,16 @@ class ConfigController extends Controller
     }else{
 
       SSH::into('ansible')->run(array(
+        "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ pull backupversion master &> /dev/null'",//Add this.
         "ansible $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen'",
-        "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+        // "ansible $servername -m shell -a 'cp /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname /home/$hostusr/vim/tmp_repo/$configkeygen/'",
         "ansible $servername -m shell -a 'cat /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/$configname > $configpath'",
         "ansible $servername -m shell -a 'rm -rf /home/$hostusr/vim/tmp_repo/$configkeygen/$configkeygen/'",
         "ansible-playbook /etc/ansible/Reservice.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'servicename=$serviceconfig'",
       ), function($line){
-
+        // echo $line;
       });
     }
-
-
 
     return redirect()->action('ConfigController@show', ['id' => $configid]);
 
