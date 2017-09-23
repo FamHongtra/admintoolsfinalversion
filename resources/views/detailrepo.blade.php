@@ -1,115 +1,115 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-<!--Import Google Icon Font-->
-<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<!--Import materialize.css-->
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-<link href="https://fonts.googleapis.com/css?family=Arsenal" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Abel|Arsenal" rel="stylesheet">
-<!-- Compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
+  <!--Import Google Icon Font-->
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Import materialize.css-->
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Arsenal" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Abel|Arsenal" rel="stylesheet">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
 
-<!-- Sweetalert2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.js"></script>
+  <!-- Sweetalert2 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.9.1/sweetalert2.js"></script>
 
-<!-- icon -->
-<link rel="stylesheet" href="https://cdn.iconmonstr.com/1.2.0/css/iconmonstr-iconic-font.min.css">
-<!--Let browser know website is optimized for mobile-->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style media="screen">
-html, body {
-  background-color: #fff;
-  color: #636b6f;
-  font-family: 'Abel', sans-serif;
-  font-weight: 100;
-  height: 100vh;
-  margin: 0;
+  <!-- icon -->
+  <link rel="stylesheet" href="https://cdn.iconmonstr.com/1.2.0/css/iconmonstr-iconic-font.min.css">
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style media="screen">
+  html, body {
+    background-color: #fff;
+    color: #636b6f;
+    font-family: 'Abel', sans-serif;
+    font-weight: 100;
+    height: 100vh;
+    margin: 0;
+    /*
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;*/
+  }
   /*
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;*/
-}
-/*
-main {
-flex: 1 0 auto;
-}*/
+  main {
+  flex: 1 0 auto;
+  }*/
 
-.input-field1.input-field input[type=text]:focus + label {
-  color: #00acc1;
-}
-.input-field1.input-field input[type=text]:focus {
-  border-bottom: 1px solid #00acc1;
-  box-shadow: 0 1px 0 0 #00acc1;
-}
+  .input-field1.input-field input[type=text]:focus + label {
+    color: #00acc1;
+  }
+  .input-field1.input-field input[type=text]:focus {
+    border-bottom: 1px solid #00acc1;
+    box-shadow: 0 1px 0 0 #00acc1;
+  }
 
-.input-field1.input-field input[type=text].valid {
-  border-bottom: 1px solid #0097a7;
-  box-shadow: 0 1px 0 0 #0097a7;
-}
+  .input-field1.input-field input[type=text].valid {
+    border-bottom: 1px solid #0097a7;
+    box-shadow: 0 1px 0 0 #0097a7;
+  }
 
-.input-field1.input-field .prefix.active {
-  color: #00acc1;
-}
-.input-field1.input-field input[type=number]:focus + label {
-  color: #00acc1;
-}
-.input-field1.input-field input[type=number]:focus {
-  border-bottom: 1px solid #00acc1;
-  box-shadow: 0 1px 0 0 #00acc1;
-}
-.input-field1.input-field input[type=number].valid {
-  border-bottom: 1px solid #0097a7;
-  box-shadow: 0 1px 0 0 #0097a7;
-}
+  .input-field1.input-field .prefix.active {
+    color: #00acc1;
+  }
+  .input-field1.input-field input[type=number]:focus + label {
+    color: #00acc1;
+  }
+  .input-field1.input-field input[type=number]:focus {
+    border-bottom: 1px solid #00acc1;
+    box-shadow: 0 1px 0 0 #00acc1;
+  }
+  .input-field1.input-field input[type=number].valid {
+    border-bottom: 1px solid #0097a7;
+    box-shadow: 0 1px 0 0 #0097a7;
+  }
 
-.input-field2.input-field input[type=text]:focus + label {
-  color: #00bfa5;
-}
-.input-field2.input-field input[type=text]:focus {
-  border-bottom: 1px solid #00bfa5;
-  box-shadow: 0 1px 0 0 #00bfa5;
-}
+  .input-field2.input-field input[type=text]:focus + label {
+    color: #00bfa5;
+  }
+  .input-field2.input-field input[type=text]:focus {
+    border-bottom: 1px solid #00bfa5;
+    box-shadow: 0 1px 0 0 #00bfa5;
+  }
 
-.input-field2.input-field .prefix.active {
-  color: #00bfa5;
-}
-.input-field2.input-field input[type=number]:focus + label {
-  color: #00bfa5;
-}
-.input-field2.input-field input[type=number]:focus {
-  border-bottom: 1px solid #00bfa5;
-  box-shadow: 0 1px 0 0 #00bfa5;
-}
-hr.style-four {
-  height: 12px;
-  border: 0;
-  box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.5);
-}
-.file-path-wrapper input[type=text].valid{
-  border-bottom: 1px solid #00acc1;
-  box-shadow: 0 1px 0 0 #00acc1;
-}
-.modal { width: 40% !important ; max-height: 55% !important ; overflow-y: hidden !important ;}
+  .input-field2.input-field .prefix.active {
+    color: #00bfa5;
+  }
+  .input-field2.input-field input[type=number]:focus + label {
+    color: #00bfa5;
+  }
+  .input-field2.input-field input[type=number]:focus {
+    border-bottom: 1px solid #00bfa5;
+    box-shadow: 0 1px 0 0 #00bfa5;
+  }
+  hr.style-four {
+    height: 12px;
+    border: 0;
+    box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.5);
+  }
+  .file-path-wrapper input[type=text].valid{
+    border-bottom: 1px solid #00acc1;
+    box-shadow: 0 1px 0 0 #00acc1;
+  }
+  .modal { width: 40% !important ; max-height: 55% !important ; overflow-y: hidden !important ;}
 
-.break-word {
-  overflow-wrap: break-word;
-}
+  .break-word {
+    overflow-wrap: break-word;
+  }
 
-.modal-header {
-  padding: 15px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
+  .modal-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
 
-.swal2-modal {
-  font-family: 'Abel', sans-serif;
-}
+  .swal2-modal {
+    font-family: 'Abel', sans-serif;
+  }
 
-</style>
+  </style>
 </head>
 
 
@@ -415,215 +415,212 @@ hr.style-four {
 
         }else{
           swal({
-            title: 'Error',
-            text: "You won't be able to revert this!",
-            type: 'warning',
+              title: "{!! Session::get('title') !!}",
+              text: "{!! Session::get('text') !!}",
+              type: "{!! Session::get('icon') !!}",
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+          confirmButtonColor: '#26a69a',
+            confirmButtonText: 'See more details'
           }).then(function () {
-            swal(
-              'Deleted!',
-              'Your file has been deleted.',
-              'success'
-            )
-          })
-
-          // swal({
-          //   title: "{!! Session::get('title') !!}",
-          //   text: "{!! Session::get('text') !!}",
-          //   type: "{!! Session::get('icon') !!}",
-          //   showCancelButton: true,
-          //   confirmButtonColor: '#26a69a',
-          //   confirmButtonText: 'see more details',
-          //   closeOnConfirm: false,
-          //   closeOnCancel: false
-          // }).then(function() {
-          //   swal({
-          //     title: "Error Message"
-          //     text: "{!! Session::get('failuremsg') !!}",
-          //     confirmButtonColor: '#26a69a',
-          //   });
-          // });
-
-          document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
-          // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
+            swal({
+              text: "{!! Session::get('failuremsg') !!}",
+              confirmButtonColor: '#26a69a',
+            });
+          });
         }
-      }
-      @endif
 
-      function loading(){
-        swal({
-          imageUrl: '../img/load.gif',
-          imageWidth: 120,
-          showCancelButton: false,
-          showConfirmButton: false,
-          animation: false,
-          allowOutsideClick: false,
-          confirmButtonColor: '#26a69a',
-        });
-      }
+        // swal({
 
-      function addDesc(){
+        //   showCancelButton: true,
 
-        $idform=document.getElementById('descform');
+        //   confirmButtonText: 'see more details',
+        //   closeOnConfirm: false,
+        //   closeOnCancel: false
+        // }).then(function() {
+        // swal({
+        //   title: "Error Message"
+        //   text: "{!! Session::get('failuremsg') !!}",
+        //   confirmButtonColor: '#26a69a',
+        // });
+        // });
 
-        $server = document.getElementById('server').textContent ;
-        $idform.elements.namedItem('serverid').value = $server;
+      document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
+      // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
+
+    }
+    @endif
+
+    function loading(){
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+    }
+
+    function addDesc(){
+
+      $idform=document.getElementById('descform');
+
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
 
 
-        $formdescname = $idform.elements.namedItem("descname").value;
+      $formdescname = $idform.elements.namedItem("descname").value;
 
-        $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-        $resvaliddescname = $descnamepatt.test($formdescname);
+      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvaliddescname = $descnamepatt.test($formdescname);
 
-        $formdescdetail = $idform.elements.namedItem("descdetail").value;
+      $formdescdetail = $idform.elements.namedItem("descdetail").value;
 
-        if( ($formdescname != "") && ($formdescdetail != "")){
-          if($resvaliddescname){
-            document.getElementById('errormsg2').style.display = "none" ;
-            $("#descform").submit();
-          }else{
-            document.getElementById('errormsg2').style.display = "block" ;
-          }
+      if( ($formdescname != "") && ($formdescdetail != "")){
+        if($resvaliddescname){
+          document.getElementById('errormsg2').style.display = "none" ;
+          $("#descform").submit();
         }else{
           document.getElementById('errormsg2').style.display = "block" ;
         }
-
+      }else{
+        document.getElementById('errormsg2').style.display = "block" ;
       }
 
-      function editDesc(id){
-        // alert("Hello"+id);
+    }
 
-        $idform=document.getElementById('editdescform'+id);
+    function editDesc(id){
+      // alert("Hello"+id);
 
-        $server = document.getElementById('server').textContent ;
-        $idform.elements.namedItem('serverid').value = $server;
+      $idform=document.getElementById('editdescform'+id);
+
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
 
 
-        $formdescname = $idform.elements.namedItem("descname").value;
+      $formdescname = $idform.elements.namedItem("descname").value;
 
-        $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-        $resvaliddescname = $descnamepatt.test($formdescname);
+      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvaliddescname = $descnamepatt.test($formdescname);
 
-        $formdescdetail = $idform.elements.namedItem("descdetail").value;
+      $formdescdetail = $idform.elements.namedItem("descdetail").value;
 
-        if( ($formdescname != "") && ($formdescdetail != "")){
-          if($resvaliddescname){
-            document.getElementById('errormsg2').style.display = "none" ;
-            $("#editdescform"+id).submit();
-          }else{
-            document.getElementById('errormsg2').style.display = "block" ;
-          }
+      if( ($formdescname != "") && ($formdescdetail != "")){
+        if($resvaliddescname){
+          document.getElementById('errormsg2').style.display = "none" ;
+          $("#editdescform"+id).submit();
         }else{
           document.getElementById('errormsg2').style.display = "block" ;
         }
-
+      }else{
+        document.getElementById('errormsg2').style.display = "block" ;
       }
 
-
-      function revisionSubmit(id){
-
-        swal({
-          imageUrl: '../img/load.gif',
-          imageWidth: 120,
-          showCancelButton: false,
-          showConfirmButton: false,
-          animation: false,
-          allowOutsideClick: false,
-          confirmButtonColor: '#26a69a',
-        });
-        $("#versform"+id).submit();
+    }
 
 
-      }
+    function revisionSubmit(id){
 
-      function delDesc(id){
-        // alert("Hello"+id);
-
-        $idform=document.getElementById('deldescform'+id);
-
-        $server = document.getElementById('server').textContent ;
-        $idform.elements.namedItem('serverid').value = $server;
-
-        $("#deldescform"+id).submit();
-
-      }
-
-      function chkconfigname(){
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+      $("#versform"+id).submit();
 
 
-        $idform=document.getElementById('hostform');
-        $formpathname = $idform.elements.namedItem("pathname").value;
-        $server = document.getElementById('server').textContent ;
-        $idform.elements.namedItem('serverid').value = $server;
+    }
 
-        $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-        $resvalidpathname = $pathnamepatt.test($formpathname);
+    function delDesc(id){
+      // alert("Hello"+id);
 
-        $formpathconf = $idform.elements.namedItem("pathconf").value;
-        if( ($formpathname != "") && ($formpathconf != "")){
-          if($resvalidpathname){
-            document.getElementById('errormsg1').style.display = "none" ;
-            $("#hostform").submit();
-          }else{
-            document.getElementById('errormsg1').style.display = "block" ;
-          }
+      $idform=document.getElementById('deldescform'+id);
+
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
+
+      $("#deldescform"+id).submit();
+
+    }
+
+    function chkconfigname(){
+
+
+      $idform=document.getElementById('hostform');
+      $formpathname = $idform.elements.namedItem("pathname").value;
+      $server = document.getElementById('server').textContent ;
+      $idform.elements.namedItem('serverid').value = $server;
+
+      $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+      $resvalidpathname = $pathnamepatt.test($formpathname);
+
+      $formpathconf = $idform.elements.namedItem("pathconf").value;
+      if( ($formpathname != "") && ($formpathconf != "")){
+        if($resvalidpathname){
+          document.getElementById('errormsg1').style.display = "none" ;
+          $("#hostform").submit();
         }else{
           document.getElementById('errormsg1').style.display = "block" ;
         }
-
+      }else{
+        document.getElementById('errormsg1').style.display = "block" ;
       }
 
-      function showCurrent(){
+    }
 
-        document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
+    function showCurrent(){
 
+      document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
+
+    }
+    //modal scripts
+    $(document).ready(function(){
+      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+      $('.modal').modal();
+    });
+
+    $(document).ready(function(){
+      $('.collapsible').collapsible();
+    });
+
+
+    function byPassword() {
+      document.getElementById('byrsakey').style.display = "none";
+      document.getElementById('bypassword').style.display = "block";
+      $("#password").removeClass('teal accent-4');
+      $("#password").addClass('teal darken-3');
+      $("#rsakey").removeClass('cyan darken-3');
+      $("#rsakey").addClass('cyan darken-1');
+    }
+    function byRSAKey() {
+      document.getElementById('bypassword').style.display = "none";
+      document.getElementById('byrsakey').style.display = "block";
+      $("#password").removeClass('teal darken-3');
+      $("#password").addClass('teal accent-4');
+      $("#rsakey").removeClass('cyan darken-1');
+      $("#rsakey").addClass('cyan darken-3');
+    }
+
+
+    $("#submitbtn").on('click', function(){
+      $form1 = document.getElementById('byrsakey').style.display ;
+
+      $form2 = document.getElementById('bypassword').style.display ;
+      if($form1 == "block"){
+        alert('Sent form RSA');
+        $("#hostform").submit();
+      }else if($form2 == "block"){
+        alert('Sent form Pass');
+        $("#hostform2").submit();
       }
-      //modal scripts
-      $(document).ready(function(){
-        // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-        $('.modal').modal();
-      });
+    });
 
-      $(document).ready(function(){
-        $('.collapsible').collapsible();
-      });
+    </script>
+  </body>
 
-
-      function byPassword() {
-        document.getElementById('byrsakey').style.display = "none";
-        document.getElementById('bypassword').style.display = "block";
-        $("#password").removeClass('teal accent-4');
-        $("#password").addClass('teal darken-3');
-        $("#rsakey").removeClass('cyan darken-3');
-        $("#rsakey").addClass('cyan darken-1');
-      }
-      function byRSAKey() {
-        document.getElementById('bypassword').style.display = "none";
-        document.getElementById('byrsakey').style.display = "block";
-        $("#password").removeClass('teal darken-3');
-        $("#password").addClass('teal accent-4');
-        $("#rsakey").removeClass('cyan darken-1');
-        $("#rsakey").addClass('cyan darken-3');
-      }
-
-
-      $("#submitbtn").on('click', function(){
-        $form1 = document.getElementById('byrsakey').style.display ;
-
-        $form2 = document.getElementById('bypassword').style.display ;
-        if($form1 == "block"){
-          alert('Sent form RSA');
-          $("#hostform").submit();
-        }else if($form2 == "block"){
-          alert('Sent form Pass');
-          $("#hostform2").submit();
-        }
-      });
-
-      </script>
-    </body>
-
-    </html> -->
+  </html> -->
