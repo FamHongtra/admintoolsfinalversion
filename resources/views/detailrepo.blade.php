@@ -263,7 +263,7 @@
                       @php
                       //impersonal token of gitlab user.
 
-                      $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+                      $imp_token = "1xfYQD8Km8LsfWaYVP_d";
                       $proj_id = $configprojid ;
 
 
@@ -317,7 +317,7 @@
                         <textarea id="textarea1" class="materialize-textarea">@php
                           //impersonal token of gitlab user.
 
-                          $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+                          $imp_token = "1xfYQD8Km8LsfWaYVP_d";
                           $proj_id = $configprojid ;
 
 
@@ -623,4 +623,4 @@
     </script>
   </body>
 
-  </html> -->
+  </html>

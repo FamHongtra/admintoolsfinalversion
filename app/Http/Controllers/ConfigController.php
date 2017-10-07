@@ -89,8 +89,8 @@ class ConfigController extends Controller
 
           //Using Gitlab API
 
-          $user_id = 4;
-          $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+          $user_id = 2;
+          $imp_token = "1xfYQD8Km8LsfWaYVP_d";
           $proj_name = str_random(20);
 
           SSH::into('gitlab')->run(array(
@@ -258,8 +258,8 @@ class ConfigController extends Controller
 
     $obj = Host::find($host_id);
 
-    $user_id = 4;
-    $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+    $user_id = 2;
+    $imp_token = "1xfYQD8Km8LsfWaYVP_d";
     $GLOBALS['jsonArray'] = "";
 
     SSH::into('gitlab')->run(array(
@@ -440,7 +440,7 @@ class ConfigController extends Controller
   public function savecommit(Request $request)
   {
 
-    $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+    $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
     $edittext = $request->input('edittext');
 

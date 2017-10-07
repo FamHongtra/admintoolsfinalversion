@@ -199,7 +199,7 @@
             <div class="input-field col s2"></div>
             <div class="input-field input-field2 col s8">
               <i class="material-icons prefix">comment</i>
-              <input id="icon_prefix" type="text" class="validate" name="commitmsg" pattern="^[a-zA-Z0-9-@\s]{1,50}$" title="Servername should be 1 to 32 characters.">
+              <input id="icon_prefix" type="text" class="validate" name="commitmsg" pattern="^[a-zA-Z0-9-@\s]{1,50}$">
               <label for="icon_prefix">Commit message</label>
             </div>
           </div>

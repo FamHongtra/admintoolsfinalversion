@@ -68,12 +68,21 @@ Route::get('/showhost', function () {
 
   $user_id = 1 ;
 
+  // objs is set of hosts havn't the group
   $objs = DB::table('hosts')
   ->join('controls', 'hosts.id', '=', 'controls.host_id')
   ->where('controls.user_id', $user_id)
+  ->where('controls.group_id', 0)
   ->get();
 
+  $all_group = DB::table('groups')
+  ->where('user_id', $user_id)
+  ->get();
+
+
+
   $data['objs'] = $objs;
+  $data['all_group'] = $all_group;
   $data['user_id'] = $user_id;
 
   return view('showhost',$data);
@@ -103,6 +112,7 @@ Route::get('search/autocomplete', 'SearchController@autocomplete');
 Route::post('/revision', 'ConfigController@revisionconfig');
 Route::post('/savecommit', 'ConfigController@savecommit');
 Route::post('/savefile', 'ConfigController@editconfig');
+Route::post('/creategroup', 'GroupController@createGroup');
 
 
 //About Gitlab API
@@ -154,7 +164,7 @@ Route::get('/testapicreateuser', function () {
     // "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' --data 'username=adminfam' --data 'password=adminfameiei' --data 'name=AdminFam' --data 'email=adminfam@example.com' http://13.228.10.174/api/v4/users",
 
     //NEW Gitlab Server
-    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: maFg6FdYbeheyfdpztx_' --data 'username=ubuntu' --data 'password=ubuntueiei' --data 'name=ubuntu' --data 'email=ubuntu@example.com' --data 'skip_confirmation=true' http://52.221.75.98/api/v4/users",
+    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'username=ubuntu' --data 'password=ubuntueiei' --data 'name=ubuntu' --data 'email=ubuntu@example.com' --data 'skip_confirmation=true' http://52.221.75.98/api/v4/users",
 
   ), function($line){
 
@@ -170,11 +180,11 @@ Route::get('/testapicreatetoken', function () {
 
   //Create Impersonal Token and get token
 
-  $user_id = 4;
+  $user_id = 2;
 
   SSH::into('gitlab')->run(array(
 
-    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: maFg6FdYbeheyfdpztx_' --data 'name=mytoken1' --data 'expires_at=2018-01-01' --data 'scopes[]=api' http://52.221.75.98/api/v4/users/$user_id/impersonation_tokens",
+    "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'name=mytoken1' --data 'expires_at=2018-01-01' --data 'scopes[]=api' http://52.221.75.98/api/v4/users/$user_id/impersonation_tokens",
 
   ), function($line){
 
@@ -191,7 +201,7 @@ Route::get('/testapicreaterepo', function () {
   //Create Repository by Using Impersonal Token
 
   $user_id = 29;
-  $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+  $imp_token = "1xfYQD8Km8LsfWaYVP_d";
   $proj_name = str_random(20);
 
   SSH::into('gitlab')->run(array(
@@ -212,7 +222,7 @@ Route::get('/testapilistrepo', function () {
   //List Repositories by Using Impersonal Token
 
   $user_id = 29;
-  $imp_token = "UmM88DPkcbo6hRVC_TBo";
+  $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
   SSH::into('gitlab')->run(array(
 
@@ -243,7 +253,7 @@ Route::get('/testapilistrepocommits', function () {
 
   $user_id = 29;
   $proj_id = 57;
-  $imp_token = "y8sjNrH5eoPoL2HEsAtk";
+  $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
   SSH::into('gitlab')->run(array(
 
@@ -267,7 +277,7 @@ Route::get('/testapilistrepocommits', function () {
 
 Route::get('/testdecode', function () {
 
-  $imp_token = "eWQofD635bPE5auXVNAE";
+  $imp_token = "1xfYQD8Km8LsfWaYVP_d";
   $proj_id = 69 ;
 
   $file = "eiei.conf";
@@ -292,7 +302,7 @@ Route::get('/testdecode', function () {
 
 Route::get('/writefile', function () {
 
-  $imp_token = "eWQofD635bPE5auXVNAE";
+  $imp_token = "1xfYQD8Km8LsfWaYVP_d";
   $proj_id = 107 ;
 
   $file = "test.conf";
@@ -334,15 +344,6 @@ Route::get('/testeditor', function () {
   return view('editconfig');
 
 });
-
-
-
-
-
-
-
-
-
 
 
 

@@ -20,6 +20,7 @@ class CreateControlsTable extends Migration
             $table->integer('passtype_id');
             $table->integer('user_id');
             $table->integer('host_id');
+            $table->integer('group_id');
             $table->timestamps();
         });
     }

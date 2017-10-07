@@ -179,7 +179,7 @@ class HostController extends Controller
       ), function($line){
         if (strpos($line, 'SUCCESS') !== false) {
           $GLOBALS['ping'] = 1;
-          echo $GLOBALS['ping'];
+          // echo $GLOBALS['ping'];
         }
       });
 
@@ -218,6 +218,7 @@ class HostController extends Controller
       $obj2->passtype_id = 2;
       $obj2->user_id = $user_id;
       $obj2->host_id = $host->id ;
+      $obj2->group_id = 0 ;
       $obj2->save();
 
       return redirect('showhost');
