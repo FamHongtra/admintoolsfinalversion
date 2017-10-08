@@ -301,7 +301,7 @@ class HostController extends Controller
         ->get();
 
         $all_group = [];
-        // 
+        //
         // if($objs->count()==0){
         //   $request->session()->flash('status', 'not found');
         //   $request->session()->flash('title', 'Not Found!');

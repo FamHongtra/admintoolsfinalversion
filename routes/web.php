@@ -114,6 +114,9 @@ Route::post('/revision', 'ConfigController@revisionconfig');
 Route::post('/savecommit', 'ConfigController@savecommit');
 Route::post('/savefile', 'ConfigController@editconfig');
 Route::post('/creategroup', 'GroupController@createGroup');
+Route::post('/groupaddmore', 'GroupController@groupAddmore');
+Route::post('/leftgroup', 'GroupController@leftGroup');
+Route::post('/delgroup', 'GroupController@delGroup');
 
 
 //About Gitlab API

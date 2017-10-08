@@ -172,7 +172,7 @@
       @foreach($objs as $indexKey=>$obj)
       <div class="col s12 m6 l3" align="center">
         <div class="card cyan darken-3" style="width:250px">
-          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">delete</i></a></h5>
         </div>
         <div class="card" style="width:250px;">
           <div class="card-image" style="padding:20px">
@@ -377,7 +377,7 @@
 
       <div class="col s12">
         <ul class="collection with-header grey lighten-2">
-          <li class="collection-header blue-grey darken-1" style="font-size:15pt;color:white"><div> <i class="material-icons">view_week</i>&nbsp&nbsp&nbsp&nbsp{{$group->groupname}}<a href="#!" class="secondary-content"><i class="material-icons" style="color:white">build</i></a></div></li>
+          <li class="collection-header blue-grey darken-1" style="font-size:15pt;color:white"><div> <i class="material-icons" style="margin-right:20px">view_week</i>{{$group->groupname}}<a href="#!" onclick="delgroup({{$group->id}})" class="secondary-content"><i class="material-icons" style="color:white">delete</i></a><a href="#addmore{{$group->id}}" class="secondary-content" style="margin-right:20px"><i class="material-icons" style="color:white">add_circle</i></a></div></li>
 
           @php
           $objs_group = DB::table('hosts')
@@ -390,7 +390,7 @@
             @foreach($objs_group as $indexKey=>$obj_group)
             <div class="col s12 m6 l3" align="center">
               <div class="card cyan darken-3" style="width:250px">
-                <h5 style="padding:10px;color:white">{{$obj_group->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+                <h5 style="padding:10px;color:white">{{$obj_group->servername}}<a href="#!" onclick="leftgroup({{$obj_group->id}})"><i class="material-icons right" style="color:white">remove_circle</i></a></h5>
               </div>
               <div class="card" style="width:250px;">
                 <div class="card-image" style="padding:20px">
@@ -402,12 +402,83 @@
                 </div>
               </div>
             </div>
+
+            <form action="{{url('leftgroup')}}" id="leftgroupform{{$obj_group->id}}" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="user_id" value="{{ $user_id }}"/>
+              <input type="hidden" name="host_id" value="{{ $obj_group->id }}"/>
+            </form>
             @endforeach
           </li>
 
         </ul>
       </div>
     </div>
+
+
+    <!-- add more hosts -->
+
+
+
+    <div class="container" align="left">
+      <!-- Page Content goes here -->
+      <!-- Modal Structure -->
+      <div id="addmore{{$group->id}}" class="modal modal-fixed-footer">
+        <div class="modal-content">
+          <br>
+          <!-- <h5>Add Host</h5> -->
+          <!-- <p>You should add host by using rsa key for secure</p> -->
+          <!-- <hr class="style-four"><br> -->
+          <div class="row">
+            <div class="col s1"></div>
+            <div class="col s10">
+              <div class="row" style="display:block;">
+                <form action="{{url('groupaddmore')}}" id="groupaddmoreform" class="col s12" method="post" enctype="multipart/form-data">
+                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="user_id" value="{{ $user_id }}">
+                  <input type="hidden" name="group_id" value="{{ $group->id }}">
+                  <div class="row">
+                    <div class="input-field col s2"></div>
+                    <div class="input-field input-field2 col s8">
+                      <i class="material-icons prefix" style="color:#00bfa5">view_week</i>
+                      <input disabled id="icon_prefix" type="text" name="groupname" value="{{$group->groupname}}" style="color:#455a64">
+                      <label for="icon_prefix" style="color:#00bfa5">Host's Group Name</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col s10 offset-s1">
+                      Ungroup Hosts:
+                      <ul class="collection scroll">
+                        @foreach($objs as $indexKey=>$obj)
+                        <li class="collection-item">
+                          <div><input type="checkbox" class="filled-in" name="selecthost[]" id="filled-in-box2{{$indexKey+1}}" value="{{$obj->id}}"/><label for="filled-in-box2{{$indexKey+1}}" style="color:#455a64; font-size:13pt">{{$obj->servername}} - {{$obj->host}}</label></div>
+                        </li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="errormsg" class="row" align="center" style="display:none">
+                    <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class="modal-action waves-effect waves-green btn-flat" id="submitgroupaddmore" >Add More</a>
+        </div>
+      </div>
+    </div>
+
+    <form action="{{url('delgroup')}}" id="delgroupform{{$group->id}}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+      <input type="hidden" name="user_id" value="{{ $user_id }}"/>
+      <input type="hidden" name="group_id" value="{{ $group->id }}"/>
+    </form>
+
     @endforeach
     <!--Import jQuery before materialize.js-->
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script> -->
@@ -464,9 +535,51 @@
       });
     }
 
+    function leftgroup(id){
+      swal({
+        title: 'Are you sure?',
+        text: "The host will be moved out from this group!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Yes'
+      }).then(function () {
+        $("#leftgroupform"+id).submit();
+        swal({
+          imageUrl: 'img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+      });
+    }
+
+    function delgroup(id){
+      swal({
+        title: 'Are you sure?',
+        text: "The group will be deleted and all hosts in this group will be moved out!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Yes'
+      }).then(function () {
+        $("#delgroupform"+id).submit();
+        swal({
+          imageUrl: 'img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+      });
+    }
+
     function searchBy(){
-
-
       // $searchby = document.getElementById("searchby");
       // $searchopt = searchby.options[searchby.selectedIndex].value;
       //
@@ -505,6 +618,12 @@
 
     $("#submitgroup").on('click', function(){
       $("#groupform").submit();
+    });
+
+    $("#submitgroupaddmore").on('click', function(){
+      $("#groupaddmoreform").submit();
+      $('.modal').modal().hide();
+      return loading();
     });
 
     $('#groupform').on('submit', function (e) {
