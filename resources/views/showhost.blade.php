@@ -160,7 +160,7 @@
           </div>
         </form>
       </div>
-      @if(!empty($objs))
+      @if(count($objs)!=0))
       <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
       @else
       <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
