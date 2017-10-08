@@ -135,462 +135,506 @@
     <br><br>
 
 
+    <div class="row">
+
+      <div class="input-field col s4 m2 l1 offset-l6">
+        <select id="searchby" onchange="searchBy()">
+          <option value="autocomplete" selected>Hostname or IP</option>
+          <option value="autocompleteGroup">Groupname</option>
+        </select>
+        <label>Search By</label>
+      </div>
+
+      <div class="col s8 m4 l2">
+
+        <form action="{{url('searchhost')}}"  onsubmit="return loading();" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="user_id" value="{{ $user_id }}">
+          <input type="hidden" name="search_by" id="checksearch" value="{{ $user_id }}">
+
+          <div class="input-field">
+            <!-- <input type="text" name="searchkey" id="autocomplete"/> -->
+            <input class="searchbar" id="autocomplete" type="search" name="searchkey" placeholder="Search here"/>
+            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+            <i class="material-icons" onclick="blankSearch()">close</i>
+          </div>
+        </form>
+      </div>
+      @if(!empty($objs))
+      <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
+      @else
+      <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
+      @endif
+    </div>
 
     <div class="row">
-      <!-- <div class="col s5">
-    </div> -->
-    <div class="col s12 m6 l3 offset-l6">
-      <form action="{{url('searchhost')}}"  onsubmit="return loading();" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="user_id" value="{{ $user_id }}">
-        <div class="input-field">
-          <!-- <input type="text" name="searchkey" id="autocomplete"/> -->
-          <input class="searchbar" id="autocomplete" type="search" name="searchkey" placeholder="Search Hostname or IP"/>
-          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-          <i class="material-icons" onclick="blankSearch()">close</i>
+
+      @foreach($objs as $indexKey=>$obj)
+      <div class="col s12 m6 l3" align="center">
+        <div class="card cyan darken-3" style="width:250px">
+          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
         </div>
-      </form>
-    </div>
-    @if(!$objs->isEmpty())
-    <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
-    @else
-    <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
-    @endif
-  </div>
-
-  <div class="row">
-
-    @foreach($objs as $indexKey=>$obj)
-    <div class="col s12 m6 l3" align="center">
-      <div class="card cyan darken-3" style="width:250px">
-        <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+        <div class="card" style="width:250px;">
+          <div class="card-image" style="padding:20px">
+            <img src="img/server.png">
+            <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
+          </div>
+          <div class="card-action white">
+            <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
+          </div>
+        </div>
       </div>
-      <div class="card" style="width:250px;">
-        <div class="card-image" style="padding:20px">
-          <img src="img/server.png">
-          <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
+      @endforeach
+
+      <div class="container" align="left">
+        <!-- Page Content goes here -->
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal modal-fixed-footer">
+          <div class="modal-content">
+            <br>
+            <!-- <h5>Add Host</h5> -->
+            <!-- <p>You should add host by using rsa key for secure</p> -->
+            <!-- <hr class="style-four"><br> -->
+            <div class="row">
+              <div class="col s1"></div>
+              <div class="col s10">
+                <div class="" align="center">
+                  <a id="password" class="waves-effect waves-light btn teal accent-4" href="#modal1" onclick="byPassword()" ><i class="material-icons right">vpn_key</i>Add Host by Using Password</a>
+                  <a id="rsakey" class="waves-effect waves-light btn cyan darken-1" href="#modal1" onclick="byRSAKey()"><i class="material-icons right">vpn_key</i>Add Host by Using RSA Key</a><br><br>
+                </div>
+                <div id="bypassword" class="row" style="display:block;">
+                  <form action="{{url('loading')}}" id="hostform2" class="col s12" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="bywhat" value="password">
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field2 col s8">
+                        <i class="material-icons prefix">perm_contact_calendar</i>
+                        <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
+                        <label for="icon_prefix">Server Name</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field2 col s5">
+                        <i class="material-icons prefix">dns</i>
+                        <input id="icon_prefix" type="text" class="validate" name="host"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid ip address.">
+                        <label for="icon_prefix">Hosts</label>
+                      </div>
+                      <div class="input-field input-field2 col s3">
+                        <i class="material-icons prefix">phone</i>
+                        <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0-65535.">
+                        <label for="icon_telephone">Port</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field2 col s8">
+                        <i class="material-icons prefix">perm_identity</i>
+                        <input id="icon_prefix" type="text" class="validate" name="usrname"  pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters.">
+                        <label for="icon_prefix">Username</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field2 col s8">
+                        <i class="material-icons prefix">vpn_key</i>
+                        <input id="icon_telephone" type="password" class="validate" name="password" pattern="^[a-z0-9]{6,}$" title="Password should consist of at least 6 characters and lower case.">
+                        <label for="icon_telephone">Password</label>
+                      </div>
+                    </div>
+
+                    <div id="errormsg" class="row" align="center" style="display:none">
+                      <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                    </div>
+
+                  </form>
+                </div>
+
+                <div id="byrsakey" class="row" style="display:none;">
+                  <form action="{{url('loading')}}" id="hostform" class="col s12" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="bywhat" value="rsakey">
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field1 col s8">
+                        <i class="material-icons prefix">perm_contact_calendar</i>
+                        <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters, required.">
+                        <label for="icon_prefix">Server Name</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field1 col s5">
+                        <i class="material-icons prefix">dns</i>
+                        <input id="icon_prefix" type="text" class="validate" name="host" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid IP, required.">
+                        <label for="icon_prefix">Hosts</label>
+                      </div>
+                      <div class="input-field input-field1 col s3">
+                        <i class="material-icons prefix">phone</i>
+                        <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0 to 65535, required.">
+                        <label for="icon_telephone">Port</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field1 col s8">
+                        <i class="material-icons prefix">perm_identity</i>
+                        <input id="icon_prefix" type="text" class="validate" name="usrname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters, required.">
+                        <label for="icon_prefix">Username</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s2"></div>
+                      <div class="file-field col s8">
+                        <div class="btn" style="background-color:#00acc1">
+                          <span>RSA Key</span>
+                          <input type="file" name="password">
+                        </div>
+                        <div class="file-path-wrapper">
+                          <input class="file-path validate" type="text" name="filepath">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="errormsg1" class="row" align="center" style="display:none">
+                      <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
+              <div class="col s1" ></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a class="modal-action waves-effect waves-green btn-flat" id="submitbtn">Submit</a>
+          </div>
         </div>
-        <div class="card-action white">
-          <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
+      </div>
+
+
+
+
+
+      <div class="container" align="left">
+        <!-- Page Content goes here -->
+        <!-- Modal Structure -->
+        <div id="modal2" class="modal modal-fixed-footer">
+          <div class="modal-content">
+            <br>
+            <!-- <h5>Add Host</h5> -->
+            <!-- <p>You should add host by using rsa key for secure</p> -->
+            <!-- <hr class="style-four"><br> -->
+            <div class="row">
+              <div class="col s1"></div>
+              <div class="col s10">
+                <div class="row" style="display:block;">
+                  <form action="{{url('creategroup')}}" id="groupform" class="col s12" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="user_id" value="{{ $user_id }}">
+                    <div class="row">
+                      <div class="input-field col s2"></div>
+                      <div class="input-field input-field2 col s8">
+                        <i class="material-icons prefix">view_week</i>
+                        <input id="icon_prefix" type="text" class="validate" name="groupname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Group name should be 1 to 32 characters.">
+                        <label for="icon_prefix">Host's Group Name</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col s10 offset-s1">
+                        Ungroup Hosts:
+                        <ul class="collection scroll">
+                          @foreach($objs as $indexKey=>$obj)
+                          <li class="collection-item">
+                            <div><input type="checkbox" class="filled-in" name="selecthost[]" id="filled-in-box{{$indexKey+1}}" value="{{$obj->id}}"/><label for="filled-in-box{{$indexKey+1}}" style="color:#455a64; font-size:13pt">{{$obj->servername}} - {{$obj->host}}</label></div>
+                          </li>
+                          @endforeach
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div id="errormsg" class="row" align="center" style="display:none">
+                      <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a class="modal-action waves-effect waves-green btn-flat" id="submitgroup" >Create Group</a>
+          </div>
         </div>
+      </div>
+
+
+    </div>
+
+
+    @foreach($all_group as $group)
+    <div class="row">
+
+      <div class="col s12">
+        <ul class="collection with-header grey lighten-2">
+          <li class="collection-header blue-grey darken-1" style="font-size:15pt;color:white"><div> <i class="material-icons">view_week</i>&nbsp&nbsp&nbsp&nbsp{{$group->groupname}}<a href="#!" class="secondary-content"><i class="material-icons" style="color:white">build</i></a></div></li>
+
+          @php
+          $objs_group = DB::table('hosts')
+          ->join('controls', 'hosts.id', '=', 'controls.host_id')
+          ->where('controls.user_id', $user_id)
+          ->where('controls.group_id', $group->id)
+          ->get();
+          @endphp
+          <li class="collection-item grey lighten-2">
+            @foreach($objs_group as $indexKey=>$obj_group)
+            <div class="col s12 m6 l3" align="center">
+              <div class="card cyan darken-3" style="width:250px">
+                <h5 style="padding:10px;color:white">{{$obj_group->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+              </div>
+              <div class="card" style="width:250px;">
+                <div class="card-image" style="padding:20px">
+                  <img src="img/server.png">
+                  <span class="card-title" style="color:#263238"><b>{{$obj_group->host}}</b></span>
+                </div>
+                <div class="card-action white">
+                  <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj_group->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
+                </div>
+              </div>
+            </div>
+            @endforeach
+          </li>
+
+        </ul>
       </div>
     </div>
     @endforeach
+    <!--Import jQuery before materialize.js-->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+    <script type="text/javascript">
 
-    <div class="container" align="left">
-      <!-- Page Content goes here -->
-      <!-- Modal Structure -->
-      <div id="modal1" class="modal modal-fixed-footer">
-        <div class="modal-content">
-          <br>
-          <!-- <h5>Add Host</h5> -->
-          <!-- <p>You should add host by using rsa key for secure</p> -->
-          <!-- <hr class="style-four"><br> -->
-          <div class="row">
-            <div class="col s1"></div>
-            <div class="col s10">
-              <div class="" align="center">
-                <a id="password" class="waves-effect waves-light btn teal accent-4" href="#modal1" onclick="byPassword()" ><i class="material-icons right">vpn_key</i>Add Host by Using Password</a>
-                <a id="rsakey" class="waves-effect waves-light btn cyan darken-1" href="#modal1" onclick="byRSAKey()"><i class="material-icons right">vpn_key</i>Add Host by Using RSA Key</a><br><br>
-              </div>
-              <div id="bypassword" class="row" style="display:block;">
-                <form action="{{url('loading')}}" id="hostform2" class="col s12" method="post" enctype="multipart/form-data">
-                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="bywhat" value="password">
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field2 col s8">
-                      <i class="material-icons prefix">perm_contact_calendar</i>
-                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
-                      <label for="icon_prefix">Server Name</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field2 col s5">
-                      <i class="material-icons prefix">dns</i>
-                      <input id="icon_prefix" type="text" class="validate" name="host"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid ip address.">
-                      <label for="icon_prefix">Hosts</label>
-                    </div>
-                    <div class="input-field input-field2 col s3">
-                      <i class="material-icons prefix">phone</i>
-                      <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0-65535.">
-                      <label for="icon_telephone">Port</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field2 col s8">
-                      <i class="material-icons prefix">perm_identity</i>
-                      <input id="icon_prefix" type="text" class="validate" name="usrname"  pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters.">
-                      <label for="icon_prefix">Username</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field2 col s8">
-                      <i class="material-icons prefix">vpn_key</i>
-                      <input id="icon_telephone" type="password" class="validate" name="password" pattern="^[a-z0-9]{6,}$" title="Password should consist of at least 6 characters and lower case.">
-                      <label for="icon_telephone">Password</label>
-                    </div>
-                  </div>
+    var searchby = document.getElementById("searchby");
 
-                  <div id="errormsg" class="row" align="center" style="display:none">
-                    <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                  </div>
+    $(document).ready(function() {
+      // On refresh check if there are values selected
+      if (localStorage.selectVal) {
+        // Select the value stored
+        $('#searchby').val( localStorage.selectVal );
+        $('#checksearch').val( localStorage.selectVal );
 
-                </form>
-              </div>
+      }
 
-              <div id="byrsakey" class="row" style="display:none;">
-                <form action="{{url('loading')}}" id="hostform" class="col s12" method="post" enctype="multipart/form-data">
-                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="bywhat" value="rsakey">
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field1 col s8">
-                      <i class="material-icons prefix">perm_contact_calendar</i>
-                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters, required.">
-                      <label for="icon_prefix">Server Name</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field1 col s5">
-                      <i class="material-icons prefix">dns</i>
-                      <input id="icon_prefix" type="text" class="validate" name="host" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid IP, required.">
-                      <label for="icon_prefix">Hosts</label>
-                    </div>
-                    <div class="input-field input-field1 col s3">
-                      <i class="material-icons prefix">phone</i>
-                      <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0 to 65535, required.">
-                      <label for="icon_telephone">Port</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field1 col s8">
-                      <i class="material-icons prefix">perm_identity</i>
-                      <input id="icon_prefix" type="text" class="validate" name="usrname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters, required.">
-                      <label for="icon_prefix">Username</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col s2"></div>
-                    <div class="file-field col s8">
-                      <div class="btn" style="background-color:#00acc1">
-                        <span>RSA Key</span>
-                        <input type="file" name="password">
-                      </div>
-                      <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text" name="filepath">
-                      </div>
-                    </div>
-                  </div>
-                  <div id="errormsg1" class="row" align="center" style="display:none">
-                    <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                  </div>
-                </form>
-              </div>
-
-            </div>
-            <div class="col s1" ></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <a class="modal-action waves-effect waves-green btn-flat" id="submitbtn">Submit</a>
-        </div>
-      </div>
-    </div>
-
-
-
-
-
-    <div class="container" align="left">
-      <!-- Page Content goes here -->
-      <!-- Modal Structure -->
-      <div id="modal2" class="modal modal-fixed-footer">
-        <div class="modal-content">
-          <br>
-          <!-- <h5>Add Host</h5> -->
-          <!-- <p>You should add host by using rsa key for secure</p> -->
-          <!-- <hr class="style-four"><br> -->
-          <div class="row">
-            <div class="col s1"></div>
-            <div class="col s10">
-              <div class="row" style="display:block;">
-                <form action="{{url('creategroup')}}" id="groupform" class="col s12" method="post" enctype="multipart/form-data">
-                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="user_id" value="{{ $user_id }}">
-                  <div class="row">
-                    <div class="input-field col s2"></div>
-                    <div class="input-field input-field2 col s8">
-                      <i class="material-icons prefix">view_week</i>
-                      <input id="icon_prefix" type="text" class="validate" name="groupname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Group name should be 1 to 32 characters.">
-                      <label for="icon_prefix">Host's Group Name</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col s10 offset-s1">
-                      Ungroup Hosts:
-                      <ul class="collection scroll">
-                        @foreach($objs as $indexKey=>$obj)
-                        <li class="collection-item">
-                          <div><input type="checkbox" class="filled-in" name="selecthost[]" id="filled-in-box{{$indexKey+1}}" value="{{$obj->id}}"/><label for="filled-in-box{{$indexKey+1}}" style="color:#455a64; font-size:13pt">{{$obj->servername}} - {{$obj->host}}</label></div>
-                        </li>
-                        @endforeach
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div id="errormsg" class="row" align="center" style="display:none">
-                    <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                  </div>
-                </form>
-
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <a class="modal-action waves-effect waves-green btn-flat" id="submitgroup" >Create Group</a>
-        </div>
-      </div>
-    </div>
-
-
-  </div>
-
-
-  @foreach($all_group as $group)
-  <div class="row">
-
-    <div class="col s12">
-      <ul class="collection with-header grey lighten-2">
-        <li class="collection-header blue-grey darken-1" style="font-size:15pt;color:white"><div> <i class="material-icons">view_week</i>&nbsp&nbsp&nbsp&nbsp{{$group->groupname}}<a href="#!" class="secondary-content"><i class="material-icons" style="color:white">build</i></a></div></li>
-
-        @php
-        $objs_group = DB::table('hosts')
-        ->join('controls', 'hosts.id', '=', 'controls.host_id')
-        ->where('controls.user_id', $user_id)
-        ->where('controls.group_id', $group->id)
-        ->get();
-        @endphp
-        <li class="collection-item grey lighten-2">
-          @foreach($objs_group as $indexKey=>$obj_group)
-          <div class="col s12 m6 l3" align="center">
-            <div class="card cyan darken-3" style="width:250px">
-              <h5 style="padding:10px;color:white">{{$obj_group->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
-            </div>
-            <div class="card" style="width:250px;">
-              <div class="card-image" style="padding:20px">
-                <img src="img/server.png">
-                <span class="card-title" style="color:#263238"><b>{{$obj_group->host}}</b></span>
-              </div>
-              <div class="card-action white">
-                <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj_group->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
-              </div>
-            </div>
-          </div>
-          @endforeach
-        </li>
-      </ul>
-    </div>
-  </div>
-  @endforeach
-  <!--Import jQuery before materialize.js-->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-  <script type="text/javascript">
-
-  @if (Session::has('status'))
-  function hasmsg(){
-    swal({
-      title: "{!! Session::get('title') !!}",
-      text: "{!! Session::get('text') !!}",
-      type: "{!! Session::get('icon') !!}",
-      confirmButtonColor: '#26a69a',
     });
 
-  }
-
-  // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
-
-  @endif
-
-  function loading(){
-    swal({
-      imageUrl: 'img/load.gif',
-      imageWidth: 120,
-      showCancelButton: false,
-      showConfirmButton: false,
-      animation: false,
-      allowOutsideClick: false,
-      confirmButtonColor: '#26a69a',
+    // On change store the value
+    $('#searchby').on('change', function(){
+      var currentVal = $(this).val();
+      localStorage.setItem('selectVal', currentVal );
     });
-  }
 
-  //dialogs
-  //modal scripts
+    $(document).ready(function() {
+      $('select').material_select();
+    });
 
-  $(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $('.modal').modal();
-  });
+    @if (Session::has('status'))
 
-  function blankSearch() {
-    document.getElementById('autocomplete').value = '';
-  }
-
-  function byPassword() {
-    document.getElementById('byrsakey').style.display = "none";
-    document.getElementById('bypassword').style.display = "block";
-    $("#password").removeClass('teal accent-4');
-    $("#password").addClass('teal darken-3');
-    $("#rsakey").removeClass('cyan darken-3');
-    $("#rsakey").addClass('cyan darken-1');
-  }
-  function byRSAKey() {
-    document.getElementById('bypassword').style.display = "none";
-    document.getElementById('byrsakey').style.display = "block";
-    $("#password").removeClass('teal darken-3');
-    $("#password").addClass('teal accent-4');
-    $("#rsakey").removeClass('cyan darken-1');
-    $("#rsakey").addClass('cyan darken-3');
-  }
-
-  $("#submitgroup").on('click', function(){
-    $("#groupform").submit();
-  });
-
-  $('#groupform').on('submit', function (e) {
-    $idgroupform=document.getElementById('groupform');
-    $formgroupname = $idgroupform.elements.namedItem("groupname").value;
-
-    if($("input[type=checkbox]:checked").length === 0 && $formgroupname == ""){
-      e.preventDefault();
+    function hasmsg(){
       swal({
-        title: 'Oops...',
-        text: "Invalid input, please check your information again !",
-        type: 'warning',
-        confirmButtonColor: '#26a69a'
-      })
-      return false;
-    }else if ($("input[type=checkbox]:checked").length === 0 ) {
-      e.preventDefault();
-      swal({
-        title: 'Oops...',
-        text: "Please choose at least 1 host for joining the group !",
-        type: 'warning',
-        confirmButtonColor: '#26a69a'
-      })
-      return false;
-    }else if ($formgroupname == ""){
-      e.preventDefault();
-      swal({
-        title: 'Oops...',
-        text: "Please check your group's name !",
-        type: 'warning',
-        confirmButtonColor: '#26a69a'
-      })
-      return false;
-    }else{
-      $('#modal2').modal().hide();
-      return loading();
+        title: "{!! Session::get('title') !!}",
+        text: "{!! Session::get('text') !!}",
+        type: "{!! Session::get('icon') !!}",
+        confirmButtonColor: '#26a69a',
+      });
+
     }
-  });
 
-  $("#submitbtn").on('click', function(){
-    $form1 = document.getElementById('byrsakey').style.display ;
-    $form2 = document.getElementById('bypassword').style.display ;
-    if($form1 == "block"){
-      // alert('Sent form RSA');
-      $idform1=document.getElementById('hostform');
-      $form1servername = $idform1.elements.namedItem("servername").value;
-      $servernamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidservername1 = $servernamepatt.test($form1servername); //return true or false
+    // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
+    @endif
 
-      $form1host = $idform1.elements.namedItem("host").value;
-      $hostpatt = new RegExp("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
-      $resvalidhost1 = $hostpatt.test($form1host);
+    function loading(){
+      swal({
+        imageUrl: 'img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+    }
 
-      $form1port = $idform1.elements.namedItem("port").value;
-      $portpatt = new RegExp("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
-      $resvalidport1 = $portpatt.test($form1port);
+    function searchBy(){
 
-      $form1usrname = $idform1.elements.namedItem("usrname").value;
-      $usrnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidusrname1 = $usrnamepatt.test($form1usrname);
-      if(($form1servername != "") && ($form1host != "") && ($form1port != "") && ($form1usrname != "")){
 
-        if($resvalidservername1 && $resvalidhost1 && $resvalidport1 && $resvalidusrname1){
+      // $searchby = document.getElementById("searchby");
+      // $searchopt = searchby.options[searchby.selectedIndex].value;
+      //
+      // alert($searchopt);
+      location.reload();
+    }
 
-          document.getElementById('errormsg1').style.display = "none" ;
-          $("#hostform").submit();
+    //dialogs
+    //modal scripts
+
+    $(document).ready(function(){
+      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+      $('.modal').modal();
+    });
+
+    function blankSearch() {
+      document.getElementById('autocomplete').value = '';
+    }
+
+    function byPassword() {
+      document.getElementById('byrsakey').style.display = "none";
+      document.getElementById('bypassword').style.display = "block";
+      $("#password").removeClass('teal accent-4');
+      $("#password").addClass('teal darken-3');
+      $("#rsakey").removeClass('cyan darken-3');
+      $("#rsakey").addClass('cyan darken-1');
+    }
+    function byRSAKey() {
+      document.getElementById('bypassword').style.display = "none";
+      document.getElementById('byrsakey').style.display = "block";
+      $("#password").removeClass('teal darken-3');
+      $("#password").addClass('teal accent-4');
+      $("#rsakey").removeClass('cyan darken-1');
+      $("#rsakey").addClass('cyan darken-3');
+    }
+
+    $("#submitgroup").on('click', function(){
+      $("#groupform").submit();
+    });
+
+    $('#groupform').on('submit', function (e) {
+      $idgroupform=document.getElementById('groupform');
+      $formgroupname = $idgroupform.elements.namedItem("groupname").value;
+
+      if($("input[type=checkbox]:checked").length === 0 && $formgroupname == ""){
+        e.preventDefault();
+        swal({
+          title: 'Oops...',
+          text: "Invalid input, please check your information again !",
+          type: 'warning',
+          confirmButtonColor: '#26a69a'
+        })
+        return false;
+      }else if ($("input[type=checkbox]:checked").length === 0 ) {
+        e.preventDefault();
+        swal({
+          title: 'Oops...',
+          text: "Please choose at least 1 host for joining the group !",
+          type: 'warning',
+          confirmButtonColor: '#26a69a'
+        })
+        return false;
+      }else if ($formgroupname == ""){
+        e.preventDefault();
+        swal({
+          title: 'Oops...',
+          text: "Please check your group's name !",
+          type: 'warning',
+          confirmButtonColor: '#26a69a'
+        })
+        return false;
+      }else{
+        $('#modal2').modal().hide();
+        return loading();
+      }
+    });
+
+    $("#submitbtn").on('click', function(){
+      $form1 = document.getElementById('byrsakey').style.display ;
+      $form2 = document.getElementById('bypassword').style.display ;
+      if($form1 == "block"){
+        // alert('Sent form RSA');
+        $idform1=document.getElementById('hostform');
+        $form1servername = $idform1.elements.namedItem("servername").value;
+        $servernamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvalidservername1 = $servernamepatt.test($form1servername); //return true or false
+
+        $form1host = $idform1.elements.namedItem("host").value;
+        $hostpatt = new RegExp("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+        $resvalidhost1 = $hostpatt.test($form1host);
+
+        $form1port = $idform1.elements.namedItem("port").value;
+        $portpatt = new RegExp("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
+        $resvalidport1 = $portpatt.test($form1port);
+
+        $form1usrname = $idform1.elements.namedItem("usrname").value;
+        $usrnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvalidusrname1 = $usrnamepatt.test($form1usrname);
+        if(($form1servername != "") && ($form1host != "") && ($form1port != "") && ($form1usrname != "")){
+
+          if($resvalidservername1 && $resvalidhost1 && $resvalidport1 && $resvalidusrname1){
+
+            document.getElementById('errormsg1').style.display = "none" ;
+            $("#hostform").submit();
+          }else{
+            document.getElementById('errormsg1').style.display = "block" ;
+          }
         }else{
           document.getElementById('errormsg1').style.display = "block" ;
         }
-      }else{
-        document.getElementById('errormsg1').style.display = "block" ;
-      }
 
 
 
-    }else if($form2 == "block"){
+      }else if($form2 == "block"){
 
-      $idform2=document.getElementById('hostform2');
-      $form2servername = $idform2.elements.namedItem("servername").value;
-      $servernamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidservername = $servernamepatt.test($form2servername); //return true or false
+        $idform2=document.getElementById('hostform2');
+        $form2servername = $idform2.elements.namedItem("servername").value;
+        $servernamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvalidservername = $servernamepatt.test($form2servername); //return true or false
 
-      $form2host = $idform2.elements.namedItem("host").value;
-      $hostpatt = new RegExp("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
-      $resvalidhost = $hostpatt.test($form2host);
+        $form2host = $idform2.elements.namedItem("host").value;
+        $hostpatt = new RegExp("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+        $resvalidhost = $hostpatt.test($form2host);
 
-      $form2port = $idform2.elements.namedItem("port").value;
-      $portpatt = new RegExp("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
-      $resvalidport = $portpatt.test($form2port);
+        $form2port = $idform2.elements.namedItem("port").value;
+        $portpatt = new RegExp("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
+        $resvalidport = $portpatt.test($form2port);
 
-      $form2usrname = $idform2.elements.namedItem("usrname").value;
-      $usrnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidusrname = $usrnamepatt.test($form2usrname);
+        $form2usrname = $idform2.elements.namedItem("usrname").value;
+        $usrnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvalidusrname = $usrnamepatt.test($form2usrname);
 
-      $form2password = $idform2.elements.namedItem("password").value;
-      $passwordpatt = new RegExp("^[a-z0-9]{6,}$");
-      $resvalidpassword = $passwordpatt.test($form2password);
+        $form2password = $idform2.elements.namedItem("password").value;
+        $passwordpatt = new RegExp("^[a-z0-9]{6,}$");
+        $resvalidpassword = $passwordpatt.test($form2password);
 
-      if(($form2servername != "") && ($form2host != "") && ($form2port != "") && ($form2usrname != "") && ($form2password != "")){
+        if(($form2servername != "") && ($form2host != "") && ($form2port != "") && ($form2usrname != "") && ($form2password != "")){
 
-        if($resvalidservername && $resvalidhost && $resvalidport && $resvalidusrname && $resvalidpassword){
+          if($resvalidservername && $resvalidhost && $resvalidport && $resvalidusrname && $resvalidpassword){
 
-          document.getElementById('errormsg').style.display = "none" ;
-          $("#hostform2").submit();
+            document.getElementById('errormsg').style.display = "none" ;
+            $("#hostform2").submit();
+          }else{
+            document.getElementById('errormsg').style.display = "block" ;
+          }
         }else{
           document.getElementById('errormsg').style.display = "block" ;
         }
-      }else{
-        document.getElementById('errormsg').style.display = "block" ;
       }
-    }
-  });
+    });
 
-  xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET", "search/autocomplete", false);
-  xmlhttp.send();
-  var hosts = JSON.parse(xmlhttp.responseText);
-  // { value: 'Andorra', data: 'AD' },
-  // // ...
-  // { value: 'Zimbabwe', data: 'ZZ' }
 
-  $('#autocomplete').autocomplete({
-    lookup: hosts,
-    onSelect: function (item) {
-      // $("#searchform").submit();
-      // alert('You selected: ' + item.value);
-    }
-  });
-  </script>
-</body>
-</html>
-<!-- document.location.href = "testload"; -->
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open("GET", "search/"+localStorage.getItem("selectVal"), false);
+    xmlhttp.send();
+    var hosts = JSON.parse(xmlhttp.responseText);
+    // { value: 'Andorra', data: 'AD' },
+    // // ...
+    // { value: 'Zimbabwe', data: 'ZZ' }
+
+    $('#autocomplete').autocomplete({
+      lookup: hosts,
+      onSelect: function (item) {
+        // $("#searchform").submit();
+        // alert('You selected: ' + item.value);
+      }
+    });
+    </script>
+  </body>
+  </html>
+  <!-- document.location.href = "testload"; -->

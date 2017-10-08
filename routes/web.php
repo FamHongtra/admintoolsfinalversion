@@ -109,6 +109,7 @@ Route::get('/detailrepo/{configid}', 'ConfigController@show');
 Route::get('/editconfig/{configid}', 'ConfigController@editconfig');
 Route::get('/detailversion/{versionid}', 'ConfigController@showcontent');
 Route::get('search/autocomplete', 'SearchController@autocomplete');
+Route::get('search/autocompleteGroup', 'SearchController@autocompleteGroup');
 Route::post('/revision', 'ConfigController@revisionconfig');
 Route::post('/savecommit', 'ConfigController@savecommit');
 Route::post('/savefile', 'ConfigController@editconfig');

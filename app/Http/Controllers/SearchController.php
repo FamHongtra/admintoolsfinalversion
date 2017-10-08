@@ -41,4 +41,26 @@ class SearchController extends Controller
     }
     return Response::json($results);
   }
+
+
+  public function autocompleteGroup(){
+    $user_id = 1 ;
+
+    $term = Input::get('term');
+
+    $results = array();
+
+
+    $queries = DB::table('groups')
+    ->where('user_id', $user_id)
+    ->where('groupname','like','%'.$term.'%')
+    ->get();
+    // ->take(5)->get();
+
+    foreach ($queries as $query)
+    {
+      $results[] = [ 'value' => $query->groupname ];
+    }
+    return Response::json($results);
+  }
 }

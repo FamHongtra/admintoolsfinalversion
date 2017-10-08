@@ -287,23 +287,93 @@ class HostController extends Controller
 
   public function search(Request $request)
   {
+    $searchby = $request->input('search_by');
     $searchkey = $request->input('searchkey');
     $user_id = $request->input('user_id');
-    if($searchkey!=null){
-      $objs = DB::table('hosts')
-      ->join('controls', 'hosts.id', '=', 'controls.host_id')
-      ->where('controls.user_id', $user_id)
-      ->where('hosts.servername','like','%'.$searchkey.'%')
-      ->orWhere('hosts.host','like', '%'.$searchkey.'%')
-      ->get();
+
+    if($searchby == "autocomplete"){
+      if($searchkey!=null){
+        $objs = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('hosts.servername','like','%'.$searchkey.'%')
+        ->orWhere('hosts.host','like', '%'.$searchkey.'%')
+        ->get();
+
+        $all_group = [];
+        // 
+        // if($objs->count()==0){
+        //   $request->session()->flash('status', 'not found');
+        //   $request->session()->flash('title', 'Not Found!');
+        //   $request->session()->flash('text', 'The host you are looking for does not exist.');
+        //   $request->session()->flash('icon', 'warning');
+        //
+        //   $objs = DB::table('hosts')
+        //   ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        //   ->where('controls.user_id', $user_id)
+        //   ->where('controls.group_id', 0)
+        //   ->get();
+        //
+        //   $all_group = DB::table('groups')
+        //   ->where('user_id', $user_id)
+        //   ->get();
+        // }
+
+      }else{
+        $objs = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.group_id', 0)
+        ->get();
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->get();
+
+      }
     }else{
-      $objs = DB::table('hosts')
-      ->join('controls', 'hosts.id', '=', 'controls.host_id')
-      ->where('controls.user_id', $user_id)
-      ->get();
+      if($searchkey!=null){
+        $objs = [];
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->where('groupname',$searchkey)
+        ->get();
+
+        // if($all_group->count()==0){
+        //   $request->session()->flash('status', 'not found');
+        //   $request->session()->flash('title', 'Not Found!');
+        //   $request->session()->flash('text', 'The group you are looking for does not exist.');
+        //   $request->session()->flash('icon', 'warning');
+        //
+        //   $objs = DB::table('hosts')
+        //   ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        //   ->where('controls.user_id', $user_id)
+        //   ->where('controls.group_id', 0)
+        //   ->get();
+        //
+        //   $all_group = DB::table('groups')
+        //   ->where('user_id', $user_id)
+        //   ->get();
+        // }
+
+      }else{
+        $objs = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.group_id', 0)
+        ->get();
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->get();
+
+      }
     }
 
+
     $data['objs'] = $objs;
+    $data['all_group'] = $all_group;
     $data['user_id'] = $user_id;
 
     return view('showhost',$data);
