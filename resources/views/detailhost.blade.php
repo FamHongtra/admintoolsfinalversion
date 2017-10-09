@@ -154,7 +154,7 @@
           </div>
           <div class="card" style="width:250px;">
             <div class="card-image" style="padding:20px">
-              <img src="../img/server.png">
+              <img src="/img/server.png">
               <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
             </div>
             <div class="card-action white">
@@ -579,7 +579,7 @@ function hasmsg(){
 
 function loading(){
   swal({
-    imageUrl: '../img/load.gif',
+    imageUrl: '/img/load.gif',
     imageWidth: 120,
     showCancelButton: false,
     showConfirmButton: false,
@@ -608,7 +608,7 @@ function addDesc(){
   if( ($formdescname != "") && ($formdescdetail != "")){
     if($resvaliddescname){
       swal({
-        imageUrl: '../img/load.gif',
+        imageUrl: '/img/load.gif',
         imageWidth: 120,
         showCancelButton: false,
         showConfirmButton: false,
@@ -647,7 +647,7 @@ function editDesc(id){
   if( ($formdescname != "") && ($formdescdetail != "")){
     if($resvaliddescname){
       swal({
-        imageUrl: '../img/load.gif',
+        imageUrl: '/img/load.gif',
         imageWidth: 120,
         showCancelButton: false,
         showConfirmButton: false,
@@ -676,7 +676,7 @@ function delDesc(id){
   $idform.elements.namedItem('serverid').value = $server;
 
   swal({
-    imageUrl: '../img/load.gif',
+    imageUrl: '/img/load.gif',
     imageWidth: 120,
     showCancelButton: false,
     showConfirmButton: false,
@@ -699,7 +699,7 @@ function delConf(id){
   $idform.elements.namedItem('serverid').value = $server;
 
   swal({
-    imageUrl: '../img/load.gif',
+    imageUrl: '/img/load.gif',
     imageWidth: 120,
     showCancelButton: false,
     showConfirmButton: false,
@@ -727,7 +727,7 @@ function chkconfigname(){
     if($resvalidpathname){
 
       swal({
-        imageUrl: '../img/load.gif',
+        imageUrl: '/img/load.gif',
         imageWidth: 120,
         showCancelButton: false,
         showConfirmButton: false,

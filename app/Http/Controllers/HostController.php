@@ -379,6 +379,107 @@ class HostController extends Controller
     return view('showhost',$data);
   }
 
+  public function sshLogin(Request $request)
+  {
+    //
+    $user_id = $request->input("user_id");
+    $host_id = $request->input("host_id");
+
+    //username and password from input form
+    $login_username = $request->input("login_username");
+    $login_password = $request->input("login_password");
+
+    $control = DB::table('controls')
+    ->where('user_id',$user_id)
+    ->where('host_id',$host_id)
+    ->get();
+
+    //username and password from database
+    $control_username = $control[0]->username_ssh;
+    $control_password = $control[0]->password_ssh;
+
+    if($login_username == $control_username){
+      if($login_password == $control_password){
+        // echo "username and password are correct!";
+
+        return redirect()->route('detailhost',$host_id);
+      }else{
+        // echo "password wrong!";
+
+        $request->session()->flash('status', 'ssh login fail');
+        $request->session()->flash('title', 'Failed!');
+        $request->session()->flash('text', 'Cannot connect to the host.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+      }
+    }else{
+      // echo "username and password wrong!";
+
+      $request->session()->flash('status', 'ssh login fail');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'Cannot connect to the host.');
+      $request->session()->flash('icon', 'error');
+
+      return redirect('showhost');
+    }
+  }
+
+
+  public function delHost(Request $request)
+  {
+    //
+    $user_id = $request->input("user_id");
+    $host_id = $request->input("host_id");
+
+    //username and password from input form
+    $login_username = $request->input("login_username");
+    $login_password = $request->input("login_password");
+
+    $control = DB::table('controls')
+    ->where('user_id',$user_id)
+    ->where('host_id',$host_id)
+    ->get();
+
+    //username and password from database
+    $control_username = $control[0]->username_ssh;
+    $control_password = $control[0]->password_ssh;
+
+    if($login_username == $control_username){
+      if($login_password == $control_password){
+        // echo "username and password are correct!";
+
+        $request->session()->flash('status', 'delete host success');
+        $request->session()->flash('title', 'Successful!');
+        $request->session()->flash('text', 'the host was deleted from the system.');
+        $request->session()->flash('icon', 'success');
+
+        DB::table('controls')->where('id', '=', $control[0]->id)->delete();
+        DB::table('hosts')->where('id', '=', $host_id)->delete();
+
+        return redirect('showhost');
+      }else{
+        // echo "password wrong!";
+
+        $request->session()->flash('status', 'delete host fail');
+        $request->session()->flash('title', 'Failed!');
+        $request->session()->flash('text', 'Cannot delete the host from the system.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+      }
+    }else{
+      // echo "username and password wrong!";
+
+      $request->session()->flash('status', 'delete host fail');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'Cannot delete the host from the system.');
+      $request->session()->flash('icon', 'error');
+
+      return redirect('showhost');
+    }
+  }
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -389,6 +490,8 @@ class HostController extends Controller
   {
     //
   }
+
+
 
   /**
   * Update the specified resource in storage.

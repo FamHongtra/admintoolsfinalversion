@@ -123,7 +123,7 @@
     <div class="navbar-fixed">
       <nav>
         <div class="nav-wrapper teal lighten-1 ">
-          <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo">Logo</a>
+          <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="img/logo0.png" height="50px" style="margin: 7px"/></a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><a href="sass.html">Sass</a></li>
             <li><a href="badges.html">Components</a></li>
@@ -160,7 +160,7 @@
           </div>
         </form>
       </div>
-      @if(count($objs)!=0))
+      @if(count($objs)!=0)
       <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
       @else
       <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
@@ -172,7 +172,7 @@
       @foreach($objs as $indexKey=>$obj)
       <div class="col s12 m6 l3" align="center">
         <div class="card cyan darken-3" style="width:250px">
-          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">delete</i></a></h5>
+          <h5 style="padding:10px;color:white">{{$obj->servername}}<a href="#!" onclick="delhost({{$obj->id}})"><i class="material-icons right" style="color:white">delete</i></a></h5>
         </div>
         <div class="card" style="width:250px;">
           <div class="card-image" style="padding:20px">
@@ -180,7 +180,7 @@
             <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
           </div>
           <div class="card-action white">
-            <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
+            <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" onclick="sshLogin({{$obj->id}})"><i class="material-icons left">input</i>Connect</a>
           </div>
         </div>
       </div>
@@ -398,7 +398,7 @@
                   <span class="card-title" style="color:#263238"><b>{{$obj_group->host}}</b></span>
                 </div>
                 <div class="card-action white">
-                  <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" href="{{url('detailhost/'.$obj_group->id)}}" onclick="return loading();"><i class="material-icons left">input</i>Connect</a>
+                  <a class="modal-trigger waves-effect waves-light btn-large cyan darken-3" onclick="sshLogin({{$obj->id}})"><i class="material-icons left">input</i>Connect</a>
                 </div>
               </div>
             </div>
@@ -498,6 +498,47 @@
 
     });
 
+    function sshLogin(id){
+
+      swal({
+        title: 'Host Authentication',
+        html:
+        '<form action="{{url("sshlogin")}}" id="sshloginform'+id+'" class="col s12" method="post" enctype="multipart/form-data">'+
+        '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+        '<input type="hidden" name="user_id" value="{{ $user_id }}">'+
+        '<input type="hidden" name="host_id" value="'+id+'">'+
+        '<br><div class="row">'+
+        '<div class="col l10 offset-l1">'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">perm_identity</i>'+
+        '<input id="icon_prefix" type="text" class="validate" name="login_username">'+
+        '<label for="icon_prefix" align="left">Username</label>'+
+        '</div>'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">vpn_key</i>'+
+        '<input id="icon_prefix" type="password" class="validate" name="login_password">'+
+        '<label for="icon_prefix" align="left">Password</label>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</form>',
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Connect',
+        showCancelButton: true,
+      }).then(function () {
+        $("#sshloginform"+id).submit();
+        swal({
+          imageUrl: 'img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+      });
+    }
+
     // On change store the value
     $('#searchby').on('change', function(){
       var currentVal = $(this).val();
@@ -575,6 +616,55 @@
           animation: false,
           allowOutsideClick: false,
           confirmButtonColor: '#26a69a',
+        });
+      });
+    }
+
+    function delhost(id){
+      swal({
+        title: 'Are you sure?',
+        text: "The host will be deleted from the system!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Yes',
+      }).then(function () {
+        swal({
+          title: 'Delete Confirmation',
+          html:
+          '<form action="{{url("deletehost")}}" id="delhostform'+id+'" class="col s12" method="post" enctype="multipart/form-data">'+
+          '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+          '<input type="hidden" name="user_id" value="{{ $user_id }}">'+
+          '<input type="hidden" name="host_id" value="'+id+'">'+
+          '<br><div class="row">'+
+          '<div class="col l10 offset-l1">'+
+          '<div class="input-field input-field2">'+
+          '<i class="material-icons prefix">perm_identity</i>'+
+          '<input id="icon_prefix" type="text" class="validate" name="login_username">'+
+          '<label for="icon_prefix" align="left">Username</label>'+
+          '</div>'+
+          '<div class="input-field input-field2">'+
+          '<i class="material-icons prefix">vpn_key</i>'+
+          '<input id="icon_prefix" type="password" class="validate" name="login_password">'+
+          '<label for="icon_prefix" align="left">Password</label>'+
+          '</div>'+
+          '</div>'+
+          '</div>'+
+          '</form>',
+          confirmButtonColor: '#26a69a',
+          confirmButtonText: 'OK, delete it!',
+          showCancelButton: true,
+        }).then(function () {
+          $("#delhostform"+id).submit();
+          swal({
+            imageUrl: 'img/load.gif',
+            imageWidth: 120,
+            showCancelButton: false,
+            showConfirmButton: false,
+            animation: false,
+            allowOutsideClick: false,
+            confirmButtonColor: '#26a69a',
+          });
         });
       });
     }

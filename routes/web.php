@@ -96,7 +96,7 @@ Route::get('/showhost', function () {
 Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');
 // Route::post('/addhost', 'HostController@store');
-Route::get('/detailhost/{hostid}', 'HostController@show');
+Route::get('detailhost/{hostid}', ['as' => 'detailhost', 'uses' => 'HostController@show']);
 Route::post('/searchhost', 'HostController@search');
 Route::get('/hostall/{id}', 'HostController@showhost');
 Route::post('/checkpath', 'ConfigController@check');
@@ -117,7 +117,8 @@ Route::post('/creategroup', 'GroupController@createGroup');
 Route::post('/groupaddmore', 'GroupController@groupAddmore');
 Route::post('/leftgroup', 'GroupController@leftGroup');
 Route::post('/delgroup', 'GroupController@delGroup');
-
+Route::post('/sshlogin', 'HostController@sshLogin');
+Route::post('/deletehost', 'HostController@delHost');
 
 //About Gitlab API
 
