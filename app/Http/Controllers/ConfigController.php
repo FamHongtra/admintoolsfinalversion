@@ -401,14 +401,14 @@ class ConfigController extends Controller
 
       $request->session()->flash('status', 'success');
       $request->session()->flash('title', 'Successful!');
-      $request->session()->flash('text', 'Revision Configuration task was successful.');
+      $request->session()->flash('text', 'Revision Configuration successful.');
       $request->session()->flash('icon', 'success');
 
     }else{
 
       $request->session()->flash('status', 'failure');
       $request->session()->flash('title', 'Failed!');
-      $request->session()->flash('text', 'Revision Configuration task was failed.');
+      $request->session()->flash('text', 'Revision Configuration failed.');
       $request->session()->flash('icon', 'error');
       $request->session()->flash('failuremsg', $GLOBALS['failuremsg']);
     }
@@ -538,14 +538,14 @@ class ConfigController extends Controller
 
       $request->session()->flash('status', 'success');
       $request->session()->flash('title', 'Successful!');
-      $request->session()->flash('text', 'Edit Configuration task was successful.');
+      $request->session()->flash('text', 'Edit Configuration successful.');
       $request->session()->flash('icon', 'success');
 
     }else{
 
       $request->session()->flash('status', 'failure');
       $request->session()->flash('title', 'Failed!');
-      $request->session()->flash('text', 'Edit Configuration task was failed.');
+      $request->session()->flash('text', 'Edit Configuration failed.');
       $request->session()->flash('icon', 'error');
       $request->session()->flash('failuremsg', $GLOBALS['failuremsg']);
     }

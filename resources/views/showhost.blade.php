@@ -196,11 +196,10 @@
             <!-- <p>You should add host by using rsa key for secure</p> -->
             <!-- <hr class="style-four"><br> -->
             <div class="row">
-              <div class="col s1"></div>
-              <div class="col s10">
+              <div class="col s12 m12 l10 offset-l1">
                 <div class="" align="center">
-                  <a id="password" class="waves-effect waves-light btn teal accent-4" href="#modal1" onclick="byPassword()" ><i class="material-icons right">vpn_key</i>Add Host by Using Password</a>
-                  <a id="rsakey" class="waves-effect waves-light btn cyan darken-1" href="#modal1" onclick="byRSAKey()"><i class="material-icons right">vpn_key</i>Add Host by Using RSA Key</a><br><br>
+                  <a id="password" class="waves-effect waves-light btn teal accent-4" href="#modal1" onclick="byPassword()" ><i class="material-icons right">vpn_key</i>Using Password</a>
+                  <a id="rsakey" class="waves-effect waves-light btn cyan darken-1" href="#modal1" onclick="byRSAKey()"><i class="material-icons right">vpn_key</i>Using RSA Key</a><br><br>
                 </div>
                 <div id="bypassword" class="row" style="display:block;">
                   <form action="{{url('loading')}}" id="hostform2" class="col s12" method="post" enctype="multipart/form-data">
@@ -307,7 +306,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <a class="modal-action waves-effect waves-green btn-flat" id="submitbtn">Submit</a>
+            <a class="modal-action waves-effect waves-green btn teal" id="submitbtn">Submit</a>
           </div>
         </div>
       </div>
@@ -363,7 +362,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <a class="modal-action waves-effect waves-green btn-flat" id="submitgroup" >Create Group</a>
+            <a class="modal-action waves-effect waves-green btn teal" id="submitgroup" >Create Group</a>
           </div>
         </div>
       </div>
@@ -468,7 +467,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <a class="modal-action waves-effect waves-green btn-flat" id="submitgroupaddmore" >Add More</a>
+          <a class="modal-action waves-effect waves-green btn teal" id="submitgroupaddmore" >Add More</a>
         </div>
       </div>
     </div>

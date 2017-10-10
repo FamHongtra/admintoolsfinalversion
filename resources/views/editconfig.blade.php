@@ -131,16 +131,18 @@
   $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
   ?>
 
-  <nav>
-    <div class="nav-wrapper teal lighten-1">
-      <a href="{{url('showhost')}}" onclick="return loading();" class="brand-logo">Logo</a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="sass.html">Sass</a></li>
-        <li><a href="badges.html">Components</a></li>
-        <li><a href="collapsible.html">JavaScript</a></li>
-      </ul>
-    </div>
-  </nav>
+  <div class="navbar-fixed">
+    <nav>
+      <div class="nav-wrapper teal lighten-1 ">
+        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="../img/logo0.png" height="50px" style="margin: 7px"/></a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a href="sass.html">Sass</a></li>
+          <li><a href="badges.html">Components</a></li>
+          <li><a href="collapsible.html">JavaScript</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
   <div class="row">
 
   </div>
@@ -167,7 +169,7 @@
         //impersonal token of gitlab user.
 
 
-        $imp_token = "9zxm6Uvgy4m_xbP-qvH7";
+        $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
 
         $conf =substr($configpath, strrpos($configpath, '/') + 1);
@@ -274,6 +276,19 @@
       $("#commitform").submit();
 
     }
+
+    function loading(){
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+    }
+
 
 
 

@@ -94,7 +94,7 @@
     border-bottom: 1px solid #00acc1;
     box-shadow: 0 1px 0 0 #00acc1;
   }
-  .modal { width: 40% !important ; max-height: 55% !important ; overflow-y: hidden !important ;}
+  .modal { max-height: 70% !important ; overflow-y: hidden !important ;}
 
   .break-word {
     overflow-wrap: break-word;
@@ -119,16 +119,19 @@
   <body onload="showCurrent()">
     @endif
 
-    <nav>
-      <div class="nav-wrapper teal lighten-1">
-        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo">Logo</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="sass.html">Sass</a></li>
-          <li><a href="badges.html">Components</a></li>
-          <li><a href="collapsible.html">JavaScript</a></li>
-        </ul>
-      </div>
-    </nav>
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper teal lighten-1 ">
+          <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="../img/logo0.png" height="50px" style="margin: 7px"/></a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="sass.html">Sass</a></li>
+            <li><a href="badges.html">Components</a></li>
+            <li><a href="collapsible.html">JavaScript</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
     <div class="row">
 
     </div>
@@ -145,8 +148,8 @@
       @endif
     </div>
     <div class="row">
-      <div class="col s6">
-        <div class="col s4" align="center">
+      <div class="col s12 m12 l6">
+        <div class="col s12 m12 l4" align="center">
           <div class="card cyan darken-3" style="width:250px">
             <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
           </div>
@@ -161,7 +164,7 @@
           </div>
         </div>
 
-        <div class="col s8">
+        <div class="col s12 m12 l8">
           <div class="row">
             <div class="col s12">
               <div class="card blue-grey darken-1">
@@ -211,7 +214,7 @@
           </div>
         </div>
       </div>
-      <div class="col s6">
+      <div class="col s12 m12 l6">
         <div class="row">
           <div class="col s12"><span style="font-size: 250%; color:#607d8b">Versions of Configuration</span><hr style="color: #607d8b"><br>
             <div class="card">
@@ -253,37 +256,38 @@
                     </tr>
                   </tbody>
 
+                  <div class="container" align="left">
+                    <div id="modal{{$indexKey+1}}" class="modal modal-fixed-footer">
+                      <div class="modal-header">
+                        <h5>{{$version->title}}</h5>
+                      </div>
 
-                  <div id="modal{{$indexKey+1}}" class="modal modal-fixed-footer">
-                    <div class="modal-header">
-                      <h5>{{$version->title}}</h5>
-                    </div>
+                      <div class="modal-content">
+                        @php
+                        //impersonal token of gitlab user.
 
-                    <div class="modal-content">
-                      @php
-                      //impersonal token of gitlab user.
-
-                      $imp_token = "1xfYQD8Km8LsfWaYVP_d";
-                      $proj_id = $configprojid ;
+                        $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+                        $proj_id = $configprojid ;
 
 
-                      $conf =substr($configpath, strrpos($configpath, '/') + 1);
+                        $conf =substr($configpath, strrpos($configpath, '/') + 1);
 
-                      $out = str_replace('.','%2E',$conf);
+                        $out = str_replace('.','%2E',$conf);
 
-                      SSH::into('gitlab')->run(array(
+                        SSH::into('gitlab')->run(array(
 
-                      "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
+                        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
 
-                      ), function($line){
-                        echo nl2br($line);
+                        ), function($line){
+                          echo nl2br($line);
 
-                      });
-                      @endphp
-                      <br><br><br><br>
-                    </div>
-                    <div class="modal-footer">
-                      <a onClick="revisionSubmit({{$indexKey+1}})" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a><a href="#!" class="modal-action modal-close waves-effect waves-green btn teal lighten-2" style="margin-right:10px">Close</a>
+                        });
+                        @endphp
+                        <br><br><br><br>
+                      </div>
+                      <div class="modal-footer">
+                        <a onClick="revisionSubmit({{$indexKey+1}})" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a>
+                      </div>
                     </div>
                   </div>
 
@@ -415,11 +419,11 @@
 
         }else{
           swal({
-              title: "{!! Session::get('title') !!}",
-              text: "{!! Session::get('text') !!}",
-              type: "{!! Session::get('icon') !!}",
+            title: "{!! Session::get('title') !!}",
+            text: "{!! Session::get('text') !!}",
+            type: "{!! Session::get('icon') !!}",
             showCancelButton: true,
-          confirmButtonColor: '#26a69a',
+            confirmButtonColor: '#26a69a',
             confirmButtonText: 'See more details'
           }).then(function () {
             swal({
@@ -444,183 +448,183 @@
         // });
         // });
 
-      document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
-      // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
+        document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
+        // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
 
-    }
-    @endif
+      }
+      @endif
 
-    function loading(){
-      swal({
-        imageUrl: '../img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
-    }
+      function loading(){
+        swal({
+          imageUrl: '../img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+      }
 
-    function addDesc(){
+      function addDesc(){
 
-      $idform=document.getElementById('descform');
+        $idform=document.getElementById('descform');
 
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
+        $server = document.getElementById('server').textContent ;
+        $idform.elements.namedItem('serverid').value = $server;
 
 
-      $formdescname = $idform.elements.namedItem("descname").value;
+        $formdescname = $idform.elements.namedItem("descname").value;
 
-      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvaliddescname = $descnamepatt.test($formdescname);
+        $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvaliddescname = $descnamepatt.test($formdescname);
 
-      $formdescdetail = $idform.elements.namedItem("descdetail").value;
+        $formdescdetail = $idform.elements.namedItem("descdetail").value;
 
-      if( ($formdescname != "") && ($formdescdetail != "")){
-        if($resvaliddescname){
-          document.getElementById('errormsg2').style.display = "none" ;
-          $("#descform").submit();
+        if( ($formdescname != "") && ($formdescdetail != "")){
+          if($resvaliddescname){
+            document.getElementById('errormsg2').style.display = "none" ;
+            $("#descform").submit();
+          }else{
+            document.getElementById('errormsg2').style.display = "block" ;
+          }
         }else{
           document.getElementById('errormsg2').style.display = "block" ;
         }
-      }else{
-        document.getElementById('errormsg2').style.display = "block" ;
+
       }
 
-    }
+      function editDesc(id){
+        // alert("Hello"+id);
 
-    function editDesc(id){
-      // alert("Hello"+id);
+        $idform=document.getElementById('editdescform'+id);
 
-      $idform=document.getElementById('editdescform'+id);
-
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
+        $server = document.getElementById('server').textContent ;
+        $idform.elements.namedItem('serverid').value = $server;
 
 
-      $formdescname = $idform.elements.namedItem("descname").value;
+        $formdescname = $idform.elements.namedItem("descname").value;
 
-      $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvaliddescname = $descnamepatt.test($formdescname);
+        $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvaliddescname = $descnamepatt.test($formdescname);
 
-      $formdescdetail = $idform.elements.namedItem("descdetail").value;
+        $formdescdetail = $idform.elements.namedItem("descdetail").value;
 
-      if( ($formdescname != "") && ($formdescdetail != "")){
-        if($resvaliddescname){
-          document.getElementById('errormsg2').style.display = "none" ;
-          $("#editdescform"+id).submit();
+        if( ($formdescname != "") && ($formdescdetail != "")){
+          if($resvaliddescname){
+            document.getElementById('errormsg2').style.display = "none" ;
+            $("#editdescform"+id).submit();
+          }else{
+            document.getElementById('errormsg2').style.display = "block" ;
+          }
         }else{
           document.getElementById('errormsg2').style.display = "block" ;
         }
-      }else{
-        document.getElementById('errormsg2').style.display = "block" ;
+
       }
 
-    }
+
+      function revisionSubmit(id){
+
+        swal({
+          imageUrl: '../img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+        $("#versform"+id).submit();
 
 
-    function revisionSubmit(id){
+      }
 
-      swal({
-        imageUrl: '../img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
-      $("#versform"+id).submit();
+      function delDesc(id){
+        // alert("Hello"+id);
 
+        $idform=document.getElementById('deldescform'+id);
 
-    }
+        $server = document.getElementById('server').textContent ;
+        $idform.elements.namedItem('serverid').value = $server;
 
-    function delDesc(id){
-      // alert("Hello"+id);
+        $("#deldescform"+id).submit();
 
-      $idform=document.getElementById('deldescform'+id);
+      }
 
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
-
-      $("#deldescform"+id).submit();
-
-    }
-
-    function chkconfigname(){
+      function chkconfigname(){
 
 
-      $idform=document.getElementById('hostform');
-      $formpathname = $idform.elements.namedItem("pathname").value;
-      $server = document.getElementById('server').textContent ;
-      $idform.elements.namedItem('serverid').value = $server;
+        $idform=document.getElementById('hostform');
+        $formpathname = $idform.elements.namedItem("pathname").value;
+        $server = document.getElementById('server').textContent ;
+        $idform.elements.namedItem('serverid').value = $server;
 
-      $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-      $resvalidpathname = $pathnamepatt.test($formpathname);
+        $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
+        $resvalidpathname = $pathnamepatt.test($formpathname);
 
-      $formpathconf = $idform.elements.namedItem("pathconf").value;
-      if( ($formpathname != "") && ($formpathconf != "")){
-        if($resvalidpathname){
-          document.getElementById('errormsg1').style.display = "none" ;
-          $("#hostform").submit();
+        $formpathconf = $idform.elements.namedItem("pathconf").value;
+        if( ($formpathname != "") && ($formpathconf != "")){
+          if($resvalidpathname){
+            document.getElementById('errormsg1').style.display = "none" ;
+            $("#hostform").submit();
+          }else{
+            document.getElementById('errormsg1').style.display = "block" ;
+          }
         }else{
           document.getElementById('errormsg1').style.display = "block" ;
         }
-      }else{
-        document.getElementById('errormsg1').style.display = "block" ;
+
       }
 
-    }
+      function showCurrent(){
 
-    function showCurrent(){
+        document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
 
-      document.getElementById('itemtitle1').innerHTML = document.getElementById('itemtitle1').textContent+"<br>(Current Version)";
-
-    }
-    //modal scripts
-    $(document).ready(function(){
-      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-      $('.modal').modal();
-    });
-
-    $(document).ready(function(){
-      $('.collapsible').collapsible();
-    });
-
-
-    function byPassword() {
-      document.getElementById('byrsakey').style.display = "none";
-      document.getElementById('bypassword').style.display = "block";
-      $("#password").removeClass('teal accent-4');
-      $("#password").addClass('teal darken-3');
-      $("#rsakey").removeClass('cyan darken-3');
-      $("#rsakey").addClass('cyan darken-1');
-    }
-    function byRSAKey() {
-      document.getElementById('bypassword').style.display = "none";
-      document.getElementById('byrsakey').style.display = "block";
-      $("#password").removeClass('teal darken-3');
-      $("#password").addClass('teal accent-4');
-      $("#rsakey").removeClass('cyan darken-1');
-      $("#rsakey").addClass('cyan darken-3');
-    }
-
-
-    $("#submitbtn").on('click', function(){
-      $form1 = document.getElementById('byrsakey').style.display ;
-
-      $form2 = document.getElementById('bypassword').style.display ;
-      if($form1 == "block"){
-        alert('Sent form RSA');
-        $("#hostform").submit();
-      }else if($form2 == "block"){
-        alert('Sent form Pass');
-        $("#hostform2").submit();
       }
-    });
+      //modal scripts
+      $(document).ready(function(){
+        // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+        $('.modal').modal();
+      });
 
-    </script>
-  </body>
+      $(document).ready(function(){
+        $('.collapsible').collapsible();
+      });
 
-  </html>
+
+      function byPassword() {
+        document.getElementById('byrsakey').style.display = "none";
+        document.getElementById('bypassword').style.display = "block";
+        $("#password").removeClass('teal accent-4');
+        $("#password").addClass('teal darken-3');
+        $("#rsakey").removeClass('cyan darken-3');
+        $("#rsakey").addClass('cyan darken-1');
+      }
+      function byRSAKey() {
+        document.getElementById('bypassword').style.display = "none";
+        document.getElementById('byrsakey').style.display = "block";
+        $("#password").removeClass('teal darken-3');
+        $("#password").addClass('teal accent-4');
+        $("#rsakey").removeClass('cyan darken-1');
+        $("#rsakey").addClass('cyan darken-3');
+      }
+
+
+      $("#submitbtn").on('click', function(){
+        $form1 = document.getElementById('byrsakey').style.display ;
+
+        $form2 = document.getElementById('bypassword').style.display ;
+        if($form1 == "block"){
+          alert('Sent form RSA');
+          $("#hostform").submit();
+        }else if($form2 == "block"){
+          alert('Sent form Pass');
+          $("#hostform2").submit();
+        }
+      });
+
+      </script>
+    </body>
+
+    </html>

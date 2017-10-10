@@ -263,10 +263,10 @@
               <div class="card blue-grey darken-1">
                 <div class="card-content white-text">
                   <div class="row">
-                    <div class="col s9">
+                    <div class="col s6 m8 l9">
                       <span class="card-title">Repository of Configurations</span>
                     </div>
-                    <div class="col s3" align="right">
+                    <div class="col s6 m4 l3" align="right">
                       <a class="modal-trigger waves-effect waves-light btn-large teal" onclick="chkconfigname()"><i class="material-icons left">add</i>Add Config</a>
                     </div>
                   </div>
