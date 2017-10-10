@@ -55,19 +55,24 @@ class ConfigController extends Controller
     $request->session()->flash('title', 'Failed!');
     $request->session()->flash('text', 'The configuration file not found.');
     $request->session()->flash('icon', 'error');
-
-    $serverid = $request->input('serverid');
-    $GLOBALS['serverid'] = $serverid;
+    //
+    // $serverid = $request->input('serverid');
+    // $GLOBALS['serverid'] = $control->serverid;
     $controlid = $request->input('controlid');
     $GLOBALS['controlid'] = $controlid;
     $pathname = $request->input('pathname');
     $GLOBALS['pathname'] = $pathname;
     $pathconf = $request->input('pathconf');
     $GLOBALS['pathconf'] = $pathconf;
+
+
+    $control = DB::table('controls')->where('id', $GLOBALS['controlid'])->first();
+
+    $GLOBALS['serverid'] = $control->host_id;
+
     $host = DB::table('hosts')->where('id', $GLOBALS['serverid'])->first();
     $servername = $host->servername ;
 
-    $control = DB::table('controls')->where('id', $GLOBALS['controlid'])->first();
 
     $hostusr = $control->username_ssh;
 
@@ -78,18 +83,19 @@ class ConfigController extends Controller
     $nameconf =substr($pathconf, strrpos($pathconf, '/') + 1);
     $namepath =substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);
 
+
     if(strpos($nameconf,'.conf') !== false || strpos($nameconf,'.cfg') !== false ){
 
       SSH::into('ansible')->run(array(
         "ansible -m shell -a 'find $namepath -type f -name $nameconf' $servername"
       ), function($line){
+        echo $line;
         if (strpos($line, $GLOBALS['pathconf']) !== false) {
           $GLOBALS['test'] = 1 ;
 
-
           //Using Gitlab API
 
-          $user_id = 2;
+          $user_id = 29;
           $imp_token = "1xfYQD8Km8LsfWaYVP_d";
           $proj_name = str_random(20);
 

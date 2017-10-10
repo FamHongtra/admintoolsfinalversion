@@ -117,16 +117,19 @@
     @endif
 
 
-    <nav>
-      <div class="nav-wrapper teal lighten-1">
-        <a href="{{url('showhost')}}" class="brand-logo">Logo</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="sass.html">Sass</a></li>
-          <li><a href="badges.html">Components</a></li>
-          <li><a href="collapsible.html">JavaScript</a></li>
-        </ul>
-      </div>
-    </nav>
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper teal lighten-1 ">
+          <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="../img/logo0.png" height="50px" style="margin: 7px"/></a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="sass.html">Sass</a></li>
+            <li><a href="badges.html">Components</a></li>
+            <li><a href="collapsible.html">JavaScript</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
     <div class="row">
 
     </div>
@@ -146,15 +149,15 @@
 
       <div class="col s12" align="center"></div>
 
-      <div class="col s8">
+      <div class="col s12 m12 l8">
 
-        <div class="col s4" align="center">
+        <div class="col s12 m12 l4" align="center">
           <div class="card cyan darken-3" style="width:250px">
             <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
           </div>
           <div class="card" style="width:250px;">
             <div class="card-image" style="padding:20px">
-              <img src="/img/server.png">
+              <img src="../img/server.png">
               <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
             </div>
             <div class="card-action white">
@@ -163,7 +166,7 @@
           </div>
         </div>
 
-        <div class="col s8">
+        <div class="col s12 m12 l8">
           <div class="row">
             <div class="col s12">
               <div class="card blue-grey darken-1">
@@ -219,7 +222,7 @@
               <div class="col s6">
                 <div class="card blue-grey darken-1">
                   <div class="card-content white-text">
-                    <span class="card-title" >Installed memory (RAM)</span>
+                    <span class="card-title" >Installed memory</span>
                     <div class="" align="right" style="margin-right:30px">
                       <br>
                       <?php
@@ -264,7 +267,7 @@
                       <span class="card-title">Repository of Configurations</span>
                     </div>
                     <div class="col s3" align="right">
-                      <a class="modal-trigger waves-effect waves-light btn-large teal" href="#modal1"><i class="material-icons left">add</i>Add Config</a>
+                      <a class="modal-trigger waves-effect waves-light btn-large teal" onclick="chkconfigname()"><i class="material-icons left">add</i>Add Config</a>
                     </div>
                   </div>
                 </div>
@@ -288,7 +291,7 @@
                         <td>{{$indexKey+1}}</td>
                         <td>{{$config->configname}}</td>
                         <td>{{$config->configpath}}</td>
-                        <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}" onclick="return loading();" style="width:120px">View</a> <a class="modal-trigger waves-effect waves-light btn" href="#delconfig{{$config->id}}" style="width:120px">Delete</a></td>
+                        <td><a class="waves-effect waves-light btn" href="{{url('detailrepo/'.$config->id)}}" onclick="return loading();" style="width:120px">View</a> <a class="modal-trigger waves-effect waves-light btn" onclick="delConf({{$config->id}})" style="width:120px">Delete</a></td>
                       </tr>
                     </tbody>
                     <div id="delconfig{{$config->id}}" class="modal modal-fixed-footer">
@@ -333,10 +336,10 @@
             </div>
           </div>
         </div>
-        <div class="col s4">
+        <div class="col s12 m12 l4">
           <div class="row">
             <div class="col s12"><span style="font-size: 250%; color:#607d8b">About Host</span><hr style="color: #607d8b">
-              <a class="modal-trigger" href="#modal2" style="color:#009688"><i class="material-icons left">add</i>add host description</a><br><br>
+              <a class="modal-trigger" href="#!" onclick="addDesc()" style="color:#009688"><i class="material-icons left">add</i>add host description</a><br><br>
               <!-- <div class="card-panel teal"> -->
 
               <?php
@@ -349,55 +352,14 @@
                 @foreach($descs as $indexKey=>$desc)
 
                 <li>
-                  <div class="collapsible-header blue-grey lighten-5 blue-grey darken-text"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" href="#delete{{$desc->id}}"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" href="#edit{{$desc->id}}"><i class="material-icons right" style="color:#009688">edit</i></a></div>
+                  <div class="collapsible-header blue-grey lighten-5 blue-grey darken-text"><i class="material-icons">dvr</i>{{$desc->descname}}<a class="modal-trigger" onclick="delDesc({{$desc->id}})"><i class="material-icons right" style="color:#009688">delete</i></a><a class="modal-trigger" onclick="editDesc({{$desc->id}})"><i class="material-icons right" style="color:#009688">edit</i></a></div>
                   <div class="collapsible-body"><span class="break-word"><?php echo nl2br($desc->descdetail);?></span></div>
                   <a href="#modal4" class="modal-trigger" id="clickmodal4" hidden=""></a>
                 </li>
 
-                <div id="edit{{$desc->id}}" class="modal modal-fixed-footer">
-                  <div class="modal-content">
-                    <br>
-                    <!-- <h5>Add Host Description</h5> -->
-                    <!-- <p>You should add host by using rsa key for secure</p> -->
-                    <!-- <hr class="style-four"><br> -->
-                    <div class="row">
-                      <div class="col s1"></div>
-                      <div class="col s10">
-                        <br>
-                        <div id="byrsakey" class="row" style="display:block;">
-                          <form action="{{url('editdesc')}}" id="editdescform{{$desc->id}}" class="col s12" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="serverid" value="" id="serverid">
-                            <input type="hidden" name="descid" value="{{$desc->id}}" id="descid">
-                            <div class="row">
-                              <div class="input-field col s2"></div>
-                              <div class="input-field  col s8">
-                                <i class="material-icons prefix">description</i>
-                                <input id="icon_prefix" type="text" class="validate" name="descname" value="{{$desc->descname}}" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
-                                <label for="icon_prefix">Description Name</label>
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="input-field col s2"></div>
-                              <div class="input-field col s8">
-                                <i class="material-icons prefix">line_weight</i>
-                                <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">{{$desc->descdetail}}</textarea>
-                                <label for="icon_prefix2">Description Detail</label>
-                              </div>
-                            </div>
-                            <div class="row" align="center">
-                              <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="editDesc({{$desc->id}})" name="button"><i class="material-icons  left">done</i>Save Changes</button>
-                              <button class="modal-action modal-close waves-effect waves-light btn-large teal lighten-2" type="button" name="button" data-dismiss=  "modal" ><i class="material-icons  left">close</i>Cancle</button>
-                            </div>
-                            <div id="errormsg2" class="row" align="center" style="display:none">
-                              <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div id="divdescname{{$desc->id}}" style="display:none">{{$desc->descname}}</div>
+                <div id="divdescdetail{{$desc->id}}" style="display:none">{{$desc->descdetail}}</div>
+
 
                 <div id="delete{{$desc->id}}" class="modal modal-fixed-footer">
                   <div class="modal-content">
@@ -458,103 +420,7 @@
 <div id="server" class="" style="display:none">
   {{$obj->id}}
 </div>
-<div class="container" align="left">
-  <!-- Page Content goes here -->
 
-
-  <!-- Modal Structure -->
-
-  <!-- add config path -->
-  <div id="modal1" class="modal modal-fixed-footer">
-    <div class="modal-content">
-      <br>
-      <!-- <h5>Add Host</h5> -->
-      <!-- <p>You should add host by using rsa key for secure</p> -->
-      <!-- <hr class="style-four"><br> -->
-      <div class="row">
-        <div class="col s1"></div>
-        <div class="col s10">
-          <br>
-          <div id="byrsakey" class="row" style="display:block;">
-            <form action="{{url('checkpath')}}" id="hostform" class="col s12" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="serverid" value="" id="serverid">
-              <input type="hidden" name="controlid" value="{{$controlid}}" id="controlid">
-              <div class="row">
-                <div class="input-field col s2"></div>
-                <div class="input-field  col s8">
-                  <i class="material-icons prefix">description</i>
-                  <input id="icon_prefix" type="text" class="validate" name="pathname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
-                  <label for="icon_prefix">Name</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s2"></div>
-                <div class="input-field col s8">
-                  <i class="material-icons prefix">label</i>
-                  <input id="icon_prefix" type="text" class="validate" name="pathconf" title="This field is required.">
-                  <label for="icon_prefix">Path</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="row" align="center">
-                  <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="chkconfigname()" name="button"><i class="material-icons  left">done</i>Save Path</button>
-                </div>
-              </div>
-              <div id="errormsg1" class="row" align="center" style="display:none">
-                <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- add description -->
-  <div id="modal2" class="modal modal-fixed-footer">
-    <div class="modal-content">
-      <br>
-      <!-- <h5>Add Host Description</h5> -->
-      <!-- <p>You should add host by using rsa key for secure</p> -->
-      <!-- <hr class="style-four"><br> -->
-      <div class="row">
-        <div class="col s1"></div>
-        <div class="col s10">
-          <br>
-          <div id="byrsakey" class="row" style="display:block;">
-            <form action="{{url('adddesc')}}" id="descform" class="col s12" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="serverid" value="" id="serverid">
-              <div class="row">
-                <div class="input-field col s2"></div>
-                <div class="input-field  col s8">
-                  <i class="material-icons prefix">description</i>
-                  <input id="icon_prefix" type="text" class="validate" name="descname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Config's name should be 1 to 32 characters, required.">
-                  <label for="icon_prefix">Description Name</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s2"></div>
-                <div class="input-field col s8">
-                  <i class="material-icons prefix">line_weight</i>
-                  <textarea name="descdetail" id="icon_prefix2" class="materialize-textarea"></textarea>
-                  <label for="icon_prefix2">Description Detail</label>
-                </div>
-              </div>
-              <div class="row" align="center">
-                <button class="modal-trigger waves-effect waves-light btn-large teal" type="button" onClick="addDesc()" name="button"><i class="material-icons  left">done</i>Save Description</button>
-              </div>
-              <div id="errormsg2" class="row" align="center" style="display:none">
-                <i class="material-icons prefix" style="color:#b71c1c">info_outline</i><span style="color:#b71c1c"> Invalid input, please check your informations.</span>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!--Import jQuery before materialize.js-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
@@ -579,7 +445,7 @@ function hasmsg(){
 
 function loading(){
   swal({
-    imageUrl: '/img/load.gif',
+    imageUrl: '../img/load.gif',
     imageWidth: 120,
     showCancelButton: false,
     showConfirmButton: false,
@@ -587,163 +453,198 @@ function loading(){
     allowOutsideClick: false,
     confirmButtonColor: '#26a69a',
   });
-}
-
-
-function addDesc(){
-
-  $idform=document.getElementById('descform');
-
-  $server = document.getElementById('server').textContent ;
-  $idform.elements.namedItem('serverid').value = $server;
-
-
-  $formdescname = $idform.elements.namedItem("descname").value;
-
-  $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-  $resvaliddescname = $descnamepatt.test($formdescname);
-
-  $formdescdetail = $idform.elements.namedItem("descdetail").value;
-
-  if( ($formdescname != "") && ($formdescdetail != "")){
-    if($resvaliddescname){
-      swal({
-        imageUrl: '/img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
-      $('#modal2').modal().hide();
-      document.getElementById('errormsg2').style.display = "none" ;
-      $("#descform").submit();
-    }else{
-      document.getElementById('errormsg2').style.display = "block" ;
-    }
-  }else{
-    document.getElementById('errormsg2').style.display = "block" ;
-  }
-
-}
-
-function editDesc(id){
-  // alert("Hello"+id);
-
-  $idform=document.getElementById('editdescform'+id);
-
-  $server = document.getElementById('server').textContent ;
-  $idform.elements.namedItem('serverid').value = $server;
-
-
-  $formdescname = $idform.elements.namedItem("descname").value;
-
-  $descnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-  $resvaliddescname = $descnamepatt.test($formdescname);
-
-  $formdescdetail = $idform.elements.namedItem("descdetail").value;
-
-  if( ($formdescname != "") && ($formdescdetail != "")){
-    if($resvaliddescname){
-      swal({
-        imageUrl: '/img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
-      $('#edit'+id).modal().hide();
-      document.getElementById('errormsg2').style.display = "none" ;
-      $("#editdescform"+id).submit();
-    }else{
-      document.getElementById('errormsg2').style.display = "block" ;
-    }
-  }else{
-    document.getElementById('errormsg2').style.display = "block" ;
-  }
-
-}
-
-function delDesc(id){
-  // alert("Hello"+id);
-
-  $idform=document.getElementById('deldescform'+id);
-
-  $server = document.getElementById('server').textContent ;
-  $idform.elements.namedItem('serverid').value = $server;
-
-  swal({
-    imageUrl: '/img/load.gif',
-    imageWidth: 120,
-    showCancelButton: false,
-    showConfirmButton: false,
-    animation: false,
-    allowOutsideClick: false,
-    confirmButtonColor: '#26a69a',
-  });
-  $('#delete'+id).modal().hide();
-
-  $("#deldescform"+id).submit();
-
-}
-
-function delConf(id){
-  // alert("Hello"+id);
-
-  $idform=document.getElementById('delconfigform'+id);
-
-  $server = document.getElementById('server').textContent ;
-  $idform.elements.namedItem('serverid').value = $server;
-
-  swal({
-    imageUrl: '/img/load.gif',
-    imageWidth: 120,
-    showCancelButton: false,
-    showConfirmButton: false,
-    animation: false,
-    allowOutsideClick: false,
-    confirmButtonColor: '#26a69a',
-  });
-  $('#delconfig'+id).modal().hide();
-  $("#delconfigform"+id).submit();
-
 }
 
 function chkconfigname(){
 
-  $idform=document.getElementById('hostform');
-  $formpathname = $idform.elements.namedItem("pathname").value;
-  $server = document.getElementById('server').textContent ;
-  $idform.elements.namedItem('serverid').value = $server;
+  swal({
+    title: 'Add Configuration',
+    html:
+    '<form action="{{url("checkpath")}}" id="hostform" class="col s12" method="post" enctype="multipart/form-data">'+
+    '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+    '<input type="hidden" name="controlid" value="{{$controlid}}" id="controlid">'+
+    '<input type="hidden" name="serverid" value="" id="serverid">'+
+    '<br><div class="row">'+
+    '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">description</i>'+
+    '<input id="icon_prefix" type="text" class="validate" name="pathname">'+
+    '<label for="icon_prefix" align="left">Configuration Name</label>'+
+    '</div>'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">label</i>'+
+    '<input id="icon_prefix" type="text" class="validate" name="pathconf">'+
+    '<label for="icon_prefix" align="left">Configuration Path</label>'+
+    '</div>'+
+    '</div>'+
+    '</div>'+
+    '</form>',
+    confirmButtonColor: '#26a69a',
+    confirmButtonText: 'Save',
+    showCancelButton: true,
+  }).then(function () {
+    $("#hostform").submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
+  });
+}
 
-  $pathnamepatt = new RegExp("^[a-zA-Z0-9-@]{1,32}$");
-  $resvalidpathname = $pathnamepatt.test($formpathname);
+function addDesc(){
 
-  $formpathconf = $idform.elements.namedItem("pathconf").value;
-  if( ($formpathname != "") && ($formpathconf != "")){
-    if($resvalidpathname){
+  swal({
+    title: 'Add Host Description',
+    html:
+    '<form action="{{url("adddesc")}}" id="descform" class="col s12" method="post" enctype="multipart/form-data">'+
+    '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+    '<input type="hidden" name="controlid" value="{{$controlid}}" id="controlid">'+
+    '<br><div class="row">'+
+    '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">description</i>'+
+    '<input id="icon_prefix" type="text" class="validate" name="descname">'+
+    '<label for="icon_prefix" align="left">Description Name</label>'+
+    '</div>'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">line_weight</i>'+
+    '<textarea name="descdetail" id="icon_prefix2" class="materialize-textarea"></textarea>'+
+    '<label for="icon_prefix2" align="left">Description Detail</label>'+
+    '</div>'+
+    '</div>'+
+    '</div>'+
+    '</form>',
+    confirmButtonColor: '#26a69a',
+    confirmButtonText: 'Save',
+    showCancelButton: true,
+  }).then(function () {
+    $("#descform").submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
+  });
+}
 
-      swal({
-        imageUrl: '/img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
-      $('#modal1').modal().hide();
-      document.getElementById('errormsg1').style.display = "none" ;
-      $("#hostform").submit();
-    }else{
-      document.getElementById('errormsg1').style.display = "block" ;
-    }
-  }else{
-    document.getElementById('errormsg1').style.display = "block" ;
-  }
+function editDesc(id){
+
+  var divdescname = document.getElementById('divdescname'+id).textContent ;
+  var divdescdetail = document.getElementById('divdescdetail'+id).textContent ;
+
+  swal({
+    title: 'Edit Host Description',
+    html:
+    '<form action="{{url("editdesc")}}" id="editdescform'+id+'" class="col s12" method="post" enctype="multipart/form-data">'+
+    '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+    '<input type="hidden" name="controlid" value="{{$controlid}}" id="controlid">'+
+    '<input type="hidden" name="descid" value="'+id+'" id="descid">'+
+    '<br><div class="row">'+
+    '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">description</i>'+
+    '<input id="icon_prefix" type="text" name="descname" value="'+divdescname+'">'+
+    '<label class="active" for="icon_prefix" align="left">Description Name</label>'+
+    '</div>'+
+    '<div class="input-field input-field2">'+
+    '<i class="material-icons prefix">line_weight</i>'+
+    '<textarea name="descdetail" id="icon_prefix2" class="materialize-textarea">'+divdescdetail+'</textarea>'+
+    '<label class="active" for="icon_prefix2" align="left">Description Detail</label>'+
+    '</div>'+
+    '</div>'+
+    '</div>'+
+    '</form>',
+    confirmButtonColor: '#26a69a',
+    confirmButtonText: 'Update',
+    showCancelButton: true,
+  }).then(function () {
+    $("#editdescform"+id).submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
+  });
+}
+
+// function delDesc(id){
+//   // alert("Hello"+id);
+//
+//   $idform=document.getElementById('deldescform'+id);
+//
+//   $server = document.getElementById('server').textContent ;
+//   $idform.elements.namedItem('serverid').value = $server;
+//
+//   swal({
+//     imageUrl: '../img/load.gif',
+//     imageWidth: 120,
+//     showCancelButton: false,
+//     showConfirmButton: false,
+//     animation: false,
+//     allowOutsideClick: false,
+//     confirmButtonColor: '#26a69a',
+//   });
+//   $('#delete'+id).modal().hide();
+//
+//   $("#deldescform"+id).submit();
+//
+// }
+
+function delDesc(id) {
+  swal({
+    title: 'Are you sure?',
+    text: "The host description will be deleted.",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#26a69a',
+    confirmButtonText: 'Yes'
+  }).then(function () {
+    $("#deldescform"+id).submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
+  });
+}
+
+function delConf(id) {
+  swal({
+    title: 'Are you sure?',
+    text: "The configuration repository will be deleted.",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#26a69a',
+    confirmButtonText: 'Yes'
+  }).then(function () {
+    $("#delconfigform"+id).submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
+  });
 }
 
 //modal scripts

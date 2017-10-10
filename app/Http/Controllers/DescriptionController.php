@@ -14,7 +14,10 @@ class DescriptionController extends Controller
   public function addDescription(Request $request)
   {
     //
-    $serverid = $request->input('serverid');
+    $controlid = $request->input('controlid');
+    $control = DB::table('controls')->where('id', $controlid)->first();
+    $serverid = $control->host_id;
+
     $descname = $request->input('descname');
     $descdetail = $request->input('descdetail');
 
@@ -37,8 +40,11 @@ class DescriptionController extends Controller
 
   public function editDescription(Request $request)
   {
-    //
-    $serverid = $request->input('serverid');
+
+    $controlid = $request->input('controlid');
+    $control = DB::table('controls')->where('id', $controlid)->first();
+    $serverid = $control->host_id;
+
     $descid = $request->input('descid');
     $descname = $request->input('descname');
     $descdetail = $request->input('descdetail');

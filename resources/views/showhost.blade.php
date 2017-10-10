@@ -137,7 +137,7 @@
 
     <div class="row">
 
-      <div class="input-field col s4 m2 l1 offset-l6">
+      <div class="input-field col s4 m4 l1 offset-l5">
         <select id="searchby" onchange="searchBy()">
           <option value="autocomplete" selected>Hostname or IP</option>
           <option value="autocompleteGroup">Groupname</option>
@@ -145,7 +145,7 @@
         <label>Search By</label>
       </div>
 
-      <div class="col s8 m4 l2">
+      <div class="col s8 m8 l2">
 
         <form action="{{url('searchhost')}}"  onsubmit="return loading();" method="post" enctype="multipart/form-data">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -161,9 +161,9 @@
         </form>
       </div>
       @if(count($objs)!=0)
-      <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
+      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
       @else
-      <div class="col s12 m6 l3" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
+      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Host</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal1"><i class="material-icons left">library_add</i>Create Group</a></div>
       @endif
     </div>
 
@@ -508,7 +508,7 @@
         '<input type="hidden" name="user_id" value="{{ $user_id }}">'+
         '<input type="hidden" name="host_id" value="'+id+'">'+
         '<br><div class="row">'+
-        '<div class="col l10 offset-l1">'+
+        '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
         '<div class="input-field input-field2">'+
         '<i class="material-icons prefix">perm_identity</i>'+
         '<input id="icon_prefix" type="text" class="validate" name="login_username">'+
