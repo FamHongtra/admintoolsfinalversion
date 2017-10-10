@@ -206,37 +206,34 @@
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="bywhat" value="password">
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field2 col s8">
+                      <!-- <div class="input-field col s2"></div> -->
+                      <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">perm_contact_calendar</i>
                         <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
                         <label for="icon_prefix">Server Name</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field2 col s5">
+                      <div class="input-field input-field2 col s5 m4 l5 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">dns</i>
                         <input id="icon_prefix" type="text" class="validate" name="host"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid ip address.">
                         <label for="icon_prefix">Hosts</label>
                       </div>
-                      <div class="input-field input-field2 col s3">
+                      <div class="input-field input-field2 col s5 m4 l3">
                         <i class="material-icons prefix">phone</i>
                         <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0-65535.">
                         <label for="icon_telephone">Port</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field2 col s8">
+                      <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">perm_identity</i>
                         <input id="icon_prefix" type="text" class="validate" name="usrname"  pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters.">
                         <label for="icon_prefix">Username</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field2 col s8">
+                      <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">vpn_key</i>
                         <input id="icon_telephone" type="password" class="validate" name="password" pattern="^[a-z0-9]{6,}$" title="Password should consist of at least 6 characters and lower case.">
                         <label for="icon_telephone">Password</label>
@@ -255,37 +252,33 @@
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="bywhat" value="rsakey">
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field1 col s8">
+                      <div class="input-field input-field1 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">perm_contact_calendar</i>
                         <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters, required.">
                         <label for="icon_prefix">Server Name</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field1 col s5">
+                      <div class="input-field input-field1 col s5 m4 l5 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">dns</i>
                         <input id="icon_prefix" type="text" class="validate" name="host" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" title="Please enter valid IP, required.">
                         <label for="icon_prefix">Hosts</label>
                       </div>
-                      <div class="input-field input-field1 col s3">
+                      <div class="input-field input-field1 col s5 m4 l3">
                         <i class="material-icons prefix">phone</i>
                         <input id="icon_telephone" type="text" class="validate" name="port" pattern="^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$" title="Length should be between 0 to 65535, required.">
                         <label for="icon_telephone">Port</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field1 col s8">
+                      <div class="input-field input-field1 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <i class="material-icons prefix">perm_identity</i>
                         <input id="icon_prefix" type="text" class="validate" name="usrname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Username should be 1 to 32 characters, required.">
                         <label for="icon_prefix">Username</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col s2"></div>
-                      <div class="file-field col s8">
+                      <div class="file-field col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                         <div class="btn" style="background-color:#00acc1">
                           <span>RSA Key</span>
                           <input type="file" name="password">
@@ -332,15 +325,14 @@
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="user_id" value="{{ $user_id }}">
                     <div class="row">
-                      <div class="input-field col s2"></div>
-                      <div class="input-field input-field2 col s8">
+                      <div class="input-field input-field2 col s10 m10 l8 offset-s1 offset-m1 offset-l2">
                         <i class="material-icons prefix">view_week</i>
                         <input id="icon_prefix" type="text" class="validate" name="groupname" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Group name should be 1 to 32 characters.">
                         <label for="icon_prefix">Host's Group Name</label>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col s10 offset-s1">
+                      <div class="col s12 m12 l10 offset-sl">
                         Ungroup Hosts:
                         <ul class="collection scroll">
                           @foreach($objs as $indexKey=>$obj)
