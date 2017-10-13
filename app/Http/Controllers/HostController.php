@@ -237,56 +237,63 @@ class HostController extends Controller
   */
   public function show($id)
   {
-    $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+    if(session('user_id')==null){
+      return redirect('login');
+    }else{
+      $host_id = DB::table('controls')->where('id', $id)->value('host_id');
 
-    $obj = Host::find($host_id);
-    $data['obj'] = $obj;
-    $data['controlid'] = $id;
+      $obj = Host::find($host_id);
+      $data['obj'] = $obj;
+      $data['controlid'] = $id;
 
-    return view('detailhost',$data) ;
+      return view('detailhost',$data) ;
+    }
   }
 
   public function checkConnection(Request $request, $id)
   {
-    $host_id = DB::table('controls')->where('id', $id)->value('host_id');
-
-
-    $obj = Host::find($host_id);
-    $servername = $obj->servername ;
-
-    $GLOBALS['ping'] = 0;
-
-    SSH::into('ansible')->run(array(
-      "ansible -m ping $servername",
-    ), function($line){
-      if (strpos($line, 'SUCCESS') !== false) {
-        $GLOBALS['ping'] = 1;
-      }
-    });
-
-    if($GLOBALS['ping'] == 1){
-      $request->session()->flash('status', 'connection');
-      $request->session()->flash('title', 'Connected!');
-      $request->session()->flash('text', 'The host is already connected.');
-      $request->session()->flash('icon', 'success');
+    if(session('user_id')==null){
+      return redirect('login');
     }else{
-      $request->session()->flash('status', 'connection');
-      $request->session()->flash('title', 'Disconnected!');
-      $request->session()->flash('text', 'The host is not connected.');
-      $request->session()->flash('icon', 'error');
+
+      $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+
+      $obj = Host::find($host_id);
+      $servername = $obj->servername ;
+
+      $GLOBALS['ping'] = 0;
+
+      SSH::into('ansible')->run(array(
+        "ansible -m ping $servername",
+      ), function($line){
+        if (strpos($line, 'SUCCESS') !== false) {
+          $GLOBALS['ping'] = 1;
+        }
+      });
+
+      if($GLOBALS['ping'] == 1){
+        $request->session()->flash('status', 'connection');
+        $request->session()->flash('title', 'Connected!');
+        $request->session()->flash('text', 'The host is already connected.');
+        $request->session()->flash('icon', 'success');
+      }else{
+        $request->session()->flash('status', 'connection');
+        $request->session()->flash('title', 'Disconnected!');
+        $request->session()->flash('text', 'The host is not connected.');
+        $request->session()->flash('icon', 'error');
+      }
+
+      $data['obj'] = $obj;
+      $data['controlid'] = $id;
+
+      return Redirect::back();
     }
-
-
-
-    $data['obj'] = $obj;
-    $data['controlid'] = $id;
-
-    return Redirect::back();
     // return view('detailhost',$data) ;
   }
 
   public function search(Request $request)
   {
+
     $searchby = $request->input('search_by');
     $searchkey = $request->input('searchkey');
     $user_id = $request->input('user_id');
@@ -377,6 +384,7 @@ class HostController extends Controller
     $data['user_id'] = $user_id;
 
     return view('showhost',$data);
+
   }
 
   public function sshLogin(Request $request)

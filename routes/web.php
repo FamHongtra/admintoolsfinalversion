@@ -66,27 +66,35 @@ Route::get('/createtmphost', function () {
 
 Route::get('/showhost', function () {
 
-  $user_id = 1 ;
-
-  // objs is set of hosts havn't the group
-  $objs = DB::table('hosts')
-  ->join('controls', 'hosts.id', '=', 'controls.host_id')
-  ->where('controls.user_id', $user_id)
-  ->where('controls.group_id', 0)
-  ->get();
-
-  $all_group = DB::table('groups')
-  ->where('user_id', $user_id)
-  ->get();
+  if(session('user_id')==null){
+    return redirect('login');
+  }else{
+    $user_id = session('user_id');
 
 
+    // objs is set of hosts havn't the group
+    $objs = DB::table('hosts')
+    ->join('controls', 'hosts.id', '=', 'controls.host_id')
+    ->where('controls.user_id', $user_id)
+    ->where('controls.group_id', 0)
+    ->get();
 
-  $data['objs'] = $objs;
-  $data['all_group'] = $all_group;
-  $data['user_id'] = $user_id;
+    $all_group = DB::table('groups')
+    ->where('user_id', $user_id)
+    ->get();
 
-  return view('showhost',$data);
+    $data['objs'] = $objs;
+    $data['all_group'] = $all_group;
+    $data['user_id'] = $user_id;
+
+    return view('showhost',$data);
+  }
 });
+
+Route::get('/login', function () {
+  return view('loginpage');
+});
+
 
 // Route::get('/searchhost', function () {
 //   echo 5555;
@@ -119,6 +127,8 @@ Route::post('/leftgroup', 'GroupController@leftGroup');
 Route::post('/delgroup', 'GroupController@delGroup');
 Route::post('/sshlogin', 'HostController@sshLogin');
 Route::post('/deletehost', 'HostController@delHost');
+Route::post('/userlogin', 'UserController@login');
+Route::get('/userlogout', 'UserController@logout');
 
 //About Gitlab API
 

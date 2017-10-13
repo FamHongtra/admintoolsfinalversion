@@ -258,49 +258,54 @@ class ConfigController extends Controller
   public function show($id)
   {
     //
-    $control_id = DB::table('configs')->where('id', $id)->value('control_id');
-    $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
-    $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
+    if(session('user_id')==null){
+      return redirect('login');
+    }else{
 
-    $obj = Host::find($host_id);
+      $control_id = DB::table('configs')->where('id', $id)->value('control_id');
+      $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+      $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
 
-    $user_id = 2;
-    $imp_token = "1xfYQD8Km8LsfWaYVP_d";
-    $GLOBALS['jsonArray'] = "";
+      $obj = Host::find($host_id);
 
-    SSH::into('gitlab')->run(array(
+      $user_id = 2;
+      $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+      $GLOBALS['jsonArray'] = "";
 
-      "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
+      SSH::into('gitlab')->run(array(
 
-    ), function($line){
-      // echo $line;
+        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
 
-      $GLOBALS['jsonArray'] = json_decode($line);
-      $collection = collect($GLOBALS['jsonArray']);
-      $sorted = $collection->sortBy('committed_date');
+      ), function($line){
+        // echo $line;
 
-      //
-      // return dd($sorted);
+        $GLOBALS['jsonArray'] = json_decode($line);
+        $collection = collect($GLOBALS['jsonArray']);
+        $sorted = $collection->sortBy('committed_date');
 
-      // foreach ($jsonArray as $item) {
-      //   # code...
-      //   print_r("Revision short ID: ".$item->short_id.", Commits Title: ".$item->title); echo '<br/>';
-      //
-      // }
+        //
+        // return dd($sorted);
 
-    });
+        // foreach ($jsonArray as $item) {
+        //   # code...
+        //   print_r("Revision short ID: ".$item->short_id.", Commits Title: ".$item->title); echo '<br/>';
+        //
+        // }
 
-    $data['obj'] = $obj;
+      });
 
-    $data['controlid'] = $control_id;
-    $data['configid'] = $id ;
-    // $collection = collect($GLOBALS['jsonArray']);
-    // $sorted = $collection->sortBy('committed_date');
-    // $data['configversions'] = $sorted;
-    $data['configversions'] = $GLOBALS['jsonArray'];
-    $GLOBALS['test'] = 5;
+      $data['obj'] = $obj;
 
-    return view('detailrepo',$data)->withErrors($GLOBALS['test']) ;
+      $data['controlid'] = $control_id;
+      $data['configid'] = $id ;
+      // $collection = collect($GLOBALS['jsonArray']);
+      // $sorted = $collection->sortBy('committed_date');
+      // $data['configversions'] = $sorted;
+      $data['configversions'] = $GLOBALS['jsonArray'];
+      $GLOBALS['test'] = 5;
+
+      return view('detailrepo',$data)->withErrors($GLOBALS['test']) ;
+    }
 
   }
 
@@ -421,21 +426,26 @@ class ConfigController extends Controller
   public function editconfig($id)
   {
     //
-    $control_id = DB::table('configs')->where('id', $id)->value('control_id');
-    $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
-    $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
 
-    $obj = Host::find($host_id);
+    if(session('user_id')==null){
+      return redirect('login');
+    }else{
 
-    $data['obj'] = $obj;
+      $control_id = DB::table('configs')->where('id', $id)->value('control_id');
+      $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+      $proj_id = DB::table('configs')->where('id', $id)->value('gitlab_projid');
 
-    $data['controlid'] = $control_id;
-    $data['configid'] = $id ;
+      $obj = Host::find($host_id);
 
-    $GLOBALS['test'] = 5;
+      $data['obj'] = $obj;
 
-    return view('editconfig',$data)->withErrors($GLOBALS['test']) ;
+      $data['controlid'] = $control_id;
+      $data['configid'] = $id ;
 
+      $GLOBALS['test'] = 5;
+
+      return view('editconfig',$data)->withErrors($GLOBALS['test']) ;
+    }
     //
     // $data = $request->input('data');
     //

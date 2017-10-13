@@ -114,7 +114,12 @@
   .swal2-modal {
     font-family: 'Abel', sans-serif;
   }
-
+  .circle {
+    background-color: white;
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+  }
 
   </style>
 </head>
@@ -132,13 +137,17 @@
   ?>
 
   <div class="navbar-fixed">
+    <ul id="dropdown1" class="dropdown-content">
+      <li><a href="#!">Account Settings</a></li>
+      <li class="divider"></li>
+      <li><a href="{{url('userlogout')}}"  onclick="return loading();" >Logout</a></li>
+    </ul>
     <nav>
       <div class="nav-wrapper teal lighten-1 ">
-        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="../img/logo0.png" height="50px" style="margin: 7px"/></a>
+        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="img/logo0.png" height="50px" style="margin: 7px"/></a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="sass.html">Sass</a></li>
-          <li><a href="badges.html">Components</a></li>
-          <li><a href="collapsible.html">JavaScript</a></li>
+          <li><div class="circle" height="50px" style="margin: 7px;background-color:white"><canvas width="40" height="40" style="margin: 5px" data-jdenticon-value="{{session('user_id')}}"></canvas></div></li>
+          <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Hello, Folder<i class="material-icons right">arrow_drop_down</i></a></li>
         </ul>
       </div>
     </nav>
@@ -256,6 +265,7 @@
     </div>
 
     <!--Import jQuery before materialize.js-->
+    <script src="https://cdn.jsdelivr.net/npm/jdenticon@1.7.2" async></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
     <script src="../ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
