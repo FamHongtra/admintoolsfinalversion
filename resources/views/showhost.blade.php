@@ -132,6 +132,11 @@
     <div class="navbar-fixed">
       <ul id="dropdown1" class="dropdown-content">
         <li><a href="#!">Account Settings</a></li>
+        <!-- <admin area -->
+        @if (session('user_id')==1)
+        <li><a href="#!" onclick="createUser()">User Creation</a></li>
+        @endif
+        <!-- admin area/> -->
         <li class="divider"></li>
         <li><a href="{{url('userlogout')}}"  onclick="return loading();" >Logout</a></li>
       </ul>
@@ -140,7 +145,12 @@
           <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="img/logo0.png" height="50px" style="margin: 7px"/></a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><div class="circle" height="50px" style="margin: 7px;background-color:white"><canvas width="40" height="40" style="margin: 5px" data-jdenticon-value="{{session('user_id')}}"></canvas></div></li>
-            <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Hello, Folder<i class="material-icons right">arrow_drop_down</i></a></li>
+            @php
+            $user_name = DB::table('users')
+            ->where('id', session('user_id'))
+            ->value('name');
+            @endphp
+            <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Hello, {{$user_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
           </ul>
         </div>
       </nav>
@@ -533,6 +543,51 @@
         showCancelButton: true,
       }).then(function () {
         $("#sshloginform"+id).submit();
+        swal({
+          imageUrl: 'img/load.gif',
+          imageWidth: 120,
+          showCancelButton: false,
+          showConfirmButton: false,
+          animation: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#26a69a',
+        });
+      });
+    }
+
+
+    function createUser(){
+
+      swal({
+        title: 'User Creation',
+        html:
+        '<form action="{{url("createuser")}}" id="createuserform" class="col s12" method="post" enctype="multipart/form-data">'+
+        '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+        '<br><div class="row">'+
+        '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">assignment_ind</i>'+
+        '<input id="icon_prefix" type="text" class="validate" name="newuser_name" required>'+
+        '<label for="icon_prefix" align="left">Name</label>'+
+        '</div>'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">perm_identity</i>'+
+        '<input id="icon_prefix" type="text" class="validate" name="newuser_username" required>'+
+        '<label for="icon_prefix" align="left">Username</label>'+
+        '</div>'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">email</i>'+
+        '<input id="icon_prefix" type="email" class="validate" name="newuser_email" required>'+
+        '<label for="icon_prefix" align="left">Email</label>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</form>',
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Create',
+        showCancelButton: true,
+      }).then(function () {
+        $("#createuserform").submit();
         swal({
           imageUrl: 'img/load.gif',
           imageWidth: 120,

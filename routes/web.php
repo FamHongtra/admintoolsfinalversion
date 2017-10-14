@@ -95,6 +95,20 @@ Route::get('/login', function () {
   return view('loginpage');
 });
 
+Route::get('/encryptpass', function () {
+
+  //Create User for Test
+  $password = "ubuntueiei" ;
+  $password_encrypted = Crypt::encryptString($password);
+
+  DB::table('users')
+  ->where('id', 1)
+  ->update(['password' => $password_encrypted]);
+
+  $password_decrypted = Crypt::decryptString($password_encrypted);
+  echo "Password encript: ".$password_encrypted." Password decript: ".$password_decrypted;
+});
+
 
 // Route::get('/searchhost', function () {
 //   echo 5555;
@@ -129,6 +143,7 @@ Route::post('/sshlogin', 'HostController@sshLogin');
 Route::post('/deletehost', 'HostController@delHost');
 Route::post('/userlogin', 'UserController@login');
 Route::get('/userlogout', 'UserController@logout');
+Route::post('/createuser', 'UserController@create');
 
 //About Gitlab API
 
