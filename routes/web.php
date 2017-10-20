@@ -144,7 +144,7 @@ Route::post('/deletehost', 'HostController@delHost');
 Route::post('/userlogin', 'UserController@login');
 Route::get('/userlogout', 'UserController@logout');
 Route::post('/createuser', 'UserController@create');
-
+Route::post('/changepassword', 'UserController@changePassword');
 //About Gitlab API
 
 // Route::get('/search', function () {

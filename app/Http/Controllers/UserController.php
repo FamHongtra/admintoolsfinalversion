@@ -31,25 +31,39 @@ class UserController extends Controller
       $password_decrypted =  Crypt::decryptString($user[0]->password);
       if($password == $password_decrypted){
 
-        $user_id = $user[0]->id;
+        if($user[0]->set_password == "no"){
 
-        $objs = DB::table('hosts')
-        ->join('controls', 'hosts.id', '=', 'controls.host_id')
-        ->where('controls.user_id', $user_id)
-        ->where('controls.group_id', 0)
-        ->get();
+          $request->session()->flash('status', 'change password');
+          $request->session()->flash('username', $username);
+          $request->session()->flash('password', $password);
+          // $request->session()->flash('title', 'Login Failed!');
+          // $request->session()->flash('text', 'Unable to login, please try again.');
+          // $request->session()->flash('icon', 'error');
 
-        $all_group = DB::table('groups')
-        ->where('user_id', $user_id)
-        ->get();
+          return redirect('login');
 
-        $data['objs'] = $objs;
-        $data['all_group'] = $all_group;
-        $data['user_id'] = $user_id;
+        }else{
 
-        session(['user_id' => $user_id]);
+          $user_id = $user[0]->id;
 
-        return view('showhost',$data);
+          $objs = DB::table('hosts')
+          ->join('controls', 'hosts.id', '=', 'controls.host_id')
+          ->where('controls.user_id', $user_id)
+          ->where('controls.group_id', 0)
+          ->get();
+
+          $all_group = DB::table('groups')
+          ->where('user_id', $user_id)
+          ->get();
+
+          $data['objs'] = $objs;
+          $data['all_group'] = $all_group;
+          $data['user_id'] = $user_id;
+
+          session(['user_id' => $user_id]);
+
+          return view('showhost',$data);
+        }
       }else{
         $request->session()->flash('status', 'user login fail');
         $request->session()->flash('title', 'Login Failed!');
@@ -86,7 +100,6 @@ class UserController extends Controller
     $password_encrypted = Crypt::encryptString($user_password);
     $password_decrypted = Crypt::decryptString($password_encrypted);
 
-    $token_name = $user_name.'token';
 
     $user_hasusername = DB::table('users')
     ->where('username',$user_username)
@@ -95,9 +108,61 @@ class UserController extends Controller
 
     if(count($user_hasusername)==0){
 
+
+      $obj = new User();
+      $obj->name = $user_name;
+      $obj->username = $user_username;
+      $obj->password = $password_encrypted;
+      $obj->set_password = "no" ;
+      $obj->email = $user_email;
+      $obj->gitlab_userid = "999999";
+      $obj->token = "null";
+      // $obj->gitlab_userid = $gitlab_userid;
+      // $obj->token = $gitlab_token;
+      $obj->save();
+
+
+
+
+      $request->session()->flash('status', 'username duplicate');
+      $request->session()->flash('title', 'Create User Successful!');
+      $request->session()->flash('text', 'Username: '.$user_username.", Password: ".$user_password);
+      $request->session()->flash('icon', 'success');
+
+      return redirect('showhost');
+    }else{
+      $request->session()->flash('status', 'username duplicate');
+      $request->session()->flash('title', 'Create User Failed!');
+      $request->session()->flash('text', 'Username aready exists, please use another.');
+      $request->session()->flash('icon', 'error');
+
+      return redirect('showhost');
+    }
+  }
+
+  function changePassword(Request $request){
+    $username = $request->input('username');
+    $password = $request->input('password');
+    $curr_password = $request->input('current_password');
+    $new_password = $request->input('new_password');
+    $confirm_password = $request->input('confirm_new_password');
+
+
+
+    if($password == $curr_password && $new_password == $confirm_password){
+
+      $newpassword_encrypted = Crypt::encryptString($new_password);
+      $token_name = $username.'token';
+
+      $user = DB::table('users')
+      ->where('username',$username)
+      ->get();
+
+      $email = $user[0]->email;
+
       //Gitlab API Create User
       SSH::into('gitlab')->run(array(
-        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'username=$user_username' --data 'password=$user_password' --data 'name=$user_name' --data 'email=$user_email' --data 'skip_confirmation=true' http://52.221.75.98/api/v4/users",
+        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'username=$username' --data 'password=$new_password' --data 'name=$username' --data 'email=$email' --data 'skip_confirmation=true' http://52.221.75.98/api/v4/users",
       ), function($line){
         $jsonArray = json_decode($line);
         $GLOBALS['gitlab_userid'] = $jsonArray->id;
@@ -116,31 +181,25 @@ class UserController extends Controller
 
       $gitlab_token = $GLOBALS['gitab_token'];
 
-      $obj = new User();
-      $obj->name = $user_name;
-      $obj->username = $user_username;
-      $obj->password = $password_encrypted;
-      $obj->email = $user_email;
-      $obj->gitlab_userid = $gitlab_userid;
-      $obj->token = $gitlab_token;
-      $obj->save();
 
-      $request->session()->flash('status', 'username duplicate');
-      $request->session()->flash('title', 'Create User Successful!');
-      $request->session()->flash('text', 'Username: '.$user_username.", Password: ".$user_password);
+      DB::table('users')
+      ->where('username', $username)
+      ->update(['password' => $newpassword_encrypted, 'set_password' => "yes", 'gitlab_userid' => $gitlab_userid, 'token' => $gitlab_token]);
+
+      $request->session()->flash('status', 'change password success');
+      $request->session()->flash('title', 'Change Password Successful!');
+      $request->session()->flash('text', 'Your password has been changed');
       $request->session()->flash('icon', 'success');
 
-      return redirect('showhost');
+      return redirect('login');
+
     }else{
-      $request->session()->flash('status', 'username duplicate');
-      $request->session()->flash('title', 'Create User Failed!');
-      $request->session()->flash('text', 'Username aready exists, please use another.');
+      $request->session()->flash('status', 'change password fail');
+      $request->session()->flash('title', 'Change Password Failed!');
+      $request->session()->flash('text', 'Unable to change password, please try again.');
       $request->session()->flash('icon', 'error');
 
-      return redirect('showhost');
+      return redirect('login');
     }
   }
-
-
-
 }
