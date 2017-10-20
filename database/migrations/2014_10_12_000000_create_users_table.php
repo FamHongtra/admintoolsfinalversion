@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('username')->unique();
-            $table->string('password');
+            $table->string('password', 256);
             $table->string('set_password');
             $table->string('token');
             $table->integer('gitlab_userid');

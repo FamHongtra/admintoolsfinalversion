@@ -567,17 +567,17 @@
         '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
         '<div class="input-field input-field2">'+
         '<i class="material-icons prefix">assignment_ind</i>'+
-        '<input id="icon_prefix" type="text" class="validate" name="newuser_name" required>'+
+        '<input id="icon_prefix" type="text" name="newuser_name" required>'+
         '<label for="icon_prefix" align="left">Name</label>'+
         '</div>'+
         '<div class="input-field input-field2">'+
         '<i class="material-icons prefix">perm_identity</i>'+
-        '<input id="icon_prefix" type="text" class="validate" name="newuser_username" required>'+
+        '<input id="icon_prefix" type="text" name="newuser_username" required>'+
         '<label for="icon_prefix" align="left">Username</label>'+
         '</div>'+
         '<div class="input-field input-field2">'+
         '<i class="material-icons prefix">email</i>'+
-        '<input id="icon_prefix" type="email" class="validate" name="newuser_email" required>'+
+        '<input id="icon_prefix" type="email" name="newuser_email" required>'+
         '<label for="icon_prefix" align="left">Email</label>'+
         '</div>'+
         '</div>'+
@@ -587,16 +587,38 @@
         confirmButtonText: 'Create',
         showCancelButton: true,
       }).then(function () {
-        $("#createuserform").submit();
-        swal({
-          imageUrl: 'img/load.gif',
-          imageWidth: 120,
-          showCancelButton: false,
-          showConfirmButton: false,
-          animation: false,
-          allowOutsideClick: false,
-          confirmButtonColor: '#26a69a',
-        });
+        var newuser_name = $('#createuserform').find('input[name="newuser_name"]').val();
+        var newuser_username = $('#createuserform').find('input[name="newuser_username"]').val();
+        var newuser_email = $('#createuserform').find('input[name="newuser_email"]').val();
+
+        var regex_name = /^([a-zA-Z0-9]{1,})$/.test(newuser_name);
+        var regex_username = /^([a-zA-Z0-9]{4,12})$/.test(newuser_username);
+        var regex_email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(newuser_email);
+
+        if(regex_name && regex_username && regex_email){
+
+          $("#createuserform").submit();
+          swal({
+            imageUrl: 'img/load.gif',
+            imageWidth: 120,
+            showCancelButton: false,
+            showConfirmButton: false,
+            animation: false,
+            allowOutsideClick: false,
+            confirmButtonColor: '#26a69a',
+          });
+        }else{
+          var invalid = "Name field must be at least 1 character with no special characters, Username field must be 4 to 12 characters with no special characters, E-mail must be a valid form!" ;
+
+          swal({
+            title: "Invalid Input!",
+            text: ""+invalid,
+            type: "warning",
+            confirmButtonColor: '#26a69a',
+          }).then(function (){
+            createUser();
+          });
+        }
       });
     }
 

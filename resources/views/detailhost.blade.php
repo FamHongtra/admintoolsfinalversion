@@ -479,12 +479,12 @@ function chkconfigname(){
     '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
     '<div class="input-field input-field2">'+
     '<i class="material-icons prefix">description</i>'+
-    '<input id="icon_prefix" type="text" class="validate" name="pathname">'+
+    '<input id="icon_prefix" type="text" name="pathname">'+
     '<label for="icon_prefix" align="left">Configuration Name</label>'+
     '</div>'+
     '<div class="input-field input-field2">'+
     '<i class="material-icons prefix">label</i>'+
-    '<input id="icon_prefix" type="text" class="validate" name="pathconf">'+
+    '<input id="icon_prefix" type="text" name="pathconf">'+
     '<label for="icon_prefix" align="left">Configuration Path</label>'+
     '</div>'+
     '</div>'+
@@ -494,16 +494,38 @@ function chkconfigname(){
     confirmButtonText: 'Save',
     showCancelButton: true,
   }).then(function () {
-    $("#hostform").submit();
-    swal({
-      imageUrl: '../img/load.gif',
-      imageWidth: 120,
-      showCancelButton: false,
-      showConfirmButton: false,
-      animation: false,
-      allowOutsideClick: false,
-      confirmButtonColor: '#26a69a',
-    });
+    var pathname = $('#hostform').find('input[name="pathname"]').val();
+    var pathconf = $('#hostform').find('input[name="pathconf"]').val();
+
+    var regex_pathname = /^([a-zA-Z0-9]{1,})$/.test(pathname);
+    var regex_pathconf = /^([a-zA-Z0-9]{1,})$/.test(pathconf);
+
+    if(regex_pathname && regex_pathconf){
+
+      $("#hostform").submit();
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+
+    }else{
+      var invalid = "Configuration name field and Configuration path field are requied.";
+
+      swal({
+        title: "Invalid Input!",
+        text: ""+invalid,
+        type: "warning",
+        confirmButtonColor: '#26a69a',
+      }).then(function (){
+        chkconfigname();
+      });
+    }
+
   });
 }
 
@@ -534,16 +556,37 @@ function addDesc(){
     confirmButtonText: 'Save',
     showCancelButton: true,
   }).then(function () {
-    $("#descform").submit();
-    swal({
-      imageUrl: '../img/load.gif',
-      imageWidth: 120,
-      showCancelButton: false,
-      showConfirmButton: false,
-      animation: false,
-      allowOutsideClick: false,
-      confirmButtonColor: '#26a69a',
-    });
+
+    var descname = $('#descform').find('input[name="descname"]').val();
+    var descdetail = $('#descform').find('textarea[name="descdetail"]').val();
+
+    var regex_descname = /^([a-zA-Z0-9]{1,})$/.test(descname);
+    var regex_descdetail = /^([a-zA-Z0-9]{1,})$/.test(descdetail);
+
+    if(regex_descname && regex_descdetail){
+      $("#descform").submit();
+      swal({
+        imageUrl: '../img/load.gif',
+        imageWidth: 120,
+        showCancelButton: false,
+        showConfirmButton: false,
+        animation: false,
+        allowOutsideClick: false,
+        confirmButtonColor: '#26a69a',
+      });
+    }else{
+      var invalid = "Description name field and Description detail field are requied.";
+
+      swal({
+        title: "Invalid Input!",
+        text: ""+invalid,
+        type: "warning",
+        confirmButtonColor: '#26a69a',
+      }).then(function (){
+        addDesc();
+      });
+    }
+
   });
 }
 

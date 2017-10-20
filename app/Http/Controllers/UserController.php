@@ -105,8 +105,11 @@ class UserController extends Controller
     ->where('username',$user_username)
     ->get();
 
+    $user_hasemail = DB::table('users')
+    ->where('email',$user_email)
+    ->get();
 
-    if(count($user_hasusername)==0){
+    if(count($user_hasusername)==0 && count($user_hasemail)==0){
 
 
       $obj = new User();
@@ -124,19 +127,41 @@ class UserController extends Controller
 
 
 
-      $request->session()->flash('status', 'username duplicate');
+      $request->session()->flash('status', 'username not duplicate');
       $request->session()->flash('title', 'Create User Successful!');
       $request->session()->flash('text', 'Username: '.$user_username.", Password: ".$user_password);
       $request->session()->flash('icon', 'success');
 
       return redirect('showhost');
     }else{
-      $request->session()->flash('status', 'username duplicate');
-      $request->session()->flash('title', 'Create User Failed!');
-      $request->session()->flash('text', 'Username aready exists, please use another.');
-      $request->session()->flash('icon', 'error');
 
-      return redirect('showhost');
+      if(count($user_hasusername) != 0 && count($user_hasemail) != 0){
+        $request->session()->flash('status', 'username duplicate');
+        $request->session()->flash('title', 'Create User Failed!');
+        $request->session()->flash('text', 'Username and E-mail aready exists, please use another.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+
+      }else if(count($user_hasusername) != 0){
+        $request->session()->flash('status', 'username duplicate');
+        $request->session()->flash('title', 'Create User Failed!');
+        $request->session()->flash('text', 'Username aready exists, please use another.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+
+      }else{
+        $request->session()->flash('status', 'username duplicate');
+        $request->session()->flash('title', 'Create User Failed!');
+        $request->session()->flash('text', 'E-mail aready exists, please use another.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+
+      }
+
+
     }
   }
 
