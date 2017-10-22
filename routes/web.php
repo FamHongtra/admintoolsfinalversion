@@ -114,6 +114,31 @@ Route::get('/encryptpass', function () {
 //   echo 5555;
 // });
 
+//New 10/21/2017
+Route::get('/runprogram', function(){
+  return view('runprogram');
+});
+
+Route::get('openTerminal', function(){
+    exec ('Start D:\Downloads\putty.exe -ssh 13.228.0.211 -l centos');
+});
+
+Route::get('executecommand', function(Illuminate\Http\Request $request){
+  $command = $request->input('commandline');
+
+  $GLOBALS['result'] = "" ;
+  SSH::into('ansible')->run(array(
+    "ansible ubuntu-test -m shell -a '$command'",
+  ), function($line){
+    $bf_pos = strpos($line,">>")+3;
+    $GLOBALS['result'] = substr($line,$bf_pos);
+
+  });
+  // echo $GLOBALS['result'];  
+  return Redirect::back()->with('result',$GLOBALS['result']);
+});
+//New 10/21/2017
+
 
 Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');

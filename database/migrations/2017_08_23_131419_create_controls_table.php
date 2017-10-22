@@ -16,7 +16,7 @@ class CreateControlsTable extends Migration
         Schema::create('controls', function (Blueprint $table) {
             $table->increments('id');
             $table->string('username_ssh');
-            $table->string('password_ssh');
+            $table->string('password_ssh', 256);
             $table->integer('passtype_id');
             $table->integer('user_id');
             $table->integer('host_id');

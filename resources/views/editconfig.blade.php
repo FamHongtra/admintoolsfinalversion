@@ -139,19 +139,30 @@
   <div class="navbar-fixed">
     <ul id="dropdown1" class="dropdown-content">
       <li><a href="#!">Account Settings</a></li>
+      <!-- <admin area -->
+      @if (session('user_id')==1)
+      <li><a href="#!" onclick="createUser()">User Creation</a></li>
+      @endif
+      <!-- admin area/> -->
       <li class="divider"></li>
       <li><a href="{{url('userlogout')}}"  onclick="return loading();" >Logout</a></li>
     </ul>
     <nav>
       <div class="nav-wrapper teal lighten-1 ">
-        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="img/logo0.png" height="50px" style="margin: 7px"/></a>
+        <a href="{{url('showhost')}}"  onclick="return loading();" class="brand-logo"><img src="../img/logo0.png" height="50px" style="margin: 7px"/></a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li><div class="circle" height="50px" style="margin: 7px;background-color:white"><canvas width="40" height="40" style="margin: 5px" data-jdenticon-value="{{session('user_id')}}"></canvas></div></li>
-          <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Hello, Folder<i class="material-icons right">arrow_drop_down</i></a></li>
+          @php
+          $user_name = DB::table('users')
+          ->where('id', session('user_id'))
+          ->value('name');
+          @endphp
+          <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Hello, {{$user_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
         </ul>
       </div>
     </nav>
   </div>
+
   <div class="row">
 
   </div>

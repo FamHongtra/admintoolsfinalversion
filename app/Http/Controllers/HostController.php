@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use SSH;
 use App\Host;
 use App\Control;
@@ -48,37 +49,86 @@ class HostController extends Controller
     $host = $request->input('host');
     $port = $request->input('port');
     $usrname = $request->input('usrname');
+    $user_id = session('user_id');
 
-    if($bywhat == "rsakey"){
 
-      $file = $request->file('password');
-      $original_name = $file->getClientOriginalName();
-      $file->move('../resources/keyfiles', $original_name);
-      $data['original_name'] = $original_name;
-    }else if($bywhat == "password"){
+    $duplicateservername  = DB::table('hosts')
+    ->join('controls', 'hosts.id', '=', 'controls.host_id')
+    ->where('controls.user_id', $user_id)
+    ->where('hosts.servername', $servername)
+    ->get();
 
-      $password = $request->input('password');
-      $data['password'] = $password ;
+    $duplicatehost  = DB::table('hosts')
+    ->join('controls', 'hosts.id', '=', 'controls.host_id')
+    ->where('controls.user_id', $user_id)
+    ->where('hosts.host', $host)
+    ->get();
+
+    //servername and host not duplicate.
+    if(count($duplicatehost)==0 && count($duplicateservername)==0){
+      // echo "servername and host can be use.";
+
+      if($bywhat == "rsakey"){
+
+        $file = $request->file('password');
+        $original_name = $file->getClientOriginalName();
+        $file->move('../resources/keyfiles', $original_name);
+        $data['original_name'] = $original_name;
+
+      }else if($bywhat == "password"){
+
+        $password = $request->input('password');
+        $data['password'] = $password ;
+      }
+
+
+      $data['bywhat'] = $bywhat ;
+      $data['servername'] = $servername ;
+      $data['host'] = $host ;
+      $data['port'] = $port ;
+      $data['usrname'] = $usrname ;
+      $data['bywhat'] = $bywhat ;
+
+      return view('loadingpage',$data);
+
+    }else{
+      if(count($duplicatehost)>0 && count($duplicateservername)>0){
+        // echo "servername and host can't be use.";
+
+        $request->session()->flash('status', 'servername and host duplicate');
+        $request->session()->flash('title', 'Add Host Failed!');
+        $request->session()->flash('text', 'Servername and Host aready exists, please use another.');
+        $request->session()->flash('icon', 'error');
+
+        return redirect('showhost');
+      }else{
+        if(count($duplicatehost)>0){
+          // echo "only host can't be use.";
+          $request->session()->flash('status', ' host duplicate');
+          $request->session()->flash('title', 'Add Host Failed!');
+          $request->session()->flash('text', 'Host aready exists, please use another.');
+          $request->session()->flash('icon', 'error');
+
+          return redirect('showhost');
+        }else if(count($duplicateservername)>0){
+          // echo "only servername can't be use.";
+
+          $request->session()->flash('status', 'servername duplicate');
+          $request->session()->flash('title', 'Add Host Failed!');
+          $request->session()->flash('text', 'Servername aready exists, please use another.');
+          $request->session()->flash('icon', 'error');
+
+          return redirect('showhost');
+        }
+      }
     }
-
-
-
-
-    $data['bywhat'] = $bywhat ;
-    $data['servername'] = $servername ;
-    $data['host'] = $host ;
-    $data['port'] = $port ;
-    $data['usrname'] = $usrname ;
-    $data['bywhat'] = $bywhat ;
-
-    return view('loadingpage',$data);
   }
 
   public function store(Request $request)
   {
 
     //  suppose user
-    $user_id = 1 ;
+    $user_id = session('user_id') ;
     $user_name = "admina" ;
     $user_pass = "adminaeiei" ;
 
@@ -135,7 +185,8 @@ class HostController extends Controller
 
 
         SSH::into('ansible')->run(array(
-          "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+
           "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
           // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
 
@@ -153,7 +204,8 @@ class HostController extends Controller
 
       $obj2 = new Control();
       $obj2->username_ssh = $usrname;
-      $obj2->password_ssh = $password;
+      $password_encrypted = Crypt::encryptString($password);
+      $obj2->password_ssh = $password_encrypted;
       $obj2->passtype_id = 1;
       $obj2->user_id = $user_id;
       $obj2->host_id = $host->id ;
@@ -214,7 +266,8 @@ class HostController extends Controller
 
       $obj2 = new Control();
       $obj2->username_ssh = $usrname;
-      $obj2->password_ssh = $password;
+      $password_encrypted = Crypt::encryptString($password);
+      $obj2->password_ssh = $password_encrypted;
       $obj2->passtype_id = 2;
       $obj2->user_id = $user_id;
       $obj2->host_id = $host->id ;
@@ -406,11 +459,13 @@ class HostController extends Controller
     $control_username = $control[0]->username_ssh;
     $control_password = $control[0]->password_ssh;
 
+    $password_decrypted =  Crypt::decryptString($control_password);
+
     if($login_username == $control_username){
-      if($login_password == $control_password){
+      if($login_password ==  $password_decrypted){
         // echo "username and password are correct!";
 
-        return redirect()->route('detailhost',$host_id);
+        return redirect()->route('detailhost',$control[0]->id);
       }else{
         // echo "password wrong!";
 
@@ -431,6 +486,8 @@ class HostController extends Controller
 
       return redirect('showhost');
     }
+
+
   }
 
 
@@ -444,6 +501,7 @@ class HostController extends Controller
     $login_username = $request->input("login_username");
     $login_password = $request->input("login_password");
 
+
     $control = DB::table('controls')
     ->where('user_id',$user_id)
     ->where('host_id',$host_id)
@@ -453,8 +511,11 @@ class HostController extends Controller
     $control_username = $control[0]->username_ssh;
     $control_password = $control[0]->password_ssh;
 
+    $password_decrypted =  Crypt::decryptString($control_password);
+
+
     if($login_username == $control_username){
-      if($login_password == $control_password){
+      if($login_password == $password_decrypted){
         // echo "username and password are correct!";
 
         $request->session()->flash('status', 'delete host success');

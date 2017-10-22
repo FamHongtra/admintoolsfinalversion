@@ -15,9 +15,11 @@ class GroupController extends Controller
   public function createGroup(Request $request)
   {
     //
-    $user_id = $request->input('user_id');
+    $user_id = session('user_id');
     $groupname = $request->input('groupname');
+    //select by controlid
     $selecthost = $request->input('selecthost');
+
 
     $obj = new Group();
     $obj->groupname = $groupname;
@@ -30,7 +32,7 @@ class GroupController extends Controller
 
       DB::table('controls')
       ->where('user_id', $user_id)
-      ->where('host_id', $host)
+      ->where('id', $host)
       ->update(['group_id' => $latest_group->id]);
 
     }
@@ -49,7 +51,7 @@ class GroupController extends Controller
   public function groupAddmore(Request $request)
   {
     //
-    $user_id = $request->input('user_id');
+    $user_id = session('user_id');
     $group_id = $request->input('group_id');
     $groupname = $request->input('groupname');
     $selecthost = $request->input('selecthost');
@@ -59,7 +61,7 @@ class GroupController extends Controller
 
       DB::table('controls')
       ->where('user_id', $user_id)
-      ->where('host_id', $host)
+      ->where('id', $host)
       ->update(['group_id' => $group_id]);
 
     }
@@ -78,7 +80,7 @@ class GroupController extends Controller
   public function leftGroup(Request $request)
   {
     //
-    $user_id = $request->input('user_id');
+    $user_id = session('user_id');
     $host_id = $request->input('host_id');
 
     DB::table('controls')
@@ -99,7 +101,7 @@ class GroupController extends Controller
   public function delGroup(Request $request)
   {
     //
-    $user_id = $request->input('user_id');
+    $user_id = session('user_id');
     $group_id = $request->input('group_id');
 
     $groupmembers = DB::table('controls')
