@@ -397,7 +397,7 @@
         @else
         <li class="collection-header blue-grey darken-1" style="font-size:15pt;color:white"><div> <i class="material-icons" style="margin-right:20px">view_week</i>{{$group->groupname}}<a href="#!" onclick="delgroup({{$group->id}})" class="secondary-content"><i class="material-icons" style="color:white">delete</i></a></div></li>
         @endif
-        
+
         @php
         $objs_group = DB::table('hosts')
         ->join('controls', 'hosts.id', '=', 'controls.host_id')

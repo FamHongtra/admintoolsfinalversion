@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use SSH;
 use Redirect;
 use App\Config;
@@ -114,9 +115,10 @@ class ConfigController extends Controller
 
 
           $obj = new Config();
+          $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
           $obj->configname = $GLOBALS['pathname'];
           $obj->configpath = $GLOBALS['pathconf'];
-          $obj->repository = "http://".$GLOBALS['user']->username.":".$GLOBALS['user']->password."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
           $obj->keygen = $GLOBALS['jsonArray']->name;
           $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
           $obj->control_id = $GLOBALS['controlid'];
