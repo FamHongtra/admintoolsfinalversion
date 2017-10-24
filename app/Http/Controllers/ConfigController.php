@@ -51,6 +51,7 @@ class ConfigController extends Controller
     //
     $GLOBALS['jsonArray'] = "";
     $GLOBALS['test'] = 0;
+    $GLOBALS['test2'] = 0;
 
     $request->session()->flash('status', 'true');
     $request->session()->flash('title', 'Failed!');
@@ -84,58 +85,90 @@ class ConfigController extends Controller
     $nameconf =substr($pathconf, strrpos($pathconf, '/') + 1);
     $namepath =substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);
 
+    // echo $pathconf;
 
     if(strpos($nameconf,'.conf') !== false || strpos($nameconf,'.cfg') !== false ){
 
       SSH::into('ansible')->run(array(
-        "ansible -m shell -a 'find $namepath -type f -name $nameconf' $servername"
+        // "ansible -m shell -a 'find $pathname -type f -name $nameconf' $servername"
+        "ansible -m shell -a 'find $pathconf' $servername"
       ), function($line){
-        echo $line;
-        if (strpos($line, $GLOBALS['pathconf']) !== false) {
+        // echo $line;
+        //If file found
+        // if (strpos($line, $GLOBALS['pathconf']) !== false) {
+        if (strpos($line, 'SUCCESS') !== false) {
+
           $GLOBALS['test'] = 1 ;
-
+          // echo "file found";
           //Using Gitlab API
-
-          $user_id = 29;
-          $imp_token = "1xfYQD8Km8LsfWaYVP_d";
-          $proj_name = str_random(20);
-
-          SSH::into('gitlab')->run(array(
-
-            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
-
-          ), function($line){
-
-            $GLOBALS['jsonArray'] = json_decode($line);
-            //
-            // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
-
-          });
-
-
-
-          $obj = new Config();
-          $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
-          $obj->configname = $GLOBALS['pathname'];
-          $obj->configpath = $GLOBALS['pathconf'];
-          $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
-          $obj->keygen = $GLOBALS['jsonArray']->name;
-          $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
-          $obj->control_id = $GLOBALS['controlid'];
-          $obj->save();
 
         }
       });
 
-
-      //Waiting...
-
       if($GLOBALS['test'] == 1){
 
-        $request->session()->flash('status', 'true');
-        $request->session()->flash('title', 'Successful!');
-        $request->session()->flash('text', 'The configuration file was saved to the system.');
-        $request->session()->flash('icon', 'success');
+        SSH::into('ansible')->run(array(
+          //find file
+          // "ansible -m shell -a 'find /home/testuser/zcretfile.conf -type f -name zcretfile.conf' ubuntu-server",
+          //Try to append text to the last line of file for checking file's permission
+          "ansible -m shell -a 'echo \"#checking permission\" >> $pathconf' $servername",
+          // 'ansible -m shell -a "echo "#checking permission" >> $GLOBALS[pathconf]\' $servername',
+          // 'ansible -m shell -a \'echo "#checking permission" >> /home/testuser/zcretfile.conf\' ubuntu-server',
+        ), function($line){
+
+          if (strpos($line, 'SUCCESS') !== false){
+            //Have permission
+            // echo $line;
+
+            $GLOBALS['test2'] = 1;
+            $user_id = 29;
+            $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+            $proj_name = str_random(20);
+
+            SSH::into('gitlab')->run(array(
+
+              "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
+
+            ), function($line){
+
+              $GLOBALS['jsonArray'] = json_decode($line);
+              //
+              // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
+
+            });
+
+            $obj = new Config();
+            $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
+            $obj->configname = $GLOBALS['pathname'];
+            $obj->configpath = $GLOBALS['pathconf'];
+            $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+            $obj->keygen = $GLOBALS['jsonArray']->name;
+            $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+            $obj->control_id = $GLOBALS['controlid'];
+            $obj->save();
+
+
+          }else{
+            //Permission denied
+            // echo "Permission denied.";
+          }
+        });
+      }else{
+
+        return Redirect::back();
+        // echo "file not found.";
+      }
+      //Waiting...
+
+      if($GLOBALS['test2'] == 1){
+
+        SSH::into('ansible')->run(array(
+          //Remove text last line.
+          "ansible -m shell -a 'sed -i \"$ d\" $pathconf' ubuntu-server",
+        ), function($line2){
+          // echo $line2;
+        });
+
         //Adding
         // $curpath = substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);// for make dir firsttime
         // $mkdirfirst = 'mkdir -p ~/nanoad/tmp_repo'.$curpath;
@@ -244,11 +277,26 @@ class ConfigController extends Controller
           // "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/nanoad/scripts/nanoad.sh'",
           "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
         ));
+
+        $request->session()->flash('status', 'true');
+        $request->session()->flash('title', 'Successful!');
+        $request->session()->flash('text', 'The configuration file was saved to the system.');
+        $request->session()->flash('icon', 'success');
+
+
+        return Redirect::back();
+
+      }else{
+        $request->session()->flash('status', 'true');
+        $request->session()->flash('title', 'Failed!');
+        $request->session()->flash('text', 'You don\'t have permission to access this file.');
+        $request->session()->flash('icon', 'error');
+
+
+        return Redirect::back();
+
       }
     }
-
-    return Redirect::back()->withErrors([$GLOBALS['test']]);
-    // return Redirect::back();
   }
 
   /**

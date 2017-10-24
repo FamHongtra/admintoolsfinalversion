@@ -71,7 +71,7 @@ return [
         ],
         'ansible' => [
             'host'      => '13.228.0.211',
-            'username'  => 'centos',
+            'username'  => 'root',
             'password'  => 'eieiei',
             'key'       => '',
             'keytext'   => '',

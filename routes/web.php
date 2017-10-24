@@ -120,7 +120,7 @@ Route::get('/runprogram', function(){
 });
 
 Route::get('openTerminal', function(){
-    exec ('Start D:\Downloads\putty.exe -ssh 13.228.0.211 -l centos');
+  exec ('Start D:\Downloads\putty.exe -ssh 13.228.0.211 -l centos');
 });
 
 Route::get('executecommand', function(Illuminate\Http\Request $request){
@@ -134,7 +134,7 @@ Route::get('executecommand', function(Illuminate\Http\Request $request){
     $GLOBALS['result'] = substr($line,$bf_pos);
 
   });
-  // echo $GLOBALS['result'];  
+  // echo $GLOBALS['result'];
   return Redirect::back()->with('result',$GLOBALS['result']);
 });
 //New 10/21/2017
@@ -413,6 +413,37 @@ Route::get('/testssh', function () {
 
 Route::get('/testload', function () {
   return view('loadingpage');
+});
+
+Route::get('/checkpermission', function(){
+
+  $testpath = "/home/testuser/zcretfile.conf";
+  $servername = "ubuntu-server";
+  $command = 'echo \"#checking permission\" >>';
+
+  SSH::into('ansible')->run(array(
+    //find file
+    // "ansible -m shell -a 'find /home/testuser/zcretfile.conf -type f -name zcretfile.conf' ubuntu-server",
+    //Try to append text to the last line of file for checking file's permission
+    "ansible -m shell -a 'echo \"#checking permission\" >> $testpath' $servername",
+    // 'ansible -m shell -a \'echo "#checking permission" >> /home/ubuntu/test.cfg\' ubuntu-server',
+    // 'ansible -m shell -a \'echo "#checking permission" >> /home/testuser/zcretfile.conf\' ubuntu-server',
+  ), function($line){
+    if (strpos($line, 'SUCCESS') !== false){
+      //Have permission
+      // echo $line;
+      SSH::into('ansible')->run(array(
+        //Remove text last line.
+        'ansible -m shell -a \'sed -i "$ d" /home/ubuntu/test.cfg\' ubuntu-server',
+      ), function($line2){
+        // echo $line2;
+      });
+    }else{
+      //Permission denied
+      echo "Permission denied.";
+    }
+  });
+
 });
 
 Route::get('/testping', function () {
