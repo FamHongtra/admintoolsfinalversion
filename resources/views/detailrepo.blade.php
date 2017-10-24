@@ -286,7 +286,9 @@
                         @php
                         //impersonal token of gitlab user.
 
-                        $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+                        //$imp_token = "1xfYQD8Km8LsfWaYVP_d";
+                        $user_id = session('user_id');
+                        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
                         $proj_id = $configprojid ;
 
 
@@ -338,10 +340,14 @@
                   <form class="col s12">
                     <div class="row">
                       <div class="input-field col s12">
-                        <textarea id="textarea1" class="materialize-textarea">@php
+                        <textarea id="textarea1" class="materialize-textarea">
+                          @php
                           //impersonal token of gitlab user.
+                          //$imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
-                          $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+                          $user_id = session('user_id');
+                          $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
                           $proj_id = $configprojid ;
 
 
@@ -395,8 +401,11 @@
 
           <?php
           use Collective\Remote\RemoteFacade as SSH ;
+          $user_id = session('user_id');
+          $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
           SSH::into('ansible')->run(array(
-            "ansible -m ping $obj->servername",
+            "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $obj->servername",
           ), function($line){
             // if (strpos($line, 'pong') !== false) {
             //   echo "<span>connected</span>" ;

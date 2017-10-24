@@ -188,8 +188,8 @@
       <div id="editor">@php
         //impersonal token of gitlab user.
 
-
-        $imp_token = "1xfYQD8Km8LsfWaYVP_d";
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
 
         $conf =substr($configpath, strrpos($configpath, '/') + 1);
@@ -263,8 +263,12 @@
 
         <?php
         use Collective\Remote\RemoteFacade as SSH ;
+
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
         SSH::into('ansible')->run(array(
-          "ansible -m ping $obj->servername",
+          "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $obj->servername",
         ), function($line){
           // if (strpos($line, 'pong') !== false) {
           //   echo "<span>connected</span>" ;

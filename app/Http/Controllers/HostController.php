@@ -140,6 +140,7 @@ class HostController extends Controller
     $password = $request->input('password');
 
     // $filepath = $request->input('filepath');
+    $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
     $repository = "http://".$user_name."@13.228.10.174/".$user_name."/".$servername.".git" ;
     //remote to ansible for keeping RSA key
@@ -152,8 +153,8 @@ class HostController extends Controller
 
 
       SSH::into('ansible')->run(array(
-        "echo [$servername] | sudo tee --a /etc/ansible/hosts",
-        "echo $host ansible_ssh_user=$usrname ansible_ssh_private_key_file=$remote_path ansible_ssh_port=$port | sudo tee --a /etc/ansible/hosts",
+        "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/hosts",
+        "echo $host ansible_ssh_user=$usrname ansible_ssh_private_key_file=$remote_path ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/hosts",
         "mkdir -p $remote_dir",
         // "sudo chmod -R 600 /etc/ansible/keyfiles",
         // "ansible -m shell -a 'mkdir /testpassnaja' $servername --become",
@@ -185,9 +186,9 @@ class HostController extends Controller
 
 
         SSH::into('ansible')->run(array(
-          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername' -e 'whoami=$usrname'",
 
-          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername'",
           // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
 
         ));
@@ -218,8 +219,8 @@ class HostController extends Controller
     }else if($bywhat == "password"){
 
       SSH::into('ansible')->run(array(
-        "echo [$servername] | sudo tee --a /etc/ansible/hosts",
-        "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/hosts",
+        "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/hosts",
+        "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/hosts",
         // "ansible -m shell -a 'mkdir /testpassnaja' $servername --become",
       ));
 
@@ -227,7 +228,7 @@ class HostController extends Controller
       $GLOBALS['ping'] = 0;
 
       SSH::into('ansible')->run(array(
-        "ansible -m ping $servername",
+        "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $servername",
       ), function($line){
         if (strpos($line, 'SUCCESS') !== false) {
           $GLOBALS['ping'] = 1;
@@ -247,9 +248,9 @@ class HostController extends Controller
           // "ansible-playbook /etc/ansible/Nanoinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
 
           //install vimad
-          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'whoami=$usrname'",
+          "ansible-playbook /etc/ansible/Viminstall.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername' -e 'whoami=$usrname'",
 
-          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername'",
+          "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername'",
           // "ansible-playbook /etc/ansible/Gitinstall.yml -i /etc/ansible/hosts -e 'host=$servername' -e 'gitusr=$usrfortest' -e 'gitemail=$emailfortest' -e 'gitrepo=$repofortest' -e 'whoami=$usrname'",
         ));
 
@@ -315,9 +316,12 @@ class HostController extends Controller
       $servername = $obj->servername ;
 
       $GLOBALS['ping'] = 0;
+      
+      $user_id = session('user_id');
+      $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
       SSH::into('ansible')->run(array(
-        "ansible -m ping $servername",
+        "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $servername",
       ), function($line){
         if (strpos($line, 'SUCCESS') !== false) {
           $GLOBALS['ping'] = 1;

@@ -12,7 +12,9 @@ use Mail;
 
 class UserController extends Controller
 {
-  //
+  //***Gitlab API PRIVATE-TOKEN(root): jbVyzyHKVahx8WHz2d59
+
+
   public function login(Request $request)
   {
     //
@@ -230,10 +232,14 @@ class UserController extends Controller
 
       $gitlab_token = $GLOBALS['gitab_token'];
 
-
       DB::table('users')
       ->where('username', $username)
       ->update(['password' => $newpassword_encrypted, 'set_password' => "yes", 'gitlab_userid' => $gitlab_userid, 'token' => $gitlab_token]);
+
+      SSH::into('ansible')->run(array(
+        "mkdir -p /etc/ansible/users/$gitlab_token",
+        "touch /etc/ansible/users/$gitlab_token/hosts"
+      ));
 
       $request->session()->flash('status', 'change password success');
       $request->session()->flash('title', 'Change Password Successful!');

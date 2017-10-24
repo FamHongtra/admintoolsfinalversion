@@ -192,8 +192,12 @@
               <div class="card blue-grey darken-1">
                 <div class="card-content white-text">
                   <span class="card-title"><h4>
-                    <?php SSH::into('ansible')->run(array(
-                      "ansible -m shell -a 'cat /etc/*-release' $obj->servername --become",
+                    <?php
+                    $user_id = session('user_id');
+                    $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
+                    SSH::into('ansible')->run(array(
+                      "ansible -i /etc/ansible/users/$imp_token/hosts -m shell -a 'cat /etc/*-release' $obj->servername --become",
                     ), function($line){
                       if (strpos($line, 'SUCCESS') !== false) {
                         $bfname_pos = strpos($line,"PRETTY_NAME=")+13;
@@ -218,8 +222,11 @@
                 <div class="card blue-grey darken-1">
                   <div class="card-content white-text">
                     <span class="card-title">Processor</span>
-                    <?php SSH::into('ansible')->run(array(
-                      "ansible -m shell -a 'cat /proc/cpuinfo | grep \"model name\" | uniq' $obj->servername --become",
+                    <?php
+                    $user_id = session('user_id');
+                    $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+                    SSH::into('ansible')->run(array(
+                      "ansible -i /etc/ansible/users/$imp_token/hosts -m shell -a 'cat /proc/cpuinfo | grep \"model name\" | uniq' $obj->servername --become",
                     ), function($line){
                       if (strpos($line, 'SUCCESS') !== false) {
                         $bfcpu_pos = strpos($line,":")+1;
@@ -247,8 +254,10 @@
                       <br>
                       <?php
                       $GLOBALS['total'] = 0;
+                      $user_id = session('user_id');
+                      $imp_token = DB::table('users')->where('id', $user_id)->value('token');
                       SSH::into('ansible')->run(array(
-                        "ansible -m shell -a 'dmidecode -t 17 | grep Size' $obj->servername --become",
+                        "ansible -i /etc/ansible/users/$imp_token/hosts -m shell -a 'dmidecode -t 17 | grep Size' $obj->servername --become",
                       ), function($line){
                         if (strpos($line, 'SUCCESS') !== false) {
                           $bfsize_pos = strpos($line,"Size:");
