@@ -301,83 +301,141 @@ class HostController extends Controller
 
     $searchby = $request->input('search_by');
     $searchkey = $request->input('searchkey');
-    $user_id = $request->input('user_id');
+    $user_id = session('user_id');
 
     if($searchby == "autocomplete"){
       if($searchkey!=null){
-        $objs = DB::table('hosts')
+        $objs1 = DB::table('hosts')
         ->join('controls', 'hosts.id', '=', 'controls.host_id')
         ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "server")
         ->where('hosts.servername','like','%'.$searchkey.'%')
-        ->orWhere('hosts.host','like', '%'.$searchkey.'%')
+        // ->orWhere('hosts.host','like', '%'.$searchkey.'%')
         ->get();
 
+        $objs2 = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "server")
+        ->where('hosts.host','like', '%'.$searchkey.'%')
+        ->get();
+
+        if(count($objs1) == 0){
+          $objs = $objs2;
+        }else{
+          if(count($objs2)==0){
+            $objs = $objs1;
+          }else{
+            $objs = $objs1->merge($objs2)->unique();
+          }
+        }
+
         $all_group = [];
-        //
-        // if($objs->count()==0){
-        //   $request->session()->flash('status', 'not found');
-        //   $request->session()->flash('title', 'Not Found!');
-        //   $request->session()->flash('text', 'The host you are looking for does not exist.');
-        //   $request->session()->flash('icon', 'warning');
-        //
-        //   $objs = DB::table('hosts')
-        //   ->join('controls', 'hosts.id', '=', 'controls.host_id')
-        //   ->where('controls.user_id', $user_id)
-        //   ->where('controls.group_id', 0)
-        //   ->get();
-        //
-        //   $all_group = DB::table('groups')
-        //   ->where('user_id', $user_id)
-        //   ->get();
-        // }
 
       }else{
+
         $objs = DB::table('hosts')
         ->join('controls', 'hosts.id', '=', 'controls.host_id')
         ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "server")
         ->where('controls.group_id', 0)
         ->get();
 
         $all_group = DB::table('groups')
         ->where('user_id', $user_id)
+        ->where('group_type', "server")
         ->get();
 
       }
-    }else{
+    }else if($searchby == "autocompleteGroup"){
       if($searchkey!=null){
         $objs = [];
 
         $all_group = DB::table('groups')
         ->where('user_id', $user_id)
         ->where('groupname',$searchkey)
+        ->where('group_type', "server")
         ->get();
-
-        // if($all_group->count()==0){
-        //   $request->session()->flash('status', 'not found');
-        //   $request->session()->flash('title', 'Not Found!');
-        //   $request->session()->flash('text', 'The group you are looking for does not exist.');
-        //   $request->session()->flash('icon', 'warning');
-        //
-        //   $objs = DB::table('hosts')
-        //   ->join('controls', 'hosts.id', '=', 'controls.host_id')
-        //   ->where('controls.user_id', $user_id)
-        //   ->where('controls.group_id', 0)
-        //   ->get();
-        //
-        //   $all_group = DB::table('groups')
-        //   ->where('user_id', $user_id)
-        //   ->get();
-        // }
 
       }else{
         $objs = DB::table('hosts')
         ->join('controls', 'hosts.id', '=', 'controls.host_id')
         ->where('controls.user_id', $user_id)
         ->where('controls.group_id', 0)
+        ->where('controls.control_type', "server")
         ->get();
 
         $all_group = DB::table('groups')
         ->where('user_id', $user_id)
+        ->where('group_type', "server")
+        ->get();
+
+      }
+    }else if($searchby == "autocomplete2"){
+      if($searchkey!=null){
+        $objs1 = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "network-device")
+        ->where('hosts.servername','like','%'.$searchkey.'%')
+        ->get();
+
+          $objs2 = DB::table('hosts')
+          ->join('controls', 'hosts.id', '=', 'controls.host_id')
+          ->where('controls.user_id', $user_id)
+          ->where('controls.control_type', "network-device")
+          ->where('hosts.host','like', '%'.$searchkey.'%')
+          ->get();
+
+        if(count($objs1) == 0){
+          $objs = $objs2;
+        }else{
+          if(count($objs2)==0){
+            $objs = $objs1;
+          }else{
+            $objs = $objs1->merge($objs2)->unique();
+          }
+        }
+
+
+        $all_group = [];
+
+      }else{
+
+        $objs = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "network-device")
+        ->where('controls.group_id', 0)
+        ->get();
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->where('group_type', "network-device")
+        ->get();
+
+      }
+    }else if($searchby == "autocompleteGroup2"){
+      if($searchkey!=null){
+        $objs = [];
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->where('groupname',$searchkey)
+        ->where('group_type', "network-device")
+        ->get();
+
+      }else{
+        $objs = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.group_id', 0)
+        ->where('controls.control_type', "network-device")
+        ->get();
+
+        $all_group = DB::table('groups')
+        ->where('user_id', $user_id)
+        ->where('group_type', "network-device")
         ->get();
 
       }
@@ -388,7 +446,11 @@ class HostController extends Controller
     $data['all_group'] = $all_group;
     $data['user_id'] = $user_id;
 
-    return view('showhost',$data);
+    if($searchby == "autocomplete" || $searchby == "autocompleteGroup"){
+      return view('showhost',$data);
+    }else if($searchby == "autocomplete2" || $searchby == "autocompleteGroup2"){
+      return view('shownwdev',$data);
+    }
 
   }
 
@@ -407,6 +469,8 @@ class HostController extends Controller
     ->where('host_id',$host_id)
     ->get();
 
+    $control_type = $control[0]->control_type;
+
     //username and password from database
     $control_username = $control[0]->username_ssh;
     $control_password = $control[0]->password_ssh;
@@ -423,20 +487,30 @@ class HostController extends Controller
 
         $request->session()->flash('status', 'ssh login fail');
         $request->session()->flash('title', 'Failed!');
-        $request->session()->flash('text', 'Cannot connect to the host.');
         $request->session()->flash('icon', 'error');
 
-        return redirect('showhost');
+        if($control_type == "server"){
+          $request->session()->flash('text', 'Cannot connect to the server.');
+          return redirect('showhost');
+        }else if($control_type == "network-device"){
+          $request->session()->flash('text', 'Cannot connect to the network-device.');
+          return redirect('shownwdev');
+        }
       }
     }else{
       // echo "username and password wrong!";
 
       $request->session()->flash('status', 'ssh login fail');
       $request->session()->flash('title', 'Failed!');
-      $request->session()->flash('text', 'Cannot connect to the host.');
       $request->session()->flash('icon', 'error');
 
-      return redirect('showhost');
+      if($control_type == "server"){
+        $request->session()->flash('text', 'Cannot connect to the server.');
+        return redirect('showhost');
+      }else if($control_type == "network-device"){
+        $request->session()->flash('text', 'Cannot connect to the network-device.');
+        return redirect('shownwdev');
+      }
     }
 
 
@@ -448,6 +522,7 @@ class HostController extends Controller
     //
     $user_id = $request->input("user_id");
     $host_id = $request->input("host_id");
+    $control_type = $request->input("bywhat");
 
     //username and password from input form
     $login_username = $request->input("login_username");
@@ -472,32 +547,48 @@ class HostController extends Controller
 
         $request->session()->flash('status', 'delete host success');
         $request->session()->flash('title', 'Successful!');
-        $request->session()->flash('text', 'the host was deleted from the system.');
         $request->session()->flash('icon', 'success');
 
         DB::table('controls')->where('id', '=', $control[0]->id)->delete();
         DB::table('hosts')->where('id', '=', $host_id)->delete();
 
-        return redirect('showhost');
+        if($control_type == "server"){
+          $request->session()->flash('text', 'the server was deleted from the system.');
+          return redirect('showhost');
+        }else if($control_type == "network-device"){
+          $request->session()->flash('text', 'the network-device was deleted from the system.');
+          return redirect('shownwdev');
+        }
+
       }else{
         // echo "password wrong!";
 
         $request->session()->flash('status', 'delete host fail');
         $request->session()->flash('title', 'Failed!');
-        $request->session()->flash('text', 'Cannot delete the host from the system.');
         $request->session()->flash('icon', 'error');
 
-        return redirect('showhost');
+        if($control_type == "server"){
+          $request->session()->flash('text', 'Cannot delete the server from the system.');
+          return redirect('showhost');
+        }else if($control_type == "network-device"){
+          $request->session()->flash('text', 'Cannot delete the network-device from the system.');
+          return redirect('shownwdev');
+        }
       }
     }else{
       // echo "username and password wrong!";
 
       $request->session()->flash('status', 'delete host fail');
       $request->session()->flash('title', 'Failed!');
-      $request->session()->flash('text', 'Cannot delete the host from the system.');
       $request->session()->flash('icon', 'error');
 
-      return redirect('showhost');
+      if($control_type == "server"){
+        $request->session()->flash('text', 'Cannot delete the server from the system.');
+        return redirect('showhost');
+      }else if($control_type == "network-device"){
+        $request->session()->flash('text', 'Cannot delete the network-device from the system.');
+        return redirect('shownwdev');
+      }
     }
   }
 

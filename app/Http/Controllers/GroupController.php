@@ -17,12 +17,14 @@ class GroupController extends Controller
     //
     $user_id = session('user_id');
     $groupname = $request->input('groupname');
+    $bywhat = $request->input('bywhat');
     //select by controlid
     $selecthost = $request->input('selecthost');
 
 
     $obj = new Group();
     $obj->groupname = $groupname;
+    $obj->group_type = $bywhat;
     $obj->user_id = $user_id;
     $obj->save();
 
@@ -39,11 +41,16 @@ class GroupController extends Controller
 
     $request->session()->flash('status', 'true');
     $request->session()->flash('title', 'Successful!');
-    $request->session()->flash('text', 'The host group was created.');
     $request->session()->flash('icon', 'success');
 
+    if($bywhat == "server"){
+      $request->session()->flash('text', 'The server group was created.');
+      return redirect('showhost');
+    }else if($bywhat == "network-device"){
+      $request->session()->flash('text', 'The network-device group was created.');
+      return redirect('shownwdev');
+    }
 
-    return redirect('showhost');
   }
 
 
@@ -66,14 +73,22 @@ class GroupController extends Controller
 
     }
 
+    $group_type = DB::table('groups')
+    ->where('id', $group_id)
+    ->value('group_type');
 
     $request->session()->flash('status', 'true');
     $request->session()->flash('title', 'Successful!');
-    $request->session()->flash('text', 'The host group was updated.');
     $request->session()->flash('icon', 'success');
 
+    if($group_type == "server"){
+      $request->session()->flash('text', 'The server group was updated.');
+      return redirect('showhost');
+    }else if($group_type == "network-device"){
+      $request->session()->flash('text', 'The network-device group was updated.');
+      return redirect('shownwdev');
+    }
 
-    return redirect('showhost');
   }
 
 
@@ -81,21 +96,30 @@ class GroupController extends Controller
   {
     //
     $user_id = session('user_id');
-    $host_id = $request->input('host_id');
+    $control_id = $request->input('control_id');
+
+    $control_type = DB::table('controls')
+    ->where('id', $control_id)
+    ->value('control_type');
+
 
     DB::table('controls')
-    ->where('user_id', $user_id)
-    ->where('host_id', $host_id)
+    ->where('id', $control_id)
     ->update(['group_id' => 0 ]);
 
 
     $request->session()->flash('status', 'true');
     $request->session()->flash('title', 'Successful!');
-    $request->session()->flash('text', 'The host group was updated.');
     $request->session()->flash('icon', 'success');
 
+    if($control_type == "server"){
+      $request->session()->flash('text', 'The server group was updated.');
+      return redirect('showhost');
+    }else if($control_type == "network-device"){
+      $request->session()->flash('text', 'The network-device group was updated.');
+      return redirect('shownwdev');
+    }
 
-    return redirect('showhost');
   }
 
   public function delGroup(Request $request)
@@ -116,6 +140,10 @@ class GroupController extends Controller
       ->update(['group_id' => 0]);
     }
 
+    $group_type = DB::table('groups')
+    ->where('id', $group_id)
+    ->value('group_type');
+
     DB::table('groups')
     ->where('id', $group_id)
     ->delete();
@@ -123,10 +151,15 @@ class GroupController extends Controller
 
     $request->session()->flash('status', 'true');
     $request->session()->flash('title', 'Successful!');
-    $request->session()->flash('text', 'The host group was deleted.');
     $request->session()->flash('icon', 'success');
 
-    return redirect('showhost');
+    if($group_type == "server"){
+      $request->session()->flash('text', 'The server group was deleted.');
+      return redirect('showhost');
+    }else if($group_type == "network-device"){
+      $request->session()->flash('text', 'The network-device group was deleted.');
+      return redirect('shownwdev');
+    }
   }
 
 }

@@ -185,7 +185,7 @@
         <form action="{{url('searchhost')}}"  onsubmit="return loading();" method="post" enctype="multipart/form-data">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <input type="hidden" name="user_id" value="{{ session('user_id') }}">
-          <input type="hidden" name="search_by" id="checksearch" value="{{ session('user_id') }}">
+          <input type="hidden" name="search_by" id="checksearch">
 
           <div class="input-field">
             <!-- <input type="text" name="searchkey" id="autocomplete"/> -->
@@ -359,6 +359,7 @@
                 <form action="{{url('creategroup')}}" id="groupform" class="col s12" method="post" enctype="multipart/form-data">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="user_id" value="{{ session('user_id') }}">
+                  <input type="hidden" name="bywhat" value="network-device">
                   <div class="row">
                     <div class="input-field input-field2 col s10 m10 l8 offset-s1 offset-m1 offset-l2">
                       <i class="material-icons prefix">view_week</i>
@@ -436,7 +437,7 @@
           <form action="{{url('leftgroup')}}" id="leftgroupform{{$obj_group->id}}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
             <input type="hidden" name="user_id" value="{{ session('user_id') }}"/>
-            <input type="hidden" name="host_id" value="{{ $obj_group->id }}"/>
+            <input type="hidden" name="control_id" value="{{ $obj_group->id }}"/>
           </form>
           @endforeach
         </li>
@@ -537,8 +538,8 @@
     // On refresh check if there are values selected
     if (typeof localStorage.selectVal !== 'undefined') {
 
-        $('#searchby').val( localStorage.selectVal );
-        $('checksearch').val( localStorage.selectVal );
+      $('#searchby').val( localStorage.selectVal );
+      $('checksearch').val( localStorage.selectVal );
 
     } else {
       // alert("It's null");
@@ -755,6 +756,7 @@
         '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
         '<input type="hidden" name="user_id" value="{{ session("user_id") }}">'+
         '<input type="hidden" name="host_id" value="'+id+'">'+
+        '<input type="hidden" name="bywhat" value="server">'+
         '<br><div class="row">'+
         '<div class="col l10 offset-l1">'+
         '<div class="input-field input-field2">'+
@@ -955,6 +957,8 @@
     // alert(localStorage.getItem('selectVal'));
     // location.reload();
   }
+
+  $('#checksearch').val( localStorage.selectVal );
 
   xmlhttp=new XMLHttpRequest();
   xmlhttp.open("GET", "search/"+localStorage.getItem("selectVal"), false);
