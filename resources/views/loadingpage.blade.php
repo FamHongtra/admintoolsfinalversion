@@ -91,13 +91,8 @@
     <div id="portdiv" style="display:none">{{$port}}</div>
     <input id="usrname" type="text" class="validate" name="usrname">
     <div id="usrnamediv" style="display:none">{{$usrname}}</div>
-    @if($bywhat == "rsakey")
-    <input id="password" type="text" class="validate" name="original_name">
-    <div id="passworddiv" style="display:block">{{$original_name}}</div>
-    @elseif($bywhat == "password")
     <input id="password" type="password" class="validate" name="password">
     <div id="passworddiv" style="display:block">{{$password}}</div>
-    @endif
     <input type="submit" name="" value="submit">
   </form>
 </body>

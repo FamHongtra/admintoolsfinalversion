@@ -171,11 +171,11 @@
       <div class="col s12 m12 l6">
         <div class="col s12 m12 l4" align="center">
           <div class="card cyan darken-3" style="width:250px">
-            <h5 style="padding:10px;color:white">{{$obj->servername}}<a href=""><i class="material-icons right" style="color:white">settings</i></a></h5>
+            <h5 style="padding:10px;color:white">{{$obj->servername}}</h5>
           </div>
           <div class="card" style="width:250px;">
             <div class="card-image" style="padding:20px">
-              <img src="../img/server.png">
+              <img src="../img/server_device.png">
               <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
             </div>
             <div class="card-action white">

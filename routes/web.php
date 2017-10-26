@@ -18,6 +18,16 @@ Route::get('/', function () {
   return view('welcome');
 });
 
+Route::get('/testipv6', function () {
+
+  SSH::into('ansible')->run(array(
+    "ansible -i /etc/ansible/hosts admintools -m ping",
+  ), function($line){
+    echo $line;
+  });
+
+});
+
 Route::get('/createtmpuser', function () {
 
   //Create User for Test
@@ -77,10 +87,12 @@ Route::get('/showhost', function () {
     ->join('controls', 'hosts.id', '=', 'controls.host_id')
     ->where('controls.user_id', $user_id)
     ->where('controls.group_id', 0)
+    ->where('controls.control_type',"server")
     ->get();
 
     $all_group = DB::table('groups')
     ->where('user_id', $user_id)
+    ->where('group_type',"server")
     ->get();
 
     $data['objs'] = $objs;
@@ -88,6 +100,36 @@ Route::get('/showhost', function () {
     $data['user_id'] = $user_id;
 
     return view('showhost',$data);
+  }
+});
+
+Route::get('/shownwdev', function () {
+
+  if(session('user_id')==null){
+    return redirect('login');
+  }else{
+
+    $user_id = session('user_id');
+
+
+    // objs is set of hosts havn't the group
+    $objs = DB::table('hosts')
+    ->join('controls', 'hosts.id', '=', 'controls.host_id')
+    ->where('controls.user_id', $user_id)
+    ->where('controls.group_id', 0)
+    ->where('controls.control_type',"network-device")
+    ->get();
+
+    $all_group = DB::table('groups')
+    ->where('user_id', $user_id)
+    ->where('group_type',"network-device")
+    ->get();
+
+    $data['objs'] = $objs;
+    $data['all_group'] = $all_group;
+    $data['user_id'] = $user_id;
+
+    return view('shownwdev',$data);
   }
 });
 
@@ -157,6 +199,8 @@ Route::get('/editconfig/{configid}', 'ConfigController@editconfig');
 Route::get('/detailversion/{versionid}', 'ConfigController@showcontent');
 Route::get('search/autocomplete', 'SearchController@autocomplete');
 Route::get('search/autocompleteGroup', 'SearchController@autocompleteGroup');
+Route::get('search/autocomplete2', 'SearchController@autocomplete2');
+Route::get('search/autocompleteGroup2', 'SearchController@autocompleteGroup2');
 Route::post('/revision', 'ConfigController@revisionconfig');
 Route::post('/savecommit', 'ConfigController@savecommit');
 Route::post('/savefile', 'ConfigController@editconfig');

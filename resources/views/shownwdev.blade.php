@@ -163,10 +163,10 @@
     <div class="row">
       <div class="col s12">
         <ul class="tabs">
-          <li class="tab col s2"><a href="!#" class="teal-text active" style="font-size:15pt"><b>Server Zone</b></a></li>
-          <li class="tab col s2"><a href="!#" onclick="clicknwdev()" style="font-size:15pt;color: #80cbc4">Network-Device Zone</a></li>
+          <li class="tab col s2"><a href="!#" onclick="clickserver()" style="font-size:15pt;color: #80cbc4">Server Zone</a></li>
+          <li class="tab col s2"><a href="!#" class="teal-text active" style="font-size:15pt"><b>Network-Device Zone</b></a></li>
         </ul>
-        <a id="clicknwdev" href="{{url('shownwdev')}}" style="display:none">Click to Network-Device Zone</a>
+        <a id="clickserver" href="{{url('showhost')}}" style="display:none">Click to Network-Device Zone</a>
       </div>
     </div>
 
@@ -174,8 +174,8 @@
 
       <div class="input-field col s4 m4 l1 offset-l5">
         <select id="searchby" onchange="searchBy()">
-          <option value="autocomplete" selected>Server Name or IP</option>
-          <option value="autocompleteGroup">Groupname</option>
+          <option value="autocomplete2" selected>NW-device Name or IP</option>
+          <option value="autocompleteGroup2">Groupname</option>
         </select>
         <label>Search By</label>
       </div>
@@ -196,9 +196,9 @@
         </form>
       </div>
       @if(count($objs)!=0)
-      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Server</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
+      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Network-Device</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
       @else
-      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Server</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
+      <div class="col s12 m12 l4" align="center"><a class="modal-trigger waves-effect waves-light btn-large z-depth-5 cyan darken-3" style="font-size:17px" href="#modal1"><i class="material-icons left">add_box</i>Add Network-Device</a>&nbsp&nbsp&nbsp&nbsp&nbsp<a class="modal-trigger waves-effect waves-light btn-large z-depth-5  blue-grey darken-1 disabled" style="font-size:17px" href="#modal2"><i class="material-icons left">library_add</i>Create Group</a></div>
       @endif
     </div>
 
@@ -211,7 +211,7 @@
         </div>
         <div class="card" style="width:250px;">
           <div class="card-image" style="padding:20px">
-            <img src="img/server_device.png">
+            <img src="img/network_device.png">
             <span class="card-title" style="color:#263238"><b>{{$obj->host}}</b></span>
           </div>
           <div class="card-action white">
@@ -240,15 +240,15 @@
                 <br>
               </div>
               <div id="bypassword" class="row" style="display:block;">
-                <form action="{{url('loading')}}" id="hostform2" class="col s12" method="post" enctype="multipart/form-data">
+                <form action="{{url('addhost')}}" id="hostform2" class="col s12" method="post" enctype="multipart/form-data">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="bywhat" value="server">
+                  <input type="hidden" name="bywhat" value="network-device">
                   <div class="row">
                     <!-- <div class="input-field col s2"></div> -->
                     <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                       <i class="material-icons prefix">perm_contact_calendar</i>
                       <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
-                      <label for="icon_prefix">Server Name</label>
+                      <label for="icon_prefix">Network-device Name</label>
                     </div>
                   </div>
                   <div class="row">
@@ -424,7 +424,7 @@
             </div>
             <div class="card" style="width:250px;">
               <div class="card-image" style="padding:20px">
-                <img src="img/server_device.png">
+                <img src="img/network_device.png">
                 <span class="card-title" style="color:#263238"><b>{{$obj_group->host}}</b></span>
               </div>
               <div class="card-action white">
@@ -516,9 +516,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
   <script type="text/javascript">
 
-  function clicknwdev(){
-    localStorage.setItem('selectVal', "autocomplete2" );
-    document.getElementById('clicknwdev').click();
+  function clickserver(){
+    localStorage.setItem('selectVal', "autocomplete" );
+    document.getElementById('clickserver').click();
     swal({
       imageUrl: 'img/load.gif',
       imageWidth: 120,
@@ -532,23 +532,24 @@
 
   var searchby = document.getElementById("searchby");
 
-  $(document).ready(function() {
 
+  $(document).ready(function() {
     // On refresh check if there are values selected
+
     if (typeof localStorage.selectVal !== 'undefined') {
 
+      if(localStorage.getItem('selectVal') == "autocomplete" || localStorage.getItem('selectVal') == "autocompleteGroup" ){
+        localStorage.setItem('selectVal', "autocomplete2" );
+      }else{
         $('#searchby').val( localStorage.selectVal );
         $('checksearch').val( localStorage.selectVal );
+      }
 
     } else {
-      // alert("It's null");
-      // localStorage not defined
-      localStorage.setItem('selectVal', "autocomplete" );
-      // alert(localStorage.selectVal);
+      localStorage.setItem('selectVal', "autocomplete2" );
     }
+
   });
-
-
 
   function sshLogin(id){
 
@@ -950,12 +951,6 @@
     }
   });
 
-  if(localStorage.getItem('selectVal') == "autocomplete2" || localStorage.getItem('selectVal') == "autocompleteGroup2" ){
-    localStorage.setItem('selectVal', "autocomplete" );
-    // alert(localStorage.getItem('selectVal'));
-    // location.reload();
-  }
-
   xmlhttp=new XMLHttpRequest();
   xmlhttp.open("GET", "search/"+localStorage.getItem("selectVal"), false);
   xmlhttp.send();
@@ -971,6 +966,7 @@
       // alert('You selected: ' + item.value);
     }
   });
+
   </script>
 </body>
 </html>

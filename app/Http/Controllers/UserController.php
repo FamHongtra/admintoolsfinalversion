@@ -53,10 +53,12 @@ class UserController extends Controller
           ->join('controls', 'hosts.id', '=', 'controls.host_id')
           ->where('controls.user_id', $user_id)
           ->where('controls.group_id', 0)
+          ->where('controls.control_type', "server")
           ->get();
 
           $all_group = DB::table('groups')
           ->where('user_id', $user_id)
+          ->where('group_type', "server")
           ->get();
 
           $data['objs'] = $objs;

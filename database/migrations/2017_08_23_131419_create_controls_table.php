@@ -17,7 +17,7 @@ class CreateControlsTable extends Migration
             $table->increments('id');
             $table->string('username_ssh');
             $table->string('password_ssh', 256);
-            $table->integer('passtype_id');
+            $table->string('control_type');
             $table->integer('user_id');
             $table->integer('host_id');
             $table->integer('group_id');
