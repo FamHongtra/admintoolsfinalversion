@@ -240,7 +240,9 @@ class UserController extends Controller
 
       SSH::into('ansible')->run(array(
         "mkdir -p /etc/ansible/users/$gitlab_token",
-        "touch /etc/ansible/users/$gitlab_token/hosts"
+        "mkdir -p /etc/ansible/users/$gitlab_token/nw-configs",
+        "touch /etc/ansible/users/$gitlab_token/hosts",
+        "touch /etc/ansible/users/$gitlab_token/nw-hosts"
       ));
 
       $request->session()->flash('status', 'change password success');

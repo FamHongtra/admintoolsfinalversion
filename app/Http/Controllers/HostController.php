@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Crypt;
 use SSH;
 use App\Host;
 use App\Control;
+use App\Config;
 use Redirect;
 use Hash;
 use DB;
@@ -120,8 +121,14 @@ class HostController extends Controller
 
     //  suppose user
     $user_id = session('user_id') ;
-    $user_name = "admina" ;
-    $user_pass = "adminaeiei" ;
+
+    $user = DB::table('users')->where('id', $user_id)->first();
+    $username = $user->username ;
+    $useremail = $user->email ;
+    $userpassword = Crypt::decryptString($user->password);
+
+    // $user_name = "admina" ;
+    // $user_pass = "adminaeiei" ;
 
     $bywhat = $request->input('bywhat');// server or network-device
     $servername = $request->input('servername');
@@ -133,7 +140,7 @@ class HostController extends Controller
     // $filepath = $request->input('filepath');
     $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
-    $repository = "http://".$user_name."@13.228.10.174/".$user_name."/".$servername.".git" ;
+    // $repository = "http://".$user_name."@13.228.10.174/".$user_name."/".$servername.".git" ;
     //remote to ansible for keeping RSA key
     if($bywhat == "server"){
 
@@ -200,11 +207,52 @@ class HostController extends Controller
       //remote to ansible for keeping Password
     }else if($bywhat == "network-device"){
 
+      $proj_name = str_random(20);
+
+      SSH::into('gitlab')->run(array(
+
+        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
+
+      ), function($line){
+
+        $GLOBALS['jsonArray'] = json_decode($line);
+        //
+        // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
+      });
+
+
+      $mknwdir = $GLOBALS['jsonArray']->name;
+
       SSH::into('ansible')->run(array(
         "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
         "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
-        // "ansible -m shell -a 'mkdir /testpassnaja' $servername --become",
+        //Create Directory for keeping network-device configuration
+        "mkdir -p /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+        //Call ansible-playbook here!
+        // "touch /etc/ansible/users/$imp_token/nw-configs/$mknwdir/testconfig",
       ));
+
+
+      //Cisco Command
+      SSH::into('ansible')->run(array(
+        "ansible -i /etc/ansible/users/$imp_token/nw-hosts $servername -m raw -a 'show startup-config'",
+      ), function($line){
+
+
+        $imp_token = DB::table('users')->where('id', session('user_id'))->value('token');
+        $mknwdir = $GLOBALS['jsonArray']->name;
+
+        SSH::into('ansible')->run(array(
+          "echo '$line' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+          "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+        ));
+
+      });
 
       //Testing
 
@@ -225,6 +273,34 @@ class HostController extends Controller
       $obj2->host_id = $host->id ;
       $obj2->group_id = 0 ;
       $obj2->save();
+
+      $control_latest = DB::table('controls')->orderBy('id', 'desc')->first();
+      $control_id = $control_latest->id;
+
+      $obj = new Config();
+      $password_decrypted = Crypt::decryptString($password_encrypted);
+      $obj->configname = "The configuration of ".$servername;
+      $obj->configpath = "/etc/ansible/users/".$imp_token."/nw-configs"."/".$GLOBALS['jsonArray']->name."/config";
+      $repository = "http://".$username.":".$userpassword."@52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git";
+      // $encrypt_repository = Crypt::encryptString($repository);
+      $obj->repository = "52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git" ;
+      $obj->keygen = $GLOBALS['jsonArray']->name;
+      $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+      $obj->control_id = $control_id;
+      $obj->save();
+
+      //Push first version of network-device configuration to gitlab repository
+
+      SSH::into('ansible')->run(array(
+        "git init /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"The configuration of $servername was initialized.\" &> /dev/null", //Add this.
+        "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ push -u backupversion master &> /dev/null",//Add this.
+      ));
+
 
       return redirect('shownwdev');
 
@@ -252,6 +328,51 @@ class HostController extends Controller
     }
   }
 
+  public function shownwdev($id)
+  {
+    if(session('user_id')==null){
+      return redirect('login');
+    }else{
+      $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+
+      $proj_id = DB::table('configs')->where('control_id', $id)->value('gitlab_projid');
+
+      $user_id = session('user_id');
+      $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
+
+      $GLOBALS['jsonArray'] = "";
+
+      SSH::into('gitlab')->run(array(
+
+        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
+
+      ), function($line){
+        // echo $line;
+
+        $GLOBALS['jsonArray'] = json_decode($line);
+        $collection = collect($GLOBALS['jsonArray']);
+        $sorted = $collection->sortBy('committed_date');
+
+        //
+        // return dd($sorted);
+
+        // foreach ($jsonArray as $item) {
+        //   # code...
+        //   print_r("Revision short ID: ".$item->short_id.", Commits Title: ".$item->title); echo '<br/>';
+        //
+        // }
+      });
+
+      $obj = Host::find($host_id);
+      $data['obj'] = $obj;
+      $data['controlid'] = $id;
+      $data['configversions'] = $GLOBALS['jsonArray'];
+
+      return view('detailnwdev',$data) ;
+    }
+  }
+
   public function checkConnection(Request $request, $id)
   {
     if(session('user_id')==null){
@@ -259,34 +380,63 @@ class HostController extends Controller
     }else{
 
       $host_id = DB::table('controls')->where('id', $id)->value('host_id');
+      $control_type = DB::table('controls')->where('id', $id)->value('control_type');
 
       $obj = Host::find($host_id);
       $servername = $obj->servername ;
 
-      $GLOBALS['ping'] = 0;
+      if($control_type == "server"){
 
-      $user_id = session('user_id');
-      $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+        $GLOBALS['ping'] = 0;
 
-      SSH::into('ansible')->run(array(
-        "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $servername",
-      ), function($line){
-        if (strpos($line, 'SUCCESS') !== false) {
-          $GLOBALS['ping'] = 1;
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
+        SSH::into('ansible')->run(array(
+          "ansible -i /etc/ansible/users/$imp_token/hosts -m ping $servername",
+        ), function($line){
+          if (strpos($line, 'SUCCESS') !== false) {
+            $GLOBALS['ping'] = 1;
+          }
+        });
+
+        if($GLOBALS['ping'] == 1){
+          $request->session()->flash('status', 'connection');
+          $request->session()->flash('title', 'Connected!');
+          $request->session()->flash('text', 'The host is already connected.');
+          $request->session()->flash('icon', 'success');
+        }else{
+          $request->session()->flash('status', 'connection');
+          $request->session()->flash('title', 'Disconnected!');
+          $request->session()->flash('text', 'The host is not connected.');
+          $request->session()->flash('icon', 'error');
         }
-      });
+      }else if($control_type == "network-device"){
+        $GLOBALS['ping'] = 0;
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
-      if($GLOBALS['ping'] == 1){
-        $request->session()->flash('status', 'connection');
-        $request->session()->flash('title', 'Connected!');
-        $request->session()->flash('text', 'The host is already connected.');
-        $request->session()->flash('icon', 'success');
-      }else{
-        $request->session()->flash('status', 'connection');
-        $request->session()->flash('title', 'Disconnected!');
-        $request->session()->flash('text', 'The host is not connected.');
-        $request->session()->flash('icon', 'error');
+        SSH::into('ansible')->run(array(
+          "ansible -i /etc/ansible/users/$imp_token/nw-hosts -m raw -a 'show version' $servername",
+        ), function($line){
+          if (strpos($line, 'SUCCESS') !== false) {
+            $GLOBALS['ping'] = 1;
+          }
+        });
+
+        if($GLOBALS['ping'] == 1){
+          $request->session()->flash('status', 'connection');
+          $request->session()->flash('title', 'Connected!');
+          $request->session()->flash('text', 'The network-device is already connected.');
+          $request->session()->flash('icon', 'success');
+        }else{
+          $request->session()->flash('status', 'connection');
+          $request->session()->flash('title', 'Disconnected!');
+          $request->session()->flash('text', 'The network-device is not connected.');
+          $request->session()->flash('icon', 'error');
+        }
       }
+
 
       $data['obj'] = $obj;
       $data['controlid'] = $id;
@@ -380,12 +530,12 @@ class HostController extends Controller
         ->where('hosts.servername','like','%'.$searchkey.'%')
         ->get();
 
-          $objs2 = DB::table('hosts')
-          ->join('controls', 'hosts.id', '=', 'controls.host_id')
-          ->where('controls.user_id', $user_id)
-          ->where('controls.control_type', "network-device")
-          ->where('hosts.host','like', '%'.$searchkey.'%')
-          ->get();
+        $objs2 = DB::table('hosts')
+        ->join('controls', 'hosts.id', '=', 'controls.host_id')
+        ->where('controls.user_id', $user_id)
+        ->where('controls.control_type', "network-device")
+        ->where('hosts.host','like', '%'.$searchkey.'%')
+        ->get();
 
         if(count($objs1) == 0){
           $objs = $objs2;
@@ -481,7 +631,14 @@ class HostController extends Controller
       if($login_password ==  $password_decrypted){
         // echo "username and password are correct!";
 
-        return redirect()->route('detailhost',$control[0]->id);
+
+        if($control_type == "server"){
+          return redirect()->route('detailhost',$control[0]->id);
+        }else if($control_type == "network-device"){
+          //edit this page
+          return redirect()->route('detailnwdev',$control[0]->id);
+        }
+
       }else{
         // echo "password wrong!";
 

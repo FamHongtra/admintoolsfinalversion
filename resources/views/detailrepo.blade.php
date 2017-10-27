@@ -115,6 +115,18 @@
     border-radius: 100%;
   }
 
+  .card-title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .card-title:hover {
+    overflow: auto;
+    white-space: initial;
+    word-wrap: break-word;
+
+  }
   </style>
 </head>
 

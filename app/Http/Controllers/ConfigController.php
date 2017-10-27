@@ -45,6 +45,82 @@ class ConfigController extends Controller
     //
   }
 
+  public function backupnwdev(Request $request){
+
+    $control_id = $request->input('controlid');
+    $msgcommit = $request->input('msgcommit');
+
+    if ($msgcommit == "") {
+      $msgcommit = 'Untitled.';
+    }
+
+
+    $user = DB::table('users')->where('id', session('user_id'))->first();
+    $config = DB::table('configs')->where('control_id', $control_id)->first();
+
+    $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
+    $host = DB::table('hosts')->where('id', $host_id)->first();
+
+    $imp_token = DB::table('users')->where('id', session('user_id'))->value('token');
+    $mknwdir = $config->keygen;
+    $GLOBALS['mknwdir'] = $mknwdir;
+    $servername = $host->servername;
+
+
+    //Cisco Command
+    SSH::into('ansible')->run(array(
+      "ansible -i /etc/ansible/users/$imp_token/nw-hosts $servername -m raw -a 'show startup-config'",
+    ), function($line){
+
+      $GLOBALS['line'] = $line ;
+
+    });
+
+    $lineoutput = $GLOBALS['line'];
+
+    // echo $lineoutput;
+
+    SSH::into('ansible')->run(array(
+      "rm -f /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config*",
+      "echo '$lineoutput' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+    ));
+
+
+    SSH::into('ansible')->run(array(
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"$msgcommit\" &> /dev/null", //Add this.
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ push -u backupversion master",//Add this.
+    ), function($line){
+
+      $GLOBALS['change'] = $line ;
+
+    });
+
+    if(!empty($GLOBALS['change'])){
+      $request->session()->flash('status', 'true');
+      $request->session()->flash('title', 'Successful!');
+      $request->session()->flash('text', 'Backup the configuration file to the system successful.');
+      $request->session()->flash('icon', 'success');
+
+      return Redirect::back();
+
+    }else{
+      $request->session()->flash('status', 'true');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'The configuration file everything up to date, It is latest version.');
+      $request->session()->flash('icon', 'error');
+
+      return Redirect::back();
+
+    }
+  }
+
 
   public function check(Request $request)
   {
@@ -350,7 +426,6 @@ class ConfigController extends Controller
         //   print_r("Revision short ID: ".$item->short_id.", Commits Title: ".$item->title); echo '<br/>';
         //
         // }
-
       });
 
       $data['obj'] = $obj;

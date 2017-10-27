@@ -18,6 +18,8 @@ Route::get('/', function () {
   return view('welcome');
 });
 
+
+
 Route::get('/testipv6', function () {
 
   SSH::into('ansible')->run(array(
@@ -186,9 +188,11 @@ Route::post('/loading', 'HostController@loading');
 Route::post('/addhost', 'HostController@store');
 // Route::post('/addhost', 'HostController@store');
 Route::get('detailhost/{hostid}', ['as' => 'detailhost', 'uses' => 'HostController@show']);
+Route::get('detailnwdev/{hostid}', ['as' => 'detailnwdev', 'uses' => 'HostController@shownwdev']);
 Route::post('/searchhost', 'HostController@search');
 Route::get('/hostall/{id}', 'HostController@showhost');
 Route::post('/checkpath', 'ConfigController@check');
+Route::post('/backupnwdev', 'ConfigController@backupnwdev');
 Route::post('/delconfig', 'ConfigController@deleteConfig');
 Route::post('/adddesc', 'DescriptionController@addDescription');
 Route::post('/editdesc', 'DescriptionController@editDescription');
@@ -220,38 +224,38 @@ Route::post('/changepassword', 'UserController@changePassword');
 //   return view('autocomplete');
 // });
 
-SSH::into('gitlab')->run(array(
-
-  // Private Token of root: 4sST2ksaug4EnxHMHd-T
-  // Create User
-  // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/users/?email=email8@example.com&username=test8&name=test&password=testeieiei'",
-
-  //Create Impersonal Token
-  //"sudo curl --silent --request POST --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' --data 'name=mytoken' --data 'expires_at=2017-04-04' --data 'scopes[]=api' http://13.228.10.174/api/v4/users/:user_id/impersonation_tokens",
-  //Get Impersonal Token and Insert it to Database
-
-  //Using Impersonal Token instead of Private Token (Impersonal Token: Yy7H679yiYqysDCaLTmB)
-  //"sudo curl --silent --header 'PRIVATE-TOKEN: Yy7H679yiYqysDCaLTmB' -X GET 'http://13.228.10.174/api/v4/projects'",
-
-  // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/projects/user/19?name=MyProject3&visibility=public'",
-), function($line){
-
-  // Return JSON Syntax
-  //echo $line;
-
-  // Decode JSON Syntax to Array
-  // $jsonArray = json_decode($line);
-
-  // Access the property's value by specific property's name
-  // print_r($jsonArray[0]->id." ".$jsonArray[0]->http_url_to_repo);
-
-  //
-  // echo $jsonArray[1]->name;
-  // $value = array_get($jsonArray, 'username');
-  // echo $line;
-  // return dd($jsonArray);
-  // echo $value;
-});
+// SSH::into('gitlab')->run(array(
+//
+//   // Private Token of root: 4sST2ksaug4EnxHMHd-T
+//   // Create User
+//   // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/users/?email=email8@example.com&username=test8&name=test&password=testeieiei'",
+//
+//   //Create Impersonal Token
+//   //"sudo curl --silent --request POST --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' --data 'name=mytoken' --data 'expires_at=2017-04-04' --data 'scopes[]=api' http://13.228.10.174/api/v4/users/:user_id/impersonation_tokens",
+//   //Get Impersonal Token and Insert it to Database
+//
+//   //Using Impersonal Token instead of Private Token (Impersonal Token: Yy7H679yiYqysDCaLTmB)
+//   //"sudo curl --silent --header 'PRIVATE-TOKEN: Yy7H679yiYqysDCaLTmB' -X GET 'http://13.228.10.174/api/v4/projects'",
+//
+//   // "sudo curl --silent --header 'PRIVATE-TOKEN: 4sST2ksaug4EnxHMHd-T' -X POST 'http://13.228.10.174/api/v4/projects/user/19?name=MyProject3&visibility=public'",
+// ), function($line){
+//
+//   // Return JSON Syntax
+//   //echo $line;
+//
+//   // Decode JSON Syntax to Array
+//   // $jsonArray = json_decode($line);
+//
+//   // Access the property's value by specific property's name
+//   // print_r($jsonArray[0]->id." ".$jsonArray[0]->http_url_to_repo);
+//
+//   //
+//   // echo $jsonArray[1]->name;
+//   // $value = array_get($jsonArray, 'username');
+//   // echo $line;
+//   // return dd($jsonArray);
+//   // echo $value;
+// });
 
 Route::get('/testapicreateuser', function () {
 
@@ -531,3 +535,29 @@ Route::get('/testping', function () {
       echo substr($bfname,0,$afname_pos);
     });
   });
+
+  // Route::get('/testsaveconfig', function () {
+  //
+  //   SSH::into('ansible')->run(array(
+  //     "ansible -i /etc/ansible/hosts network-device01 -m raw -a 'show startup-config'",
+  //   ), function($line){
+  //
+  //     $output = nl2br($line);
+  //     // echo $output;
+  //
+  //     SSH::into('ansible')->run(array(
+  //       "echo '$line' > /etc/ansible/users/test.conf",
+  //       "sed -i '1d' /etc/ansible/users/test.conf",
+  //       "sed -i '1d' /etc/ansible/users/test.conf",
+  //       "sed -ie '\$d' /etc/ansible/users/test.conf",
+  //       "sed -ie '\$d' /etc/ansible/users/test.conf",
+  //       "sed -ie '\$d' /etc/ansible/users/test.conf",
+  //       "sed -ie '\$d' /etc/ansible/users/test.conf",
+  //     ),function($line2){
+  //
+  //       echo $line2;
+  //     });
+  //
+  //   });
+  //
+  // });

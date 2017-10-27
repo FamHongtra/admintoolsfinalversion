@@ -18,7 +18,7 @@ class CreateConfigsTable extends Migration
             $table->increments('id');
             $table->string('configname');
             $table->string('configpath');
-            $table->string('repository');
+            $table->string('repository', 256);
             $table->string('keygen');
             $table->integer('gitlab_projid');
             $table->integer('control_id');
