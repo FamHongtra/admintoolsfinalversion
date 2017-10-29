@@ -207,6 +207,8 @@ class HostController extends Controller
       //remote to ansible for keeping Password
     }else if($bywhat == "network-device"){
 
+      
+
       $proj_name = str_random(20);
 
       SSH::into('gitlab')->run(array(

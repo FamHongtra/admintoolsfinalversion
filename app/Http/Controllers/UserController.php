@@ -160,7 +160,14 @@ class UserController extends Controller
       $request->session()->flash('text', 'We have sent a random password generated to this email: '.$user_email);
       $request->session()->flash('icon', 'success');
 
-      return redirect('showhost');
+      if(session('user_id')!=null){
+        return redirect('showhost');
+
+      }else{
+
+        return redirect('login');
+      }
+
     }else{
 
       if(count($user_hasusername) != 0 && count($user_hasemail) != 0){

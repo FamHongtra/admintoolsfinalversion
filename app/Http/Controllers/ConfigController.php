@@ -85,6 +85,7 @@ class ConfigController extends Controller
       "echo '$lineoutput' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+      "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",

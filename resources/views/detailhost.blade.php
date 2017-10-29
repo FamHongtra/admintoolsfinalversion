@@ -595,8 +595,8 @@ function addDesc(){
     var descname = $('#descform').find('input[name="descname"]').val();
     var descdetail = $('#descform').find('textarea[name="descdetail"]').val();
 
-    var regex_descname = /^([a-zA-Z0-9]{1,})$/.test(descname);
-    var regex_descdetail = /^([a-zA-Z0-9]{1,})$/.test(descdetail);
+    var regex_descname = /^([a-zA-Z0-9 ]{1,})$/.test(descname);
+    var regex_descdetail = /^([a-zA-Z0-9 ]{1,})$/.test(descdetail);
 
     if(regex_descname && regex_descdetail){
       $("#descform").submit();

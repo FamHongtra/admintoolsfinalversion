@@ -374,7 +374,7 @@
                 <form action="{{url('creategroup')}}" id="groupform" class="col s12" method="post" enctype="multipart/form-data">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="user_id" value="{{ session('user_id') }}">
-                  <input type="hidden" name="bywhat" value="network-device">
+                  <input type="hidden" name="bywhat" value="server">
                   <div class="row">
                     <div class="input-field input-field2 col s10 m10 l8 offset-s1 offset-m1 offset-l2">
                       <i class="material-icons prefix">view_week</i>

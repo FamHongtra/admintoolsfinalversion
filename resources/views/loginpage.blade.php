@@ -27,15 +27,67 @@
   <!-- Styles -->
   <style>
   html, body {
-    background: #4CB8C4;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #3CD3AD, #4CB8C4);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #3CD3AD, #4CB8C4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('img/bg.png');
     font-family: 'Abel', sans-serif;
     color: #636b6f;
-    font-family: 'Raleway', sans-serif;
     font-weight: 100;
     height: 100vh;
     margin: 0;
+  }
+
+  .input-field1.input-field input[type=text]:focus + label {
+    color: #00acc1;
+
+  }
+  .input-field1.input-field input[type=text]:focus {
+    border-bottom: 1px solid #00acc1;
+    box-shadow: 0 1px 0 0 #00acc1;
+  }
+
+  .input-field1.input-field input[type=text].valid {
+    border-bottom: 1px solid #0097a7;
+    box-shadow: 0 1px 0 0 #0097a7;
+  }
+
+  .input-field1.input-field .prefix.active {
+    color: #00acc1;
+  }
+  .input-field1.input-field input[type=number]:focus + label {
+    color: #00acc1;
+  }
+  .input-field1.input-field input[type=number]:focus {
+    border-bottom: 1px solid #00acc1;
+    box-shadow: 0 1px 0 0 #00acc1;
+  }
+  .input-field1.input-field input[type=number].valid {
+    border-bottom: 1px solid #0097a7;
+    box-shadow: 0 1px 0 0 #0097a7;
+  }
+
+  .input-field2.input-field input[type=text]:focus + label {
+    color: #00bfa5;
+  }
+  .input-field2.input-field input[type=text]:focus {
+    border-bottom: 1px solid #00bfa5;
+    box-shadow: 0 1px 0 0 #00bfa5;
+  }
+
+  .input-field2.input-field .prefix.active {
+    color: #00bfa5;
+  }
+  .input-field2.input-field input[type=number]:focus + label {
+    color: #00bfa5;
+  }
+
+
+  .input-field2.input-field input[type=number]:focus {
+    border-bottom: 1px solid #00bfa5;
+    box-shadow: 0 1px 0 0 #00bfa5;
   }
 
   .full-height {
@@ -79,30 +131,39 @@
     </div>
     @endif
 
-    <div class="row full-height" style="align-items: center;display: flex;">
-      <div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4 shadow-box" style="background-color:white;opacity: 0.8">
+    <div class="row full-height" style="align-items: center;display: flex; background-color: rgb(0, 0, 0);background-color: rgba(0, 0, 0, 0.3);">
+      <div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4 shadow-box" style="background-color:white;">
         <form action="{{url("userlogin")}}" id="userloginform" method="post" enctype="multipart/form-data" style="padding:50px">
           <div class="row" align="center">
-            <img src="img/logo1.png" height="120px"/>
-          </div>
+            <img src="img/logoicon.png" height="220px"/>
+          </div><br>
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <div class="row">
             <div class="col s12 m8 l8 offset-m2 offset-l2">
-              <div class="input-field">
+              <div class="input-field input-field2">
                 <i class="material-icons prefix">perm_identity</i>
                 <input id="icon_prefix" type="text" name="userlogin_username" autofocus>
                 <label for="icon_prefix" align="left">Username</label>
               </div>
-              <div class="input-field">
+              <div class="input-field input-field2">
                 <i class="material-icons prefix">vpn_key</i>
                 <input id="icon_prefix" type="password" name="userlogin_password">
                 <label for="icon_prefix" align="left">Password</label>
-              </div>
+              </div><br>
               <div class="input-field">
                 <button class="btn-large waves-effect waves-light" type="button" name="action" onclick="loginSubmit()" style="position: relative;width: 100%;">Login
-                  <i class="material-icons right">send</i>
                 </button>
               </div>
+              @php
+                $count_user = DB::table('users')->count();
+              @endphp
+
+              @if($count_user==0)
+              <div class="input-field" align="right">
+                <a href="#!" onclick="createUser()" class="teal-text" style="font-size:14pt">create your account</a>
+              </div>
+              @endif
+
             </div>
           </div>
         </form>
@@ -199,6 +260,72 @@
     @endif
     // swal("{!! Session::get('title') !!}","{!! Session::get('text') !!}", "{!! Session::get('icon') !!}");
     @endif
+
+    function createUser(){
+
+      swal({
+        title: 'User Creation',
+        html:
+        '<form action="{{url("createuser")}}" id="createuserform" class="col s12" method="post" enctype="multipart/form-data">'+
+        '<input type="hidden" name="_token" value="{{ csrf_token() }}">'+
+        '<br><div class="row">'+
+        '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">assignment_ind</i>'+
+        '<input id="icon_prefix" type="text" name="newuser_name" required>'+
+        '<label for="icon_prefix" align="left">Name</label>'+
+        '</div>'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">perm_identity</i>'+
+        '<input id="icon_prefix" type="text" name="newuser_username" required>'+
+        '<label for="icon_prefix" align="left">Username</label>'+
+        '</div>'+
+        '<div class="input-field input-field2">'+
+        '<i class="material-icons prefix">email</i>'+
+        '<input id="icon_prefix" type="email" name="newuser_email" required>'+
+        '<label for="icon_prefix" align="left">Email</label>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</form>',
+        confirmButtonColor: '#26a69a',
+        confirmButtonText: 'Create',
+        showCancelButton: true,
+      }).then(function () {
+        var newuser_name = $('#createuserform').find('input[name="newuser_name"]').val();
+        var newuser_username = $('#createuserform').find('input[name="newuser_username"]').val();
+        var newuser_email = $('#createuserform').find('input[name="newuser_email"]').val();
+
+        var regex_name = /^([a-zA-Z0-9]{1,})$/.test(newuser_name);
+        var regex_username = /^([a-zA-Z0-9]{4,12})$/.test(newuser_username);
+        var regex_email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(newuser_email);
+
+        if(regex_name && regex_username && regex_email){
+
+          $("#createuserform").submit();
+          swal({
+            imageUrl: 'img/load.gif',
+            imageWidth: 120,
+            showCancelButton: false,
+            showConfirmButton: false,
+            animation: false,
+            allowOutsideClick: false,
+            confirmButtonColor: '#26a69a',
+          });
+        }else{
+          var invalid = "Name field must be at least 1 character with no special characters, Username field must be 4 to 12 characters with no special characters, E-mail must be a valid form!" ;
+
+          swal({
+            title: "Invalid Input!",
+            text: ""+invalid,
+            type: "warning",
+            confirmButtonColor: '#26a69a',
+          }).then(function (){
+            createUser();
+          });
+        }
+      });
+    }
 
 
 

@@ -15,7 +15,33 @@
 
 Route::get('/', function () {
 
-  return view('welcome');
+  if(session('user_id')!=null){
+    //Retaining Session (no logout)
+    $user_id = session('user_id');
+
+    $objs = DB::table('hosts')
+    ->join('controls', 'hosts.id', '=', 'controls.host_id')
+    ->where('controls.user_id', $user_id)
+    ->where('controls.group_id', 0)
+    ->where('controls.control_type', "server")
+    ->get();
+
+    $all_group = DB::table('groups')
+    ->where('user_id', $user_id)
+    ->where('group_type', "server")
+    ->get();
+
+    $data['objs'] = $objs;
+    $data['all_group'] = $all_group;
+    $data['user_id'] = $user_id;
+
+    session(['user_id' => $user_id]);
+
+    return view('showhost',$data);
+  }else{
+    //Not have session
+    return view('loginpage');
+  }
 });
 
 
