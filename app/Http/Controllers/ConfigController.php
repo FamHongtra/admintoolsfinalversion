@@ -129,11 +129,6 @@ class ConfigController extends Controller
     $GLOBALS['jsonArray'] = "";
     $GLOBALS['test'] = 0;
     $GLOBALS['test2'] = 0;
-
-    $request->session()->flash('status', 'true');
-    $request->session()->flash('title', 'Failed!');
-    $request->session()->flash('text', 'The configuration file not found.');
-    $request->session()->flash('icon', 'error');
     //
     // $serverid = $request->input('serverid');
     // $GLOBALS['serverid'] = $control->serverid;
@@ -203,41 +198,25 @@ class ConfigController extends Controller
             $GLOBALS['test2'] = 1;
             // $user_id = 29;
             // $imp_token = "1xfYQD8Km8LsfWaYVP_d";
-            $user_id = session('user_id');
-            $imp_token = DB::table('users')->where('id', $user_id)->value('token');
-
-
-            $proj_name = str_random(20);
-
-            SSH::into('gitlab')->run(array(
-
-              "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
-
-            ), function($line){
-
-              $GLOBALS['jsonArray'] = json_decode($line);
-              //
-              // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
-
-            });
-
-            $obj = new Config();
-            $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
-            $obj->configname = $GLOBALS['pathname'];
-            $obj->configpath = $GLOBALS['pathconf'];
-            $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
-            $obj->keygen = $GLOBALS['jsonArray']->name;
-            $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
-            $obj->control_id = $GLOBALS['controlid'];
-            $obj->save();
-
 
           }else{
             //Permission denied
             // echo "Permission denied.";
+            $request->session()->flash('status', 'true');
+            $request->session()->flash('title', 'Failed!');
+            $request->session()->flash('text', 'You don\'t have permission to access this file.');
+            $request->session()->flash('icon', 'error');
+
+
+            return Redirect::back();
           }
         });
       }else{
+
+        $request->session()->flash('status', 'true');
+        $request->session()->flash('title', 'Failed!');
+        $request->session()->flash('text', 'The configuration file not found.');
+        $request->session()->flash('icon', 'error');
 
         return Redirect::back();
         // echo "file not found.";
@@ -246,23 +225,56 @@ class ConfigController extends Controller
 
       if($GLOBALS['test2'] == 1){
 
+        //check repo exist (same host and config path)
+
+        //In Progress....
+        
+        $repo_exist = DB::table('controls')
+        ->join('configs','controls.id', '=', 'configs.control_id')
+        ->join('hosts','hosts.id', '=', 'controls.host_id')
+        ->where('configs.configpath', $GLOBALS['pathconf'])
+        ->where('hosts.host', $host->host)
+        ->where('controls.id', '<>', $control->id)
+        ->get();
+        return count($repo_exist);
+
+        //In Progress....
+
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
+
+
+        $proj_name = str_random(20);
+
+        SSH::into('gitlab')->run(array(
+
+          "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
+
+        ), function($line){
+
+          $GLOBALS['jsonArray'] = json_decode($line);
+          //
+          // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
+
+        });
+
+        $obj = new Config();
+        $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
+        $obj->configname = $GLOBALS['pathname'];
+        $obj->configpath = $GLOBALS['pathconf'];
+        $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+        $obj->keygen = $GLOBALS['jsonArray']->name;
+        $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+        $obj->control_id = $GLOBALS['controlid'];
+        $obj->save();
+
+
         SSH::into('ansible')->run(array(
           //Remove text last line.
           "ansible -i /etc/ansible/users/$imp_token/hosts -m shell -a 'sed -i \"$ d\" $pathconf' $servername",
         ), function($line2){
           // echo $line2;
         });
-
-        //Adding
-        // $curpath = substr( $pathconf, 0, strrpos( $pathconf, '/' ) + 1);// for make dir firsttime
-        // $mkdirfirst = 'mkdir -p ~/nanoad/tmp_repo'.$curpath;
-        // $cpfilefirst = 'cp '.$pathconf.' ~/nanoad/tmp_repo'.$curpath;
-        // $gitaddfirst = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo add . &> /dev/null';
-        // $editedf = $pathname.' was initialized at ';
-        // $datemsgf = '%%Y-%%m-%%d';
-        // $timemsgf = '%%H:%%M:%%S';
-        // $gitcommitfirst = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo commit -m \"'.$editedf.'\".date+'.$datemsgf.'\" \"'.$timemsgf.')\" &> /dev/null';
-        // $gitpushfirst = 'git --git-dir=/home/'.$hostusr.'/nanoad/tmp_repo/.git --work-tree=/home/'.$hostusr.'/nanoad/tmp_repo push -u backupversion master &> /dev/null';
 
         $configlatest = DB::table('configs')->orderBy('id','desc')->first();
         $configkeygen = $configlatest->keygen ;
@@ -272,21 +284,6 @@ class ConfigController extends Controller
 
         $username = $GLOBALS['user']->username;
         $useremail = $GLOBALS['user']->email;
-
-        //for nanoad editor
-        // SSH::into('ansible')->run(array(
-        //   //To Adding
-        //   "ansible-playbook /etc/ansible/Nanoadform.yml -i /etc/ansible/hosts -e 'host=$servername'",
-        //   "ansible $servername -m shell -a 'mkdir -p ~/nanoad/tmp_repo/$configkeygen'",
-        //   "ansible $servername -m shell -a 'git init ~/nanoad/tmp_repo/$configkeygen'",
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.name \"$username\"'",
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
-        //   "ansible $servername -m shell -a 'cp $configpath ~/nanoad/tmp_repo/$configkeygen'",//Add this.
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
-        //   "ansible $servername -m shell -a 'git --git-dir=/home/$hostusr/nanoad/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/nanoad/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
-        // ));
 
         //for vimad editor
         SSH::into('ansible')->run(array(
@@ -317,13 +314,7 @@ class ConfigController extends Controller
 
         $GLOBALS['configs'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->get();
         $GLOBALS['configscount'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->count();
-        // foreach ($GLOBALS['configs'] as $key => $config) {
-        //   $cfp = '\"'.$config->configpath.'\"';
-        //   SSH::into('ansible')->run(array(
-        //     // "ansible $servername -m shell -a 'printf \"\\nHello\\nWorld\\n$config->configname\" >> /etc/nanoad/scripts/nanoad.sh' --become",
-        //     "ansible $servername -m shell -a 'printf \"\\n\\nif[[ $dollar == $cfp ]]\\nthen\\n\tclear\\n\techo $pleasewait\" >> /etc/nanoad/scripts/nanoad.sh' --become",
-        //   ));
-        // }
+
         $inloop = "";
 
         foreach ($GLOBALS['configs'] as $key => $config) {
@@ -354,11 +345,7 @@ class ConfigController extends Controller
           }
         }
         SSH::into('ansible')->run(array(
-          // "ansible $servername -m shell -a 'printf \"\\nHello\\nWorld\\n$config->configname\" >> /etc/nanoad/scripts/nanoad.sh' --become",
 
-
-          //append checkpath to nanoad.sh
-          // "ansible $servername -m shell -a 'printf \"$inloop\" >> ~/nanoad/scripts/nanoad.sh'",
           "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
         ));
 
@@ -366,15 +353,6 @@ class ConfigController extends Controller
         $request->session()->flash('title', 'Successful!');
         $request->session()->flash('text', 'The configuration file was saved to the system.');
         $request->session()->flash('icon', 'success');
-
-
-        return Redirect::back();
-
-      }else{
-        $request->session()->flash('status', 'true');
-        $request->session()->flash('title', 'Failed!');
-        $request->session()->flash('text', 'You don\'t have permission to access this file.');
-        $request->session()->flash('icon', 'error');
 
 
         return Redirect::back();

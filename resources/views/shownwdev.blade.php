@@ -260,7 +260,7 @@
                     <!-- <div class="input-field col s2"></div> -->
                     <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                       <i class="material-icons prefix">perm_contact_calendar</i>
-                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
+                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters." autofocus>
                       <label for="icon_prefix">Network-device Name</label>
                     </div>
                   </div>
@@ -376,13 +376,13 @@
                   <div class="row">
                     <div class="input-field input-field2 col s10 m10 l8 offset-s1 offset-m1 offset-l2">
                       <i class="material-icons prefix">view_week</i>
-                      <input id="icon_prefix" type="text" name="groupname">
-                      <label for="icon_prefix">Server's Group Name</label>
+                      <input id="icon_prefix" type="text" name="groupname" autofocus>
+                      <label for="icon_prefix">Network-device's Group Name</label>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col s10 offset-s1">
-                      Ungroup Servers:
+                      Ungroup Network-devices:
                       <ul class="collection scroll">
                         @foreach($objs as $indexKey=>$obj)
                         <li class="collection-item">
@@ -486,12 +486,12 @@
                   <div class="input-field input-field2 col s8">
                     <i class="material-icons prefix" style="color:#00bfa5">view_week</i>
                     <input disabled id="icon_prefix" type="text" name="groupname" value="{{$group->groupname}}" style="color:#455a64">
-                    <label for="icon_prefix" style="color:#00bfa5">Server's Group Name</label>
+                    <label for="icon_prefix" style="color:#00bfa5">Network-device's Group Name</label>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col s10 offset-s1">
-                    Ungroup Servers:
+                    Ungroup Network-devices:
                     <ul class="collection scroll">
                       @foreach($objs as $indexKey=>$obj)
                       <li class="collection-item">
@@ -578,7 +578,7 @@
       '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
       '<div class="input-field input-field2">'+
       '<i class="material-icons prefix">perm_identity</i>'+
-      '<input id="icon_prefix" type="text" class="validate" name="login_username">'+
+      '<input id="icon_prefix" type="text" class="validate" name="login_username" autofocus>'+
       '<label for="icon_prefix" align="left">Username</label>'+
       '</div>'+
       '<div class="input-field input-field2">'+
@@ -618,7 +618,7 @@
       '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
       '<div class="input-field input-field2">'+
       '<i class="material-icons prefix">assignment_ind</i>'+
-      '<input id="icon_prefix" type="text" name="newuser_name" required>'+
+      '<input id="icon_prefix" type="text" name="newuser_name" required autofocus>'+
       '<label for="icon_prefix" align="left">Name</label>'+
       '</div>'+
       '<div class="input-field input-field2">'+
@@ -713,7 +713,7 @@
   function leftgroup(id){
     swal({
       title: 'Are you sure?',
-      text: "The server will be moved out from this group!",
+      text: "The network-device will be moved out from this group!",
       type: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#26a69a',
@@ -735,7 +735,7 @@
   function delgroup(id){
     swal({
       title: 'Are you sure?',
-      text: "The group will be deleted and all servers in this group will be moved out!",
+      text: "The group will be deleted and all network-devices in this group will be moved out!",
       type: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#26a69a',
@@ -757,7 +757,7 @@
   function delhost(id){
     swal({
       title: 'Are you sure?',
-      text: "The server will be deleted from the system!",
+      text: "The network-device will be deleted from the system!",
       type: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#26a69a',
@@ -868,7 +868,7 @@
       e.preventDefault();
       swal({
         title: 'Oops...',
-        text: "Please choose at least 1 server for joining the group !",
+        text: "Please choose at least 1 network-device for joining the group !",
         type: 'warning',
         confirmButtonColor: '#26a69a'
       })

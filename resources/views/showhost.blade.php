@@ -261,7 +261,7 @@
                     <!-- <div class="input-field col s2"></div> -->
                     <div class="input-field input-field2 col s10 m8 l8 offset-s1 offset-m2 offset-l2">
                       <i class="material-icons prefix">perm_contact_calendar</i>
-                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters.">
+                      <input id="icon_prefix" type="text" class="validate" name="servername" pattern="^[a-zA-Z0-9-@]{1,32}$" title="Servername should be 1 to 32 characters." autofocus>
                       <label for="icon_prefix">Server Name</label>
                     </div>
                   </div>
@@ -378,7 +378,7 @@
                   <div class="row">
                     <div class="input-field input-field2 col s10 m10 l8 offset-s1 offset-m1 offset-l2">
                       <i class="material-icons prefix">view_week</i>
-                      <input id="icon_prefix" type="text" name="groupname">
+                      <input id="icon_prefix" type="text" name="groupname" autofocus>
                       <label for="icon_prefix">Server's Group Name</label>
                     </div>
                   </div>
@@ -579,7 +579,7 @@
       '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
       '<div class="input-field input-field2">'+
       '<i class="material-icons prefix">perm_identity</i>'+
-      '<input id="icon_prefix" type="text" class="validate" name="login_username">'+
+      '<input id="icon_prefix" type="text" class="validate" name="login_username" autofocus>'+
       '<label for="icon_prefix" align="left">Username</label>'+
       '</div>'+
       '<div class="input-field input-field2">'+
@@ -619,7 +619,7 @@
       '<div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">'+
       '<div class="input-field input-field2">'+
       '<i class="material-icons prefix">assignment_ind</i>'+
-      '<input id="icon_prefix" type="text" name="newuser_name" required>'+
+      '<input id="icon_prefix" type="text" name="newuser_name" required autofocus>'+
       '<label for="icon_prefix" align="left">Name</label>'+
       '</div>'+
       '<div class="input-field input-field2">'+

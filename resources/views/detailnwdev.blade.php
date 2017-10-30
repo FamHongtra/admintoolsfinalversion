@@ -214,19 +214,24 @@
                 <div class="card-content white-text">
                   <span class="card-title"><h4>Cisco -
                     <?php
+
                     $GLOBALS['total'] = 0;
                     $user_id = session('user_id');
                     $imp_token = DB::table('users')->where('id', $user_id)->value('token');
                     SSH::into('ansible')->run(array(
                       "ansible -i /etc/ansible/users/$imp_token/nw-hosts -m raw -a 'show version' $obj->servername",
                     ), function($line){
-                      $afterserie = strpos($line,") processor");
-                      $bfserie = $afterserie - 30 ;
-                      $seriecon = substr($line,$bfserie);
-                      $bfserie2 = strpos($seriecon,"cisco");
-                      $afterserie2 = strpos($seriecon," processor");
-                      $serie = substr($seriecon,$bfserie2, ($afterserie2 - $bfserie2));
-                      echo $serie;
+                      if (strpos($line, 'SUCCESS') !== false) {
+                        $afterserie = strpos($line,") processor");
+                        $bfserie = $afterserie - 30 ;
+                        $seriecon = substr($line,$bfserie);
+                        $bfserie2 = strpos($seriecon,"cisco");
+                        $afterserie2 = strpos($seriecon," processor");
+                        $serie = substr($seriecon,$bfserie2, ($afterserie2 - $bfserie2));
+                        echo $serie;
+                      }else{
+                        echo "Undifined" ;
+                      }
                     }); ?>
                   </h4></span>
                 </div>
@@ -251,15 +256,19 @@
                     SSH::into('ansible')->run(array(
                       "ansible -i /etc/ansible/users/$imp_token/nw-hosts -m raw -a 'show version' $obj->servername",
                     ), function($line){
-                      $bfos = strpos($line,">>")+3;
-                      $afteros = strpos($line," Software");
-                      $os = substr($line,$bfos, ($afteros - $bfos));
-                      if($os == "Cisco Internetwork Operating System"){
-                        echo "<h4>";
-                        echo "IOS";
-                        echo "</h4>";
+                      if (strpos($line, 'SUCCESS') !== false) {
+                        $bfos = strpos($line,">>")+3;
+                        $afteros = strpos($line," Software");
+                        $os = substr($line,$bfos, ($afteros - $bfos));
+                        if($os == "Cisco Internetwork Operating System"){
+                          echo "<h4>";
+                          echo "IOS";
+                          echo "</h4>";
+                        }else{
+                          echo $os;
+                        }
                       }else{
-                        echo $os;
+                        echo "<h4>Undifined</h4>" ;
                       }
                     }); ?>
                   </div>
@@ -277,13 +286,17 @@
                     SSH::into('ansible')->run(array(
                       "ansible -i /etc/ansible/users/$imp_token/nw-hosts -m raw -a 'show version' $obj->servername",
                     ), function($line){
-                      $bfversion = strpos($line,"Version");
-                      $versioncon = substr($line,$bfversion);
-                      $afterversion = strpos($versioncon,",");
-                      $version = substr($versioncon,0,$afterversion);
-                      echo "<h4>";
-                      echo $version;
-                      echo "</h4>";
+                      if (strpos($line, 'SUCCESS') !== false) {
+                        $bfversion = strpos($line,"Version");
+                        $versioncon = substr($line,$bfversion);
+                        $afterversion = strpos($versioncon,",");
+                        $version = substr($versioncon,0,$afterversion);
+                        echo "<h4>";
+                        echo $version;
+                        echo "</h4>";
+                      }else{
+                        echo "<h4>Undifined</h4>" ;
+                      }
                     }); ?>
                   </div>
                 </div>
@@ -323,12 +336,11 @@
                       <th style="width:36%">Configuration Name</th>
                       <th style="width:35%">Path</th>
                       <th style="width:25%">Actions</th> -->
-                      <th style="width:4%">No.</th>
+                      <th style="width:5%">No.</th>
                       <th style="width:40%">Version Title</th>
                       <th style="width:5%"></th>
-                      <th style="width:14%">Edited by</th>
-                      <th style="width:17%">Edited at</th>
-                      <th style="width:10%">Version ID</th>
+                      <th style="width:20%">Edited by</th>
+                      <th style="width:20%">Edited at</th>
                       <th style="width:10%">Actions</th>
                     </tr>
                   </thead>
@@ -342,7 +354,6 @@
                       <td></td>
                       <td>{{$version->author_name}}</td>
                       <td>{{substr($version->committed_date,0,10)." ".substr($version->committed_date,11,5)}}</td>
-                      <td>{{$version->short_id}}</td>
                       <td><a class="modal-trigger waves-effect waves-light btn" href="#modal{{$indexKey+1}}">View</a></td>
                     </tr>
                   </tbody>
@@ -363,6 +374,8 @@
                         $proj_id = $configprojid ;
 
 
+
+
                         SSH::into('gitlab')->run(array(
 
                         "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/config/raw?ref=$version->id'",
@@ -375,22 +388,10 @@
                         <br><br><br><br>
                       </div>
                       <div class="modal-footer">
-                        <a onClick="revisionSubmit({{$indexKey+1}})" class="modal-action modal-close waves-effect waves-green btn teal" style="margin-right:10px"><i class="material-icons left">rotate_left</i>Revision</a>
+                        <a id="modalclose" href="#!" class="modal-action modal-close waves-effect btn grey" style="margin-right:10px">Close</a>
                       </div>
                     </div>
                   </div>
-
-
-                  <form id="versform{{$indexKey+1}}" action="{{url('revision')}}" method="post">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="configid" value="{{ $configid }}">
-                    <input type="hidden" name="configrepo" value="{{ $configrepo }}">
-                    <input type="hidden" name="configkeygen" value="{{ $configkeygen }}">
-                    <input type="hidden" name="revisionid" value="{{ $version->short_id }}">
-                    <input type="hidden" name="serverid" value="{{$obj->id}}">
-                    <input type="hidden" name="servername" value="{{$obj->servername}}">
-                    <input type="hidden" name="configpath" value="{{$configpath}}">
-                  </form>
                   @endforeach
                   @endif
                 </table>
@@ -519,6 +520,8 @@ function loading(){
   });
 }
 
+$('#modalclose').modal('close');
+
 function backupnwdev(){
 
   swal({
@@ -543,16 +546,16 @@ function backupnwdev(){
     showCancelButton: true,
   }).then(function () {
 
-      $("#backupnwdevform").submit();
-      swal({
-        imageUrl: '../img/load.gif',
-        imageWidth: 120,
-        showCancelButton: false,
-        showConfirmButton: false,
-        animation: false,
-        allowOutsideClick: false,
-        confirmButtonColor: '#26a69a',
-      });
+    $("#backupnwdevform").submit();
+    swal({
+      imageUrl: '../img/load.gif',
+      imageWidth: 120,
+      showCancelButton: false,
+      showConfirmButton: false,
+      animation: false,
+      allowOutsideClick: false,
+      confirmButtonColor: '#26a69a',
+    });
 
   });
 }
