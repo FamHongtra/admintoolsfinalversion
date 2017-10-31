@@ -207,7 +207,6 @@ class ConfigController extends Controller
             $request->session()->flash('text', 'You don\'t have permission to access this file.');
             $request->session()->flash('icon', 'error');
 
-
             return Redirect::back();
           }
         });
@@ -227,47 +226,6 @@ class ConfigController extends Controller
 
         //check repo exist (same host and config path)
 
-        //In Progress....
-        
-        $repo_exist = DB::table('controls')
-        ->join('configs','controls.id', '=', 'configs.control_id')
-        ->join('hosts','hosts.id', '=', 'controls.host_id')
-        ->where('configs.configpath', $GLOBALS['pathconf'])
-        ->where('hosts.host', $host->host)
-        ->where('controls.id', '<>', $control->id)
-        ->get();
-        return count($repo_exist);
-
-        //In Progress....
-
-        $user_id = session('user_id');
-        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
-
-
-        $proj_name = str_random(20);
-
-        SSH::into('gitlab')->run(array(
-
-          "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
-
-        ), function($line){
-
-          $GLOBALS['jsonArray'] = json_decode($line);
-          //
-          // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
-
-        });
-
-        $obj = new Config();
-        $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
-        $obj->configname = $GLOBALS['pathname'];
-        $obj->configpath = $GLOBALS['pathconf'];
-        $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
-        $obj->keygen = $GLOBALS['jsonArray']->name;
-        $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
-        $obj->control_id = $GLOBALS['controlid'];
-        $obj->save();
-
 
         SSH::into('ansible')->run(array(
           //Remove text last line.
@@ -276,87 +234,243 @@ class ConfigController extends Controller
           // echo $line2;
         });
 
-        $configlatest = DB::table('configs')->orderBy('id','desc')->first();
-        $configkeygen = $configlatest->keygen ;
-        $configrepo = $configlatest->repository ;
-        $configpath = $configlatest->configpath ; //Add this.
-        $configname = $configlatest->configname ; //Add this.
+        //In Progress....
 
-        $username = $GLOBALS['user']->username;
-        $useremail = $GLOBALS['user']->email;
+        $repo_exist = DB::table('controls')
+        ->join('configs','controls.id', '=', 'configs.control_id')
+        ->join('hosts','hosts.id', '=', 'controls.host_id')
+        ->where('configs.configpath', $GLOBALS['pathconf'])
+        ->where('hosts.host', $host->host)
+        ->where('controls.id', '<>', $control->id)
+        ->get();
 
-        //for vimad editor
-        SSH::into('ansible')->run(array(
-          //To Adding
-          "ansible-playbook /etc/ansible/Vimadform.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'mkdir -p ~/vim/tmp_repo/$configkeygen'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git init ~/vim/tmp_repo/$configkeygen'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
-        ));
+        // return count($repo_exist);
 
-        $dollar = '$filepath' ;
-        $dollar = preg_quote($dollar, '/');
-
-        $choice = '$choice' ;
-        $choice = preg_quote($choice, '/');
-
-        $yourmsg = '$msg';
-        $yourmsg = preg_quote($yourmsg, '/');
-
-        $pleasewait = '\"Please wait...\"' ;
+        //In Progress....
+        $user_id = session('user_id');
+        $imp_token = DB::table('users')->where('id', $user_id)->value('token');
 
 
-        $GLOBALS['configs'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->get();
-        $GLOBALS['configscount'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->count();
+        if(count($repo_exist)==0){
 
-        $inloop = "";
+          $proj_name = str_random(20);
 
-        foreach ($GLOBALS['configs'] as $key => $config) {
-          $key = $key+1;
-          $cfp = '\"'.$config->configpath.'\"';
-          $conf =substr($config->configpath, strrpos($config->configpath, '/') + 1);
-          $path =substr( $config->configpath, 0, strrpos( $config->configpath, '/' ) + 1);
+          SSH::into('gitlab')->run(array(
 
-          $cpfile = 'cp '.$config->configpath.' ~/vim/tmp_repo/'.$config->keygen;
+            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
 
-          $gitadd = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' add . &> /dev/null';
-          $edited = $config->configname.' was edited by '.$hostusr.' at ';
-          $datemsg = '%%Y-%%m-%%d';
-          $timemsg = '%%H:%%M:%%S';
+          ), function($line){
 
-          $first_prompt = 'read -p \"Do you want to enter commit message for your change? (y/n): \" choice';
-          $second_prompt = 'read -p \"Enter the commit message: \" msg';
+            $GLOBALS['jsonArray'] = json_decode($line);
+            //
+            // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
 
-          $gitcommitmsg = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m '.$yourmsg.' &> /dev/null';
-          // $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
-          $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"Untitled.\" &> /dev/null';
-          $gitpush = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
-          $done = 'echo \"Done! Your Configuration file was saved.\"';
-          if($key!=$GLOBALS['configscount']){
-            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nel';
-          }else{
-            $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nfi';
+          });
+
+          $obj = new Config();
+          $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
+          $obj->configname = $GLOBALS['pathname'];
+          $obj->configpath = $GLOBALS['pathconf'];
+          // $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->repository = "52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->keygen = $GLOBALS['jsonArray']->name;
+          $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+          $obj->control_id = $GLOBALS['controlid'];
+          $obj->save();
+
+          $username = $GLOBALS['user']->username;
+          $useremail = $GLOBALS['user']->email;
+
+
+          $configlatest = DB::table('configs')->orderBy('id','desc')->first();
+          $configkeygen = $configlatest->keygen ;
+          $configrepo = $configlatest->repository ;
+          $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+          $configpath = $configlatest->configpath ; //Add this.
+          $configname = $configlatest->configname ; //Add this.
+
+
+          //for vimad editor
+          SSH::into('ansible')->run(array(
+            //To Adding
+            "ansible-playbook /etc/ansible/Vimadform.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'mkdir -p ~/vim/tmp_repo/$configkeygen'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git init ~/vim/tmp_repo/$configkeygen'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+          ));
+
+          $dollar = '$filepath' ;
+          $dollar = preg_quote($dollar, '/');
+
+          $choice = '$choice' ;
+          $choice = preg_quote($choice, '/');
+
+          $yourmsg = '$msg';
+          $yourmsg = preg_quote($yourmsg, '/');
+
+          $pleasewait = '\"Please wait...\"' ;
+
+
+          $GLOBALS['configs'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->get();
+          $GLOBALS['configscount'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->count();
+
+          $inloop = "";
+
+          foreach ($GLOBALS['configs'] as $key => $config) {
+            $key = $key+1;
+            $cfp = '\"'.$config->configpath.'\"';
+            $conf =substr($config->configpath, strrpos($config->configpath, '/') + 1);
+            $path =substr( $config->configpath, 0, strrpos( $config->configpath, '/' ) + 1);
+
+            $cpfile = 'cp '.$config->configpath.' ~/vim/tmp_repo/'.$config->keygen;
+
+            $gitadd = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' add . &> /dev/null';
+            $edited = $config->configname.' was edited by '.$hostusr.' at ';
+            $datemsg = '%%Y-%%m-%%d';
+            $timemsg = '%%H:%%M:%%S';
+
+            $first_prompt = 'read -p \"Do you want to enter commit message for your change? (y/n): \" choice';
+            $second_prompt = 'read -p \"Enter the commit message: \" msg';
+
+            $gitcommitmsg = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m '.$yourmsg.' &> /dev/null';
+            // $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
+            $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"Untitled.\" &> /dev/null';
+            $gitpush = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
+            $done = 'echo \"Done! Your Configuration file was saved.\"';
+            if($key!=$GLOBALS['configscount']){
+              $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nel';
+            }else{
+              $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nfi';
+            }
           }
+          SSH::into('ansible')->run(array(
+
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
+          ));
+
+          $request->session()->flash('status', 'true');
+          $request->session()->flash('title', 'Successful!');
+          $request->session()->flash('text', 'The configuration file was saved to the system.');
+          $request->session()->flash('icon', 'success');
+
+
+          return Redirect::back();
+        }else{
+          //มี repo อยู่แล้ว
+          $repo_old = $repo_exist[0]->repository;
+          $keygen_old = $repo_exist[0]->keygen;
+
+          $gitprojid_old = $repo_exist[0]->gitlab_projid;
+
+          $owner_userid = DB::table('controls')->where('id', $repo_exist[0]->control_id)->value('user_id');
+          $owner_token = DB::table('users')->where('id', $owner_userid)->value('token');
+
+          $gituserid = DB::table('users')->where('id', $user_id)->value('gitlab_userid');
+
+          SSH::into('ansible')->run(array(
+            "curl --request POST --header 'PRIVATE-TOKEN: $owner_token' --data 'user_id=$gituserid&access_level=40' http://52.221.75.98/api/v4/projects/$gitprojid_old/members",
+          ));
+
+          $obj = new Config();
+          $password_decrypted = Crypt::decryptString($GLOBALS['user']->password);
+          $obj->configname = $GLOBALS['pathname'];
+          $obj->configpath = $GLOBALS['pathconf'];
+          // $obj->repository = "http://".$GLOBALS['user']->username.":".$password_decrypted."@52.221.75.98/".$GLOBALS['user']->username."/".$GLOBALS['jsonArray']->path.".git";
+          $obj->repository = $repo_old;
+          $obj->keygen = $keygen_old;
+          $obj->gitlab_projid = $gitprojid_old;
+          $obj->control_id = $GLOBALS['controlid'];
+          $obj->save();
+
+          $username = $GLOBALS['user']->username;
+          $useremail = $GLOBALS['user']->email;
+
+          $configlatest = DB::table('configs')->orderBy('id','desc')->first();
+          $configkeygen = $configlatest->keygen ;
+          $configrepo = $configlatest->repository ;
+          $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+          $configpath = $configlatest->configpath ; //Add this.
+          $configname = $configlatest->configname ; //Add this.
+
+          //for vimad editor
+          SSH::into('ansible')->run(array(
+            //To Adding
+            "ansible-playbook /etc/ansible/Vimadform.yml -i /etc/ansible/users/$imp_token/hosts -e 'host=$servername'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'mkdir -p ~/vim/tmp_repo/$configkeygen'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git clone $configrepo /home/$hostusr/vim/tmp_repo/$configkeygen/'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ push -u backupversion master &> /dev/null'",//Add this.
+          ));
+
+
+          $dollar = '$filepath' ;
+          $dollar = preg_quote($dollar, '/');
+
+          $choice = '$choice' ;
+          $choice = preg_quote($choice, '/');
+
+          $yourmsg = '$msg';
+          $yourmsg = preg_quote($yourmsg, '/');
+
+          $pleasewait = '\"Please wait...\"' ;
+
+
+          $GLOBALS['configs'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->get();
+          $GLOBALS['configscount'] = DB::table('configs')->where('control_id', $GLOBALS['controlid'])->count();
+
+          $inloop = "";
+
+          foreach ($GLOBALS['configs'] as $key => $config) {
+            $key = $key+1;
+            $cfp = '\"'.$config->configpath.'\"';
+            $conf =substr($config->configpath, strrpos($config->configpath, '/') + 1);
+            $path =substr( $config->configpath, 0, strrpos( $config->configpath, '/' ) + 1);
+
+            $cpfile = 'cp '.$config->configpath.' ~/vim/tmp_repo/'.$config->keygen;
+
+            $gitadd = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' add . &> /dev/null';
+            $edited = $config->configname.' was edited by '.$hostusr.' at ';
+            $datemsg = '%%Y-%%m-%%d';
+            $timemsg = '%%H:%%M:%%S';
+
+            $first_prompt = 'read -p \"Do you want to enter commit message for your change? (y/n): \" choice';
+            $second_prompt = 'read -p \"Enter the commit message: \" msg';
+
+            $gitcommitmsg = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m '.$yourmsg.' &> /dev/null';
+            // $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"'.$edited.'\$(date +'.$datemsg.'\" \"'.$timemsg.')\" &> /dev/null';
+            $gitcommit = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' commit -m \"Untitled.\" &> /dev/null';
+            $gitpush = 'git --git-dir=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.'/.git --work-tree=/home/'.$hostusr.'/vim/tmp_repo/'.$config->keygen.' push -u backupversion master &> /dev/null';
+            $done = 'echo \"Done! Your Configuration file was saved.\"';
+            if($key!=$GLOBALS['configscount']){
+              $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nel';
+            }else{
+              $inloop = $inloop.'if [[ '.$dollar.' == '.$cfp.' ]]\\nthen\\n\\t'.$cpfile.'\\n\\t'.$gitadd.'\\n\\t'.$first_prompt.'\\n\\t'.'if [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\tthen\\n\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\tthen\\n\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\tdo\\n\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\tdone\\n\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\telse\\n\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t'.$gitpush.'\\n\\t\\tfi\\n\\telse\\n\\t\\twhile [[ '.$choice.' != \"y\" || '.$choice.' != \"n\" ]];\\n\\t\\tdo\\n\\t\\t\\t'.$first_prompt.'\\n\\t\\t\\tif [[ '.$choice.' == \"y\" || '.$choice.' == \"n\" ]];\\n\\t\\t\\tthen\\n\\t\\t\\t\\tif [[ '.$choice.' == \"y\" ]];\\n\\t\\t\\t\\tthen\\n\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\twhile [[ -z '.$yourmsg.' ]];\\n\\t\\t\\t\\t\\tdo\\n\\t\\t\\t\\t\\t\\t'.$second_prompt.'\\n\\t\\t\\t\\t\\tdone\\n\\t\\t\\t\\t\\t'.$gitcommitmsg.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t'.$gitcommit.'\\n\\t\\t\\t\\t\\techo '.$pleasewait.'\\n\\t\\t\\t\\t\\t'.$gitpush.'\\n\\t\\t\\t\\tfi\\n\\t\\t\\t\\tbreak\\n\\t\\t\\tfi\\n\\t\\tdone\\n\\tfi\\n\\t'.$done.'\\nfi';
+            }
+          }
+          SSH::into('ansible')->run(array(
+
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
+          ));
+
+          $request->session()->flash('status', 'true');
+          $request->session()->flash('title', 'Successful!');
+          $request->session()->flash('text', 'The configuration file was saved to the system.');
+          $request->session()->flash('icon', 'success');
+
+
+          return Redirect::back();
         }
-        SSH::into('ansible')->run(array(
-
-          "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'printf \"$inloop\" >> ~/vim/scripts/vimad.sh'",
-        ));
-
-        $request->session()->flash('status', 'true');
-        $request->session()->flash('title', 'Successful!');
-        $request->session()->flash('text', 'The configuration file was saved to the system.');
-        $request->session()->flash('icon', 'success');
-
-
-        return Redirect::back();
-
       }
     }
   }
@@ -447,10 +561,15 @@ class ConfigController extends Controller
     $configid = $request->input('configid');
 
     $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
+    $user_id = session('user_id');
 
     $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
+    $username = DB::table('users')->where('id', $user_id)->value('username');
+    $password = DB::table('users')->where('id', $user_id)->value('password');
 
+    $password_decrypted = Crypt::decryptString($password);
     $configrepo = $request->input('configrepo');
+    $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
     $configkeygen = $request->input('configkeygen');
     $revisionid = $request->input('revisionid');
     $serverid = $request->input('serverid');
@@ -574,6 +693,10 @@ class ConfigController extends Controller
   public function savecommit(Request $request)
   {
     $user_id = session('user_id');
+    $username = DB::table('users')->where('id', $user_id)->value('username');
+    $password = DB::table('users')->where('id', $user_id)->value('password');
+
+    $password_decrypted = Crypt::decryptString($password);
     $imp_token = DB::table('users')->where('id', $user_id)->value('token');
     // $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
@@ -615,6 +738,8 @@ class ConfigController extends Controller
 
     $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
     $configrepo = DB::table('configs')->where('id', $configid)->value('repository');
+
+    $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
     $proj_id = DB::table('configs')->where('id', $configid)->value('gitlab_projid');
     $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
     $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
