@@ -243,7 +243,7 @@ class HostController extends Controller
 
         SSH::into('gitlab')->run(array(
 
-          "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
+          "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' https://52.221.75.98/api/v4/projects",
 
         ), function($line){
 
@@ -313,7 +313,7 @@ class HostController extends Controller
         $password_decrypted = Crypt::decryptString($password_encrypted);
         $obj->configname = "The configuration of ".$servername;
         $obj->configpath = "/etc/ansible/users/".$imp_token."/nw-configs"."/".$GLOBALS['jsonArray']->name."/config";
-        $repository = "http://".$username.":".$userpassword."@52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git";
+        $repository = "https://".$username.":".$userpassword."@52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git";
         // $encrypt_repository = Crypt::encryptString($repository);
         $obj->repository = "52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git" ;
         $obj->keygen = $GLOBALS['jsonArray']->name;
@@ -327,6 +327,7 @@ class HostController extends Controller
           "git init /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
+          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config http.sslVerify false'",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"The configuration of $servername was initialized.\" &> /dev/null", //Add this.
@@ -360,7 +361,7 @@ class HostController extends Controller
   * Display the specified resource.
   *
   * @param  int  $id
-  * @return \Illuminate\Http\Response
+  * @return \Illuminate\\Response
   */
   public function show($id)
   {
@@ -394,7 +395,7 @@ class HostController extends Controller
 
       SSH::into('gitlab')->run(array(
 
-        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
+        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' https://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
 
       ), function($line){
         // echo $line;

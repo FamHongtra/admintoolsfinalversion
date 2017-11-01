@@ -290,6 +290,8 @@ class ConfigController extends Controller
           $configname = $configlatest->configname ; //Add this.
 
 
+
+
           //for vimad editor
           SSH::into('ansible')->run(array(
             //To Adding
@@ -299,6 +301,7 @@ class ConfigController extends Controller
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config http.sslVerify false'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
@@ -407,6 +410,7 @@ class ConfigController extends Controller
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.name \"$username\"'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config user.email \"$useremail\"'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ remote add backupversion \"$configrepo\"'",
+            "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ config http.sslVerify false'",
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'cp $configpath ~/vim/tmp_repo/$configkeygen'",//Add this.
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ add . &> /dev/null'",//Add this.
             "ansible -i /etc/ansible/users/$imp_token/hosts $servername -m shell -a 'git --git-dir=/home/$hostusr/vim/tmp_repo/$configkeygen/.git --work-tree=/home/$hostusr/vim/tmp_repo/$configkeygen/ commit -m \"$configname was initialized.\" &> /dev/null'", //Add this.
