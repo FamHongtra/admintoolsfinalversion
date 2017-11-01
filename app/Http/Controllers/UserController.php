@@ -222,7 +222,7 @@ class UserController extends Controller
 
       //Gitlab API Create User
       SSH::into('gitlab')->run(array(
-        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'username=$username' --data 'password=$new_password' --data 'name=$username' --data 'email=$email' --data 'skip_confirmation=true' http://52.221.75.98/api/v4/users",
+        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'username=$username' --data 'password=$new_password' --data 'name=$username' --data 'email=$email' --data 'skip_confirmation=true' https://52.221.75.98/api/v4/users",
       ), function($line){
         $jsonArray = json_decode($line);
         $GLOBALS['gitlab_userid'] = $jsonArray->id;
@@ -232,7 +232,7 @@ class UserController extends Controller
       $gitlab_userid = $GLOBALS['gitlab_userid'];
 
       SSH::into('gitlab')->run(array(
-        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'name=$token_name' --data 'expires_at=2018-01-01' --data 'scopes[]=api' http://52.221.75.98/api/v4/users/$gitlab_userid/impersonation_tokens",
+        "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: jbVyzyHKVahx8WHz2d59' --data 'name=$token_name' --data 'expires_at=2018-01-01' --data 'scopes[]=api' https://52.221.75.98/api/v4/users/$gitlab_userid/impersonation_tokens",
       ), function($line){
         $jsonArray = json_decode($line);
         $GLOBALS['gitab_token'] = $jsonArray->token;

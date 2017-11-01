@@ -257,7 +257,7 @@ class ConfigController extends Controller
 
           SSH::into('gitlab')->run(array(
 
-            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' http://52.221.75.98/api/v4/projects",
+            "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' https://52.221.75.98/api/v4/projects",
 
           ), function($line){
 
@@ -285,7 +285,7 @@ class ConfigController extends Controller
           $configlatest = DB::table('configs')->orderBy('id','desc')->first();
           $configkeygen = $configlatest->keygen ;
           $configrepo = $configlatest->repository ;
-          $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+          $configrepo = "https://".$username.":".$password_decrypted."@".$configrepo ;
           $configpath = $configlatest->configpath ; //Add this.
           $configname = $configlatest->configname ; //Add this.
 
@@ -374,7 +374,7 @@ class ConfigController extends Controller
           $gituserid = DB::table('users')->where('id', $user_id)->value('gitlab_userid');
 
           SSH::into('ansible')->run(array(
-            "curl --request POST --header 'PRIVATE-TOKEN: $owner_token' --data 'user_id=$gituserid&access_level=40' http://52.221.75.98/api/v4/projects/$gitprojid_old/members",
+            "curl --request POST --header 'PRIVATE-TOKEN: $owner_token' --data 'user_id=$gituserid&access_level=40' https://52.221.75.98/api/v4/projects/$gitprojid_old/members",
           ));
 
           $obj = new Config();
@@ -394,7 +394,7 @@ class ConfigController extends Controller
           $configlatest = DB::table('configs')->orderBy('id','desc')->first();
           $configkeygen = $configlatest->keygen ;
           $configrepo = $configlatest->repository ;
-          $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+          $configrepo = "https://".$username.":".$password_decrypted."@".$configrepo ;
           $configpath = $configlatest->configpath ; //Add this.
           $configname = $configlatest->configname ; //Add this.
 
@@ -502,7 +502,7 @@ class ConfigController extends Controller
 
       SSH::into('gitlab')->run(array(
 
-        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' http://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
+        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' https://52.221.75.98/api/v4/projects/$proj_id/repository/commits",
 
       ), function($line){
         // echo $line;
@@ -569,7 +569,7 @@ class ConfigController extends Controller
 
     $password_decrypted = Crypt::decryptString($password);
     $configrepo = $request->input('configrepo');
-    $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+    $configrepo = "https://".$username.":".$password_decrypted."@".$configrepo ;
     $configkeygen = $request->input('configkeygen');
     $revisionid = $request->input('revisionid');
     $serverid = $request->input('serverid');
@@ -739,14 +739,14 @@ class ConfigController extends Controller
     $configkeygen = DB::table('configs')->where('id', $configid)->value('keygen');
     $configrepo = DB::table('configs')->where('id', $configid)->value('repository');
 
-    $configrepo = "http://".$username.":".$password_decrypted."@".$configrepo ;
+    $configrepo = "https://".$username.":".$password_decrypted."@".$configrepo ;
     $proj_id = DB::table('configs')->where('id', $configid)->value('gitlab_projid');
     $control_id = DB::table('configs')->where('id', $configid)->value('control_id');
     $hostusr = DB::table('controls')->where('id', $control_id)->value('username_ssh');
     $host_id =  DB::table('controls')->where('id', $control_id)->value('host_id');
     $servername = DB::table('hosts')->where('id', $host_id)->value('servername');
     SSH::into('gitlab')->run(array(
-      "curl --request PUT --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$configname?branch=master&content=$edittext&commit_message=$commitmsg'",
+      "curl --request PUT --header 'PRIVATE-TOKEN: $imp_token' 'https://52.221.75.98//api/v4/projects/$proj_id/repository/files/$configname?branch=master&content=$edittext&commit_message=$commitmsg'",
     ), function($line){
       // echo $line;
     });

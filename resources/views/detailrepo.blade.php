@@ -310,7 +310,7 @@
 
                         SSH::into('gitlab')->run(array(
 
-                        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
+                        "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'https://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=$version->id'",
 
                         ), function($line){
                           echo nl2br($line);
@@ -369,7 +369,7 @@
 
                           SSH::into('gitlab')->run(array(
 
-                          "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'http://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=master'",
+                          "sudo curl --silent --request GET --header 'PRIVATE-TOKEN: $imp_token' 'https://52.221.75.98//api/v4/projects/$proj_id/repository/files/$out/raw?ref=master'",
 
                           ), function($line){
                             echo $line;
