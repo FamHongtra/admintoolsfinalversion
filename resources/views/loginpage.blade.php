@@ -27,6 +27,17 @@
 
   <!-- Styles -->
   <style>
+
+  .footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #00695c;
+    color: white;
+    text-align: center;
+  }
+
   html, body {
 
     /* Center and scale the image nicely */
@@ -134,13 +145,13 @@
 
     <div class="row full-height" style="align-items: center;display: flex; background-color: rgb(0, 0, 0);background-color: rgba(0, 0, 0, 0.3);">
       <div class="col s8 m8 l4 offset-s2 offset-m2 offset-l4 shadow-box" style="background-color:white;">
-        <form action="{{url("userlogin")}}" id="userloginform" method="post" enctype="multipart/form-data" style="padding:50px">
+        <form action="{{url("userlogin")}}" id="userloginform" method="post" enctype="multipart/form-data" style="padding:30px">
           <div class="row" align="center">
-            <img src="img/logoicon.png" height="220px"/>
+            <img src="img/logoicon.png" height="210px"/>
           </div><br>
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <div class="row">
-            <div class="col s12 m8 l8 offset-m2 offset-l2">
+            <div class="col s12 m6 l6 offset-m3 offset-l3">
               <div class="input-field input-field2">
                 <i class="material-icons prefix">perm_identity</i>
                 <input id="icon_prefix" type="text" name="userlogin_username" autofocus>
@@ -152,11 +163,11 @@
                 <label for="icon_prefix" align="left">Password</label>
               </div><br>
               <div class="input-field">
-                <button class="btn-large waves-effect waves-light" type="button" name="action" onclick="loginSubmit()" style="position: relative;width: 100%;">Login
+                <button id="btnsubmit" class="btn-large waves-effect waves-light" type="button" name="action" onclick="loginSubmit()" style="position: relative;width: 100%;">Login
                 </button>
               </div>
               @php
-                $count_user = DB::table('users')->count();
+              $count_user = DB::table('users')->count();
               @endphp
 
               @if($count_user==0)
@@ -172,6 +183,13 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
     <script type="text/javascript">
+
+    document.onkeydown=function(){
+        if(window.event.keyCode=='13'){
+            loginSubmit();
+        }
+    }
+
     @if (Session::has('status'))
 
     @if (Session::get('status') == "change password")
@@ -343,5 +361,10 @@
       });
     }
     </script>
+    <div class="footer z-depth-5">
+      <!-- <p>Administrator assistant tools is a senior project of our team.</p> -->
+      <p >© 2014 Copyright 2017 School of Information Technology, King Mongkut's University of Technology Thonburi.</p>
+    </div>
   </body>
+
   </html>
