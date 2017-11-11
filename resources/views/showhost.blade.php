@@ -153,7 +153,11 @@
       <ul id="dropdown1" class="dropdown-content">
         <!-- <li><a href="#!">Account Settings</a></li> -->
         <!-- <admin area -->
-        @if (session('user_id')==1)
+        @php
+          $first = DB::table('users')->first();
+          $first_userid = $first->id;
+        @endphp
+        @if (session('user_id')==$first_userid)
         <li><a href="#!" onclick="createUser()">User Creation</a></li>
         @endif
         <!-- admin area/> -->

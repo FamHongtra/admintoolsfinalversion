@@ -141,13 +141,13 @@
       <ul id="dropdown1" class="dropdown-content">
         <!-- <li><a href="#!">Account Settings</a></li> -->
         <!-- <admin area -->
-        @php
+        <!-- @php
           $first = DB::table('users')->first();
           $first_userid = $first->id;
         @endphp
         @if (session('user_id')==$first_userid)
         <li><a href="#!" onclick="createUser()">User Creation</a></li>
-        @endif
+        @endif -->
         <!-- admin area/> -->
         <li class="divider"></li>
         <li><a href="{{url('userlogout')}}"  onclick="return loading();" >Logout</a></li>
