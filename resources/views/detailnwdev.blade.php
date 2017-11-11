@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Admintools</title>
+  <link rel="shortcut icon" href="../img/adminicon.png" />
   <!--Import Google Icon Font-->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!--Import materialize.css-->
@@ -146,9 +148,13 @@
 
     <div class="navbar-fixed">
       <ul id="dropdown1" class="dropdown-content">
-        <li><a href="#!">Account Settings</a></li>
+        <!-- <li><a href="#!">Account Settings</a></li> -->
         <!-- <admin area -->
-        @if (session('user_id')==1)
+        @php
+          $first = DB::table('users')->first();
+          $first_userid = $first->id;
+        @endphp
+        @if (session('user_id')==$first_userid)
         <li><a href="#!" onclick="createUser()">User Creation</a></li>
         @endif
         <!-- admin area/> -->
