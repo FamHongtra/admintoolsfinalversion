@@ -278,6 +278,7 @@ class HostController extends Controller
             "echo '$line' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
             "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
             "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+            "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
             "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
             "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
             "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
@@ -323,11 +324,12 @@ class HostController extends Controller
 
         //Push first version of network-device configuration to gitlab repository
 
+
         SSH::into('ansible')->run(array(
           "git init /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false'",
+          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
           "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"The configuration of $servername was initialized.\" &> /dev/null", //Add this.
