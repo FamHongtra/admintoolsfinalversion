@@ -36,6 +36,7 @@
     background-color: #00695c;
     color: white;
     text-align: center;
+    opacity: 0.75;
   }
 
   html, body {
@@ -361,9 +362,9 @@
       });
     }
     </script>
-    <div class="footer z-depth-5">
+    <div class="footer">
       <!-- <p>Administrator assistant tools is a senior project of our team.</p> -->
-      <p >© 2014 Copyright 2017 School of Information Technology, King Mongkut's University of Technology Thonburi.</p>
+      <p >School of Information Technology, King Mongkut's University of Technology Thonburi.</p>
     </div>
   </body>
 
