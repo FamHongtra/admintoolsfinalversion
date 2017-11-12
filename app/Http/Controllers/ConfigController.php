@@ -214,17 +214,10 @@ class ConfigController extends Controller
             // $user_id = 29;
             // $imp_token = "1xfYQD8Km8LsfWaYVP_d";
 
-          }else{
-            //Permission denied
-            // echo "Permission denied.";
-            $request->session()->flash('status', 'true');
-            $request->session()->flash('title', 'Failed!');
-            $request->session()->flash('text', 'You don\'t have permission to access this file.');
-            $request->session()->flash('icon', 'error');
-
-            return Redirect::back();
           }
         });
+
+
       }else{
 
         $request->session()->flash('status', 'true');
@@ -490,6 +483,16 @@ class ConfigController extends Controller
 
           return Redirect::back();
         }
+      }else{
+        //Permission denied
+        // echo "Permission denied.";
+        $request->session()->flash('status', 'true');
+        $request->session()->flash('title', 'Failed!');
+        $request->session()->flash('text', 'You don\'t have permission to access this file.');
+        $request->session()->flash('icon', 'error');
+
+        return Redirect::back();
+        
       }
     }
   }
