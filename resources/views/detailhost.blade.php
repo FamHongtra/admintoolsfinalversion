@@ -539,7 +539,7 @@ function chkconfigname(){
     var pathconf = $('#hostform').find('input[name="pathconf"]').val();
 
     var regex_pathname = /^([a-zA-Z0-9 ]{1,})$/.test(pathname);
-    var regex_pathconf = /^([a-zA-Z0-9!@#$&()\\-`.+,/\"]{1,})$/.test(pathconf);
+    var regex_pathconf = /^([a-zA-Z0-9\-\\./]{1,})$/.test(pathconf);
 
     if(regex_pathname && regex_pathconf){
 
