@@ -56,7 +56,11 @@ class ConfigController extends Controller
 
 
     $user = DB::table('users')->where('id', session('user_id'))->first();
+    $username = $user->username ;
+    $password_encrypted = $user->password ;
+    $useremail = $user->email ;
     $config = DB::table('configs')->where('control_id', $control_id)->first();
+    $repo = $config->repository;
 
     $host_id = DB::table('controls')->where('id', $control_id)->value('host_id');
     $host = DB::table('hosts')->where('id', $host_id)->first();
@@ -65,6 +69,12 @@ class ConfigController extends Controller
     $mknwdir = $config->keygen;
     $GLOBALS['mknwdir'] = $mknwdir;
     $servername = $host->servername;
+
+
+    $password_decrypted = Crypt::decryptString($password_encrypted);
+    $repository = "https://".$username.":".$password_decrypted."@".$repo;
+
+    // return $repository ;
 
 
     //Cisco Command
@@ -81,6 +91,8 @@ class ConfigController extends Controller
     // echo $lineoutput;
 
     SSH::into('ansible')->run(array(
+      "rm -rf /etc/ansible/users/$imp_token/nw-configs/$mknwdir/",
+      "git clone $repository /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
       "rm -f /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config*",
       "echo '$lineoutput' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
       "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
@@ -92,8 +104,11 @@ class ConfigController extends Controller
       "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
     ));
 
-
     SSH::into('ansible')->run(array(
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false",
+      "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
       "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
       "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"$msgcommit\" &> /dev/null", //Add this.
       "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ push -u backupversion master",//Add this.

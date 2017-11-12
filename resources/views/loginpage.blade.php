@@ -185,11 +185,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
     <script type="text/javascript">
 
-    document.onkeydown=function(){
-        if(window.event.keyCode=='13'){
-            loginSubmit();
-        }
-    }
+    // document.onkeydown=function(){
+    //     if(window.event.keyCode=='13'){
+    //         loginSubmit();
+    //     }
+    // }
 
     @if (Session::has('status'))
 

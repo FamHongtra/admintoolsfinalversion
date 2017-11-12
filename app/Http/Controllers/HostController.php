@@ -90,6 +90,7 @@ class HostController extends Controller
       });
 
       if($GLOBALS['ping'] == 1){
+        //place code can be adding here
 
         SSH::into('ansible')->run(array(
           "rm /etc/ansible/tmp-hosts",
@@ -104,6 +105,7 @@ class HostController extends Controller
         $data['bywhat'] = $bywhat ;
 
         return view('loadingpage',$data);
+        //place code can be adding here
       }else{
 
         SSH::into('ansible')->run(array(
@@ -132,7 +134,7 @@ class HostController extends Controller
       }else{
         if(count($duplicatehost)>0){
           // echo "only host can't be use.";
-          $request->session()->flash('status', ' host duplicate');
+          $request->session()->flash('status', 'host duplicate');
           $request->session()->flash('title', 'Add Host Failed!');
           $request->session()->flash('text', 'Host aready exists, please use another.');
           $request->session()->flash('icon', 'error');
@@ -217,144 +219,290 @@ class HostController extends Controller
       //remote to ansible for keeping Password
     }else if($bywhat == "network-device"){
 
-      //Check connection of network-device
-      SSH::into('ansible')->run(array(
-        "touch /etc/ansible/tmp-hosts",
-        "echo [$servername] | sudo tee --a /etc/ansible/tmp-hosts",
-        "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/tmp-hosts",
-      ));
+      $duplicateservername  = DB::table('hosts')
+      ->join('controls', 'hosts.id', '=', 'controls.host_id')
+      ->where('controls.user_id', $user_id)
+      ->where('hosts.servername', $servername)
+      ->where('controls.control_type', $bywhat)
+      ->get();
 
-      $GLOBALS['ping'] = 0;
+      $duplicatehost  = DB::table('hosts')
+      ->join('controls', 'hosts.id', '=', 'controls.host_id')
+      ->where('controls.user_id', $user_id)
+      ->where('hosts.host', $host)
+      ->where('controls.control_type', $bywhat)
+      ->get();
 
-      SSH::into('ansible')->run(array(
-        "ansible -i /etc/ansible/tmp-hosts $servername -m raw -a 'show startup-config'",
-      ), function($line){
-        if (strpos($line, 'SUCCESS') !== false) {
-          $GLOBALS['ping'] = 1;
-          // echo $GLOBALS['ping'];
-        }
-      });
+      if(count($duplicatehost)==0 && count($duplicateservername)==0){
 
-
-      if($GLOBALS['ping'] == 1){
-
-
-        $proj_name = str_random(20);
-
-        SSH::into('gitlab')->run(array(
-
-          "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' https://52.221.75.98/api/v4/projects",
-
-        ), function($line){
-
-          $GLOBALS['jsonArray'] = json_decode($line);
-          //
-          // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
-        });
-
-
-        $mknwdir = $GLOBALS['jsonArray']->name;
+        // return "This nw-dev name and host can be use.";
 
         SSH::into('ansible')->run(array(
-          "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
-          "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
-          //Create Directory for keeping network-device configuration
-          "mkdir -p /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
-          //Call ansible-playbook here!
-          // "touch /etc/ansible/users/$imp_token/nw-configs/$mknwdir/testconfig",
+          "touch /etc/ansible/tmp-hosts",
+          "echo [$servername] | sudo tee --a /etc/ansible/tmp-hosts",
+          "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/tmp-hosts",
         ));
 
+        $GLOBALS['ping'] = 0;
 
-        //Cisco Command
         SSH::into('ansible')->run(array(
-          "ansible -i /etc/ansible/users/$imp_token/nw-hosts $servername -m raw -a 'show startup-config'",
+          "ansible -i /etc/ansible/tmp-hosts $servername -m raw -a 'show startup-config'",
         ), function($line){
+          if (strpos($line, 'SUCCESS') !== false) {
+            $GLOBALS['ping'] = 1;
+            // echo $GLOBALS['ping'];
+          }
+        });
+
+        if($GLOBALS['ping'] == 1){
+          //Have Permission!
+
+          // return "You can backup configuration on network device.";
+
+          $repo_exist = DB::table('controls')
+          ->join('configs','controls.id', '=', 'configs.control_id')
+          ->join('hosts','hosts.id', '=', 'controls.host_id')
+          ->where('hosts.host', $host)
+          ->where('controls.user_id', '<>', $user_id)
+          ->get();
+
+          // return $repo_exist ;
+
+          if(count($repo_exist)==0){
+            //New!
+            $proj_name = str_random(20);
+
+            SSH::into('gitlab')->run(array(
+
+              "sudo curl --silent --request POST --header 'PRIVATE-TOKEN: $imp_token' --data 'name=$proj_name' https://52.221.75.98/api/v4/projects",
+
+            ), function($line){
+
+              $GLOBALS['jsonArray'] = json_decode($line);
+              //
+              // print_r("Project ID: ".$jsonArray->id.", Project Name(keygen): ".$jsonArray->name.", Project Path(.git): ".$jsonArray->path);
+            });
 
 
-          $imp_token = DB::table('users')->where('id', session('user_id'))->value('token');
-          $mknwdir = $GLOBALS['jsonArray']->name;
+            $mknwdir = $GLOBALS['jsonArray']->name;
+
+            SSH::into('ansible')->run(array(
+              "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
+              "echo $host ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
+              //Create Directory for keeping network-device configuration
+              "mkdir -p /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+              //Call ansible-playbook here!
+              // "touch /etc/ansible/users/$imp_token/nw-configs/$mknwdir/testconfig",
+            ));
+
+
+            //Cisco Command
+            SSH::into('ansible')->run(array(
+              "ansible -i /etc/ansible/users/$imp_token/nw-hosts $servername -m raw -a 'show startup-config'",
+            ), function($line){
+
+
+              $imp_token = DB::table('users')->where('id', session('user_id'))->value('token');
+              $mknwdir = $GLOBALS['jsonArray']->name;
+
+              SSH::into('ansible')->run(array(
+                "echo '$line' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+                "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+              ));
+
+            });
+
+            //Testing
+
+            $obj = new Host();
+            $obj->servername = $servername;
+            $obj->host = $host;
+            $obj->port = $port;
+            $obj->save();
+
+            $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+
+            $obj2 = new Control();
+            $obj2->username_ssh = $usrname;
+            $password_encrypted = Crypt::encryptString($password);
+            $obj2->password_ssh = $password_encrypted;
+            $obj2->control_type = "network-device";
+            $obj2->user_id = $user_id;
+            $obj2->host_id = $host->id ;
+            $obj2->group_id = 0 ;
+            $obj2->save();
+
+            $control_latest = DB::table('controls')->orderBy('id', 'desc')->first();
+            $control_id = $control_latest->id;
+
+            $obj = new Config();
+            $password_decrypted = Crypt::decryptString($password_encrypted);
+            $obj->configname = "The configuration of ".$servername;
+            $obj->configpath = "/etc/ansible/users/".$imp_token."/nw-configs"."/".$GLOBALS['jsonArray']->name."/config";
+            $repository = "https://".$username.":".$userpassword."@52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git";
+            // $encrypt_repository = Crypt::encryptString($repository);
+            $obj->repository = "52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git" ;
+            $obj->keygen = $GLOBALS['jsonArray']->name;
+            $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
+            $obj->control_id = $control_id;
+            $obj->save();
+
+            //Push first version of network-device configuration to gitlab repository
+
+
+            SSH::into('ansible')->run(array(
+              "git init /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"The configuration of $servername was initialized.\" &> /dev/null", //Add this.
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ push -u backupversion master &> /dev/null",//Add this.
+            ));
+
+            SSH::into('ansible')->run(array(
+              "rm /etc/ansible/tmp-hosts",
+            ));
+
+            return redirect('shownwdev');
+
+          }else{
+            //Already have!
+
+            $imp_token = DB::table('users')->where('id', session('user_id'))->value('token');
+
+            $repo_old = $repo_exist[0]->repository;
+            $keygen_old = $repo_exist[0]->keygen;
+            $gitprojid_old = $repo_exist[0]->gitlab_projid;
+            $owner_userid = DB::table('controls')->where('id', $repo_exist[0]->control_id)->value('user_id');
+            $owner_token = DB::table('users')->where('id', $owner_userid)->value('token');
+
+            $gituserid = DB::table('users')->where('id', $user_id)->value('gitlab_userid');
+
+            // return $owner_token." | ".$gituserid." | ".$gitprojid_old ;
+
+
+            SSH::into('ansible')->run(array(
+              //option -k is turning off check ca
+              "curl -k --request POST --header 'PRIVATE-TOKEN: $owner_token' --data 'user_id=$gituserid&access_level=40' https://52.221.75.98/api/v4/projects/$gitprojid_old/members",
+            ));
+
+            $obj = new Host();
+            $obj->servername = $servername;
+            $obj->host = $host;
+            $obj->port = $port;
+            $obj->save();
+
+            $host = DB::table('hosts')->orderBy('id', 'desc')->first();
+            $hostname = $host->host ;
+
+            $obj2 = new Control();
+            $obj2->username_ssh = $usrname;
+            $password_encrypted = Crypt::encryptString($password);
+            $obj2->password_ssh = $password_encrypted;
+            $obj2->control_type = "network-device";
+            $obj2->user_id = $user_id;
+            $obj2->host_id = $host->id ;
+            $obj2->group_id = 0 ;
+            $obj2->save();
+
+            $control_latest = DB::table('controls')->orderBy('id', 'desc')->first();
+            $control_id = $control_latest->id;
+
+            $obj = new Config();
+            $password_decrypted = Crypt::decryptString($password_encrypted);
+            $obj->configname = "The configuration of ".$servername;
+            $obj->configpath = "/etc/ansible/users/".$imp_token."/nw-configs"."/".$keygen_old."/config";
+            $repository = "https://".$username.":".$userpassword."@".$repo_old;
+            // $encrypt_repository = Crypt::encryptString($repository);
+            $obj->repository = $repo_old ;
+            $obj->keygen = $keygen_old;
+            $obj->gitlab_projid = $gitprojid_old;
+            $obj->control_id = $control_id;
+            $obj->save();
+
+            // return $repository ;
+
+
+            $mknwdir = $keygen_old;
+
+            SSH::into('ansible')->run(array(
+              "echo [$servername] | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
+              "echo $hostname ansible_ssh_user=$usrname ansible_ssh_pass=$password ansible_sudo_pass=$password ansible_ssh_port=$port | sudo tee --a /etc/ansible/users/$imp_token/nw-hosts",
+              //Create Directory for keeping network-device configuration
+              "mkdir -p /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+              //Call ansible-playbook here!
+              // "touch /etc/ansible/users/$imp_token/nw-configs/$mknwdir/testconfig",
+            ));
+
+            SSH::into('ansible')->run(array(
+              "git clone $repository /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false",
+              "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
+            ));
+
+            SSH::into('ansible')->run(array(
+              "rm /etc/ansible/tmp-hosts",
+            ));
+
+            return redirect('shownwdev');
+          }
+
+        }else{
 
           SSH::into('ansible')->run(array(
-            "echo '$line' > /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -i '1d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
-            "sed -ie '\$d' /etc/ansible/users/$imp_token/nw-configs/$mknwdir/config",
+            "rm /etc/ansible/tmp-hosts",
           ));
 
-        });
+          $request->session()->flash('status', 'servername duplicate');
+          $request->session()->flash('title', 'Add Host Failed!');
+          $request->session()->flash('text', 'Unable to connect this network-device, please check your information.');
+          $request->session()->flash('icon', 'error');
 
-        //Testing
+          return redirect('shownwdev');
 
-        $obj = new Host();
-        $obj->servername = $servername;
-        $obj->host = $host;
-        $obj->port = $port;
-        $obj->save();
-
-        $host = DB::table('hosts')->orderBy('id', 'desc')->first();
-
-        $obj2 = new Control();
-        $obj2->username_ssh = $usrname;
-        $password_encrypted = Crypt::encryptString($password);
-        $obj2->password_ssh = $password_encrypted;
-        $obj2->control_type = "network-device";
-        $obj2->user_id = $user_id;
-        $obj2->host_id = $host->id ;
-        $obj2->group_id = 0 ;
-        $obj2->save();
-
-        $control_latest = DB::table('controls')->orderBy('id', 'desc')->first();
-        $control_id = $control_latest->id;
-
-        $obj = new Config();
-        $password_decrypted = Crypt::decryptString($password_encrypted);
-        $obj->configname = "The configuration of ".$servername;
-        $obj->configpath = "/etc/ansible/users/".$imp_token."/nw-configs"."/".$GLOBALS['jsonArray']->name."/config";
-        $repository = "https://".$username.":".$userpassword."@52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git";
-        // $encrypt_repository = Crypt::encryptString($repository);
-        $obj->repository = "52.221.75.98/".$username."/".$GLOBALS['jsonArray']->path.".git" ;
-        $obj->keygen = $GLOBALS['jsonArray']->name;
-        $obj->gitlab_projid = $GLOBALS['jsonArray']->id;
-        $obj->control_id = $control_id;
-        $obj->save();
-
-        //Push first version of network-device configuration to gitlab repository
-
-
-        SSH::into('ansible')->run(array(
-          "git init /etc/ansible/users/$imp_token/nw-configs/$mknwdir",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.name \"$username\"",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config user.email \"$useremail\"",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ config --global http.sslVerify false",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ remote add backupversion \"$repository\"",
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ add ./config &> /dev/null",//Add this.
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ commit -m \"The configuration of $servername was initialized.\" &> /dev/null", //Add this.
-          "git --git-dir=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/.git --work-tree=/etc/ansible/users/$imp_token/nw-configs/$mknwdir/ push -u backupversion master &> /dev/null",//Add this.
-        ));
-
-        SSH::into('ansible')->run(array(
-          "rm /etc/ansible/tmp-hosts",
-        ));
-
-        return redirect('shownwdev');
+        }
 
       }else{
 
-        SSH::into('ansible')->run(array(
-          "rm /etc/ansible/tmp-hosts",
-        ));
+        if(count($duplicatehost)>0 && count($duplicateservername)>0){
+          // return "servername and host can't be use.";
 
-        $request->session()->flash('status', 'servername duplicate');
-        $request->session()->flash('title', 'Add Host Failed!');
-        $request->session()->flash('text', 'Unable to connect this network-device, please check your information.');
-        $request->session()->flash('icon', 'error');
+          $request->session()->flash('status', 'servername and host duplicate');
+          $request->session()->flash('title', 'Add Host Failed!');
+          $request->session()->flash('text', 'Network-device name and Host aready exists, please use another.');
+          $request->session()->flash('icon', 'error');
 
-        return redirect('shownwdev');
+          return redirect('shownwdev');
+        }else{
+          if(count($duplicatehost)>0){
+            // return "only host can't be use.";
+            $request->session()->flash('status', 'host duplicate');
+            $request->session()->flash('title', 'Add Host Failed!');
+            $request->session()->flash('text', 'Host aready exists, please use another.');
+            $request->session()->flash('icon', 'error');
 
+            return redirect('shownwdev');
+          }else if(count($duplicateservername)>0){
+            // return "only nw-dev name can't be use.";
+
+            $request->session()->flash('status', 'servername duplicate');
+            $request->session()->flash('title', 'Add Host Failed!');
+            $request->session()->flash('text', 'Network-device name aready exists, please use another.');
+            $request->session()->flash('icon', 'error');
+
+            return redirect('shownwdev');
+          }
+        }
       }
     }
   }
