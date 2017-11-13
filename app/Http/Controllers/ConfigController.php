@@ -492,8 +492,15 @@ class ConfigController extends Controller
         $request->session()->flash('icon', 'error');
 
         return Redirect::back();
-        
+
       }
+    }else{
+      $request->session()->flash('status', 'true');
+      $request->session()->flash('title', 'Failed!');
+      $request->session()->flash('text', 'please check your The configuration file extension (.cfg, .conf)');
+      $request->session()->flash('icon', 'error');
+
+      return Redirect::back();
     }
   }
 
